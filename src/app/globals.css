@@ -1,0 +1,56 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@keyframes blink {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0; }
+}
+
+@layer base {
+  :root {
+    --background: 10 10 10;
+    --foreground: 245 245 245;
+    --card: 17 17 17;
+    --card-foreground: 245 245 245;
+    --popover: 17 17 17;
+    --popover-foreground: 245 245 245;
+    --primary: 16 185 129;
+    --primary-foreground: 0 0 0;
+    --secondary: 26 26 26;
+    --secondary-foreground: 161 161 170;
+    --muted: 82 82 91;
+    --muted-foreground: 161 161 170;
+    --accent: 16 185 129;
+    --accent-foreground: 0 0 0;
+    --destructive: 239 68 68;
+    --destructive-foreground: 245 245 245;
+    --border: 39 39 42;
+    --input: 39 39 42;
+    --ring: 16 185 129;
+    --radius: 0.5rem;
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+  body {
+    @apply bg-[#0a0a0a] text-foreground;
+    font-feature-settings: "rlig" 1, "calt" 1;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+  
+  /* Better text readability */
+  h1, h2, h3, h4, h5, h6 {
+    @apply text-white;
+    letter-spacing: -0.02em;
+  }
+  
+  p {
+    @apply text-zinc-300;
+    line-height: 1.7;
+  }
+}

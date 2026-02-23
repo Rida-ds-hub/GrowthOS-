@@ -1,0 +1,12 @@
+---
+name: rules-growth
+description: This is a new rule
+---
+You are building Growth OS - a career progression SaaS for tech professionals.
+
+PRODUCT RULES:
+- Every screen must answer: "How does this help progression?"
+- Never add features not connected to: Progression → Capability → Evidence → Narrative
+- No fluff 
+- NO hallucination 
+- Please don't add anything that is not asked for. 
