@@ -1,5 +1,20 @@
 // Core types for GrowthOS
 
+export interface DataSourceContribution {
+  source: "github" | "linkedin" | "resume" | "website";
+  contribution: string;
+  impact: "high" | "medium" | "low";
+}
+
+export interface DomainScoreBreakdown {
+  score: number;
+  range: "excellent" | "strong" | "moderate" | "needs-improvement";
+  explanation: string;
+  evidence: string[];
+  dataContributions?: DataSourceContribution[];
+  nextSteps: string[];
+}
+
 export interface GapAnalysis {
   summary: string;
   readinessScore: number; // 0–100
@@ -10,6 +25,13 @@ export interface GapAnalysis {
     "Technical Depth": number;
     "Leadership & Influence": number;
   };
+  domainBreakdowns?: {
+    "System Design Maturity"?: DomainScoreBreakdown;
+    "Execution Scope"?: DomainScoreBreakdown;
+    "Communication & Visibility"?: DomainScoreBreakdown;
+    "Technical Depth"?: DomainScoreBreakdown;
+    "Leadership & Influence"?: DomainScoreBreakdown;
+  };
   gaps: Array<{
     domain: string;
     gap: "high" | "medium" | "low";
@@ -18,9 +40,41 @@ export interface GapAnalysis {
     closingAction: string;
   }>;
   plan: {
-    phase1: { label: string; theme: string; actions: string[] };
-    phase2: { label: string; theme: string; actions: string[] };
-    phase3: { label: string; theme: string; actions: string[] };
+    phase1: { 
+      label: string; 
+      theme: string; 
+      actions: string[];
+      specificTasks?: string[];
+      deliverables?: string[];
+    };
+    phase2: { 
+      label: string; 
+      theme: string; 
+      actions: string[];
+      specificTasks?: string[];
+      deliverables?: string[];
+    };
+    phase3: { 
+      label: string; 
+      theme: string; 
+      actions: string[];
+      specificTasks?: string[];
+      deliverables?: string[];
+    };
+  };
+  upskillingProjects?: Array<{
+    title: string;
+    description: string;
+    timeline: string;
+    skills: string[];
+    outcome: string;
+  }>;
+  postingStrategy?: {
+    frequency: string;
+    contentTypes: string[];
+    platforms: string[];
+    topics: string[];
+    nextPosts: string[];
   };
   promotionNarrative: string;
 }

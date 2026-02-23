@@ -34,21 +34,23 @@ export function Philosophy() {
   const cardRefs = [React.useRef<HTMLDivElement>(null), React.useRef<HTMLDivElement>(null), React.useRef<HTMLDivElement>(null)]
 
   return (
-    <section className="py-24 px-4">
-      <div className="max-w-6xl mx-auto">
+    <section className="relative py-32 px-4 bg-[#0a0a0a] border-b border-zinc-800 overflow-hidden">
+      {/* Subtle gradient overlay */}
+      <div className="absolute inset-0 bg-gradient-to-br from-emerald-500/5 via-transparent to-transparent pointer-events-none" />
+      <div className="max-w-6xl mx-auto relative z-10">
         {/* Features Title */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
-          transition={{ duration: 0.35 }}
-          className="text-center mb-4"
+          transition={{ duration: 0.5 }}
+          className="text-center mb-16"
         >
-          <h2 className="text-4xl md:text-5xl font-bold text-white mb-3">
-            Features
+          <h2 className="text-4xl md:text-5xl font-bold text-white mb-4">
+            Built for engineering professionals
           </h2>
-          <p className="text-zinc-400 text-lg max-w-2xl mx-auto">
-            Your career second brain. Currently offering Plan and Upskill. Brand features coming soon.
+          <p className="text-xl text-zinc-400 max-w-2xl mx-auto">
+            Structured progression tools that help you close the gap between where you are and where you want to be.
           </p>
         </motion.div>
 

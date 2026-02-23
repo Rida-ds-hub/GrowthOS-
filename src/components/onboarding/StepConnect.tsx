@@ -6,7 +6,8 @@ import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Card, CardContent } from "@/components/ui/card"
-import { Github, Linkedin, Check, ExternalLink } from "lucide-react"
+import { Github, Linkedin, Check, ExternalLink, FileText } from "lucide-react"
+import { Textarea } from "@/components/ui/textarea"
 
 interface StepConnectProps {
   onContinue: (data: {
@@ -24,7 +25,8 @@ export function StepConnect({ onContinue }: StepConnectProps) {
   const [linkedinConnected, setLinkedinConnected] = useState(false)
   const [websiteUrl, setWebsiteUrl] = useState("")
   const [githubUsername, setGithubUsername] = useState("")
-  const [linkedinUrl, setLinkedinUrl] = useState("")
+  const [linkedinManualData, setLinkedinManualData] = useState("")
+  const [showLinkedInManual, setShowLinkedInManual] = useState(false)
 
   useEffect(() => {
     // Load from localStorage
@@ -37,7 +39,8 @@ export function StepConnect({ onContinue }: StepConnectProps) {
           if (data.linkedinConnected) setLinkedinConnected(true)
           if (data.websiteUrl) setWebsiteUrl(data.websiteUrl)
           if (data.githubUsername) setGithubUsername(data.githubUsername)
-          if (data.linkedinUrl) setLinkedinUrl(data.linkedinUrl)
+          if (data.linkedinManualData) setLinkedinManualData(data.linkedinManualData)
+          if (data.showLinkedInManual) setShowLinkedInManual(data.showLinkedInManual)
         } catch {}
       }
     }
@@ -71,25 +74,16 @@ export function StepConnect({ onContinue }: StepConnectProps) {
     }
   }
 
-  const handleLinkedInConnect = () => {
-    // If authenticated, connect LinkedIn via OAuth
-    if (session) {
-      signIn("linkedin", { callbackUrl: "/onboarding" })
-    } else {
-      // For unauthenticated users, we'll use the URL input below
-      // Just focus on the input field
-      const input = document.getElementById("linkedin-url")
-      input?.focus()
-    }
-  }
+  // LinkedIn connection removed - only manual input allowed for authenticated users
 
   const handleContinue = () => {
     const continueData = {
       githubConnected: githubConnected || !!githubUsername.trim(),
-      linkedinConnected: linkedinConnected || !!linkedinUrl.trim(),
+      linkedinConnected: linkedinConnected || (session && !!linkedinManualData.trim()), // Only if authenticated
       websiteUrl: websiteUrl.trim() || undefined,
       githubUsername: githubUsername.trim() || undefined,
-      linkedinUrl: linkedinUrl.trim() || undefined,
+      // linkedinUrl removed - only manual data allowed
+      linkedinManualData: session ? (linkedinManualData.trim() || undefined) : undefined, // Only if authenticated
     }
     
     // Save to localStorage
@@ -176,59 +170,67 @@ export function StepConnect({ onContinue }: StepConnectProps) {
 
           {/* LinkedIn */}
           <div className="space-y-2">
-            <Label>LinkedIn</Label>
+            <Label>LinkedIn (Optional)</Label>
             {session ? (
-              // Authenticated: OAuth connection
-              <div className="flex items-center gap-3">
-                <Button
-                  type="button"
-                  onClick={handleLinkedInConnect}
-                  disabled={linkedinConnected}
-                  className={`
-                    flex-1 bg-zinc-950 border border-zinc-700 text-zinc-300 hover:bg-zinc-900 hover:border-emerald-500/50
-                    ${linkedinConnected && "opacity-50 cursor-not-allowed"}
-                  `}
-                >
-                  {linkedinConnected ? (
-                    <>
-                      <Check className="w-4 h-4 mr-2 text-emerald-500" />
-                      Connected
-                    </>
-                  ) : (
-                    <>
-                      <Linkedin className="w-4 h-4 mr-2" />
-                      Connect LinkedIn
-                    </>
-                  )}
-                </Button>
+              // Authenticated: Manual data input only
+              <div className="space-y-2">
+                {!showLinkedInManual ? (
+                  <>
+                    <div className="p-4 bg-zinc-950 border border-zinc-700 rounded-lg">
+                      <p className="text-sm text-zinc-300 mb-3">
+                        To comply with LinkedIn's Terms of Service, we only accept manually provided profile data.
+                      </p>
+                      <Button
+                        type="button"
+                        onClick={() => setShowLinkedInManual(true)}
+                        className="w-full bg-zinc-900 border border-zinc-700 text-zinc-300 hover:bg-zinc-800 hover:border-emerald-500/50"
+                      >
+                        <FileText className="w-4 h-4 mr-2" />
+                        Paste Your LinkedIn Profile Data
+                      </Button>
+                    </div>
+                  </>
+                ) : (
+                  <>
+                    <Textarea
+                      placeholder="Paste your LinkedIn profile information here (experience, education, skills, certifications, etc.)"
+                      value={linkedinManualData}
+                      onChange={(e) => setLinkedinManualData(e.target.value)}
+                      className="bg-zinc-950 border-zinc-700 text-white focus:border-emerald-500 min-h-[150px]"
+                    />
+                    <Button
+                      type="button"
+                      variant="ghost"
+                      onClick={() => setShowLinkedInManual(false)}
+                      className="w-full text-xs text-zinc-400 hover:text-zinc-300"
+                    >
+                      Cancel
+                    </Button>
+                  </>
+                )}
               </div>
             ) : (
-              // Unauthenticated: Profile URL input
-              <div className="flex items-center gap-3">
-                <Input
-                  id="linkedin-url"
-                  type="url"
-                  placeholder="Enter LinkedIn profile URL"
-                  value={linkedinUrl}
-                  onChange={(e) => setLinkedinUrl(e.target.value)}
-                  className="flex-1 bg-zinc-950 border-zinc-700 text-white focus:border-emerald-500"
-                />
-                {linkedinUrl && (
-                  <Button
-                    type="button"
-                    variant="outline"
-                    onClick={() => window.open(linkedinUrl, "_blank")}
-                    className="flex-shrink-0"
-                  >
-                    <ExternalLink className="w-4 h-4" />
-                  </Button>
-                )}
+              // Unauthenticated: Blocked
+              <div className="p-4 bg-zinc-950 border border-zinc-700 rounded-lg">
+                <div className="flex items-start gap-3">
+                  <div className="p-2 bg-amber-500/10 rounded">
+                    <Linkedin className="w-4 h-4 text-amber-500" />
+                  </div>
+                  <div className="flex-1">
+                    <p className="text-sm font-medium text-white mb-1">
+                      Sign in required
+                    </p>
+                    <p className="text-xs text-zinc-400">
+                      LinkedIn data can only be added after signing in. This ensures compliance with LinkedIn's Terms of Service. Gap analysis works great with just GitHub and Resume data.
+                    </p>
+                  </div>
+                </div>
               </div>
             )}
             <p className="text-xs text-zinc-400">
               {session
-                ? "Unlocks: Professional background, experience timeline, skills"
-                : "Enter your LinkedIn profile URL to analyze your professional background"}
+                ? "Manually paste your LinkedIn profile information. No automated scraping is performed."
+                : "LinkedIn data is optional. Sign in to add your profile information manually."}
             </p>
           </div>
 

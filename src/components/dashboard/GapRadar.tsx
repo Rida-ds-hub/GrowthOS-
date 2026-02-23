@@ -79,13 +79,19 @@ export function GapRadar({ gapAnalysis }: GapRadarProps) {
             </RadarChart>
           </ResponsiveContainer>
 
+          {/* Compact score cards - click to see full breakdown */}
           <div className="grid grid-cols-1 md:grid-cols-5 gap-3">
             {data.map((item) => {
               const severity = getGapSeverity(item.score)
               return (
                 <div
                   key={item.fullDomain}
-                  className="flex flex-col items-center gap-2 p-3 rounded-lg bg-zinc-950/50 border border-zinc-800"
+                  className="flex flex-col items-center gap-2 p-3 rounded-lg bg-zinc-950/50 border border-zinc-800 hover:border-emerald-500/30 transition-colors cursor-pointer"
+                  onClick={() => {
+                    // Scroll to detailed breakdown section
+                    const element = document.getElementById(`domain-${item.fullDomain.replace(/\s+/g, '-').toLowerCase()}`)
+                    element?.scrollIntoView({ behavior: 'smooth', block: 'start' })
+                  }}
                 >
                   <div className="text-center">
                     <div className="text-2xl font-bold text-white mb-1">

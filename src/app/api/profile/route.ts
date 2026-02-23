@@ -30,6 +30,11 @@ export async function POST(request: NextRequest) {
       years_exp: body.yearsExp || null,
       timeline: body.timeline || null,
       website_url: body.websiteUrl || null,
+      github_data_text: body.githubDataText || null,
+      linkedin_data: body.linkedinDataText || null,
+      resume_text: body.resumeText || null,
+      gap_analysis: body.gapAnalysis || null,
+      onboarding_complete: body.gapAnalysis ? true : false,
       updated_at: new Date().toISOString(),
     })
 

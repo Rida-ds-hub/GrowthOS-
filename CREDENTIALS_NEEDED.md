@@ -52,13 +52,39 @@ You'll need to create accounts and get keys for these services. I'll set up plac
 ### 3. LinkedIn OAuth App
 **Where:** https://www.linkedin.com/developers → Create App
 
-**Settings:**
-- Add redirect URL: `http://localhost:3000/api/auth/callback/linkedin`
-- Request product: **Sign In with LinkedIn using OpenID Connect**
+**IMPORTANT - Redirect URI Setup:**
+1. Go to your LinkedIn app → **Auth** tab
+2. Under **Redirect URLs**, add **EXACTLY** these URLs (case-sensitive, no trailing slashes):
+   - For local development: `http://localhost:3000/api/auth/callback/linkedin`
+   - If using port 3001: `http://localhost:3001/api/auth/callback/linkedin`
+   - For production: `https://yourdomain.com/api/auth/callback/linkedin`
+3. **Request product:** **Sign In with LinkedIn using OpenID Connect**
+4. Make sure to **Save** the redirect URLs
+
+**Common Issues:**
+- ❌ `http://localhost:3000/api/auth/callback/linkedin/` (trailing slash - WRONG)
+- ✅ `http://localhost:3000/api/auth/callback/linkedin` (no trailing slash - CORRECT)
+- Make sure the URL matches **exactly** what NextAuth uses
 
 **What to copy:**
-- `LINKEDIN_CLIENT_ID` - Client ID
-- `LINKEDIN_CLIENT_SECRET` - Client Secret
+- `LINKEDIN_CLIENT_ID` - Client ID (found in Auth tab)
+- `LINKEDIN_CLIENT_SECRET` - Client Secret (found in Auth tab, click "Show" to reveal)
+
+---
+
+### 3.5 LinkedIn Profile Data (Optional)
+**IMPORTANT:** No automated scraping is performed. LinkedIn data can only be added by authenticated users who manually paste their profile information.
+
+**How It Works:**
+- Users must sign in to add LinkedIn data
+- Users manually copy and paste their LinkedIn profile information
+- No automated scraping or API calls to LinkedIn
+- Fully compliant with LinkedIn's Terms of Service
+
+**Note:** 
+- LinkedIn profile data is **optional** for gap analysis
+- The system works perfectly with just GitHub and Resume data
+- Only authenticated users can add LinkedIn data (manual input only)
 
 ---
 
@@ -96,10 +122,11 @@ You'll need to create accounts and get keys for these services. I'll set up plac
 
 1. **Start here:** Generate `NEXTAUTH_SECRET` (can do immediately)
 2. **Gemini API** - Fastest to set up (just sign up and get key from https://aistudio.google.com/app/apikey)
-3. **Supabase** - Create project, get keys, run SQL schema
-4. **Google OAuth** - Create app in Google Cloud Console, get Client ID/Secret
-5. **GitHub OAuth** - Create app, get Client ID/Secret
-6. **LinkedIn OAuth** - Create app, get Client ID/Secret (may take longer for approval)
+3. **RapidAPI (LinkedIn)** - Sign up at https://rapidapi.com/, subscribe to LinkedIn Scraper API, get key (recommended for full LinkedIn analysis)
+4. **Supabase** - Create project, get keys, run SQL schema
+5. **Google OAuth** - Create app in Google Cloud Console, get Client ID/Secret
+6. **GitHub OAuth** - Create app, get Client ID/Secret
+7. **LinkedIn OAuth** - Create app, get Client ID/Secret (may take longer for approval)
 
 ---
 
@@ -112,5 +139,5 @@ Add them to `.env.local` file (I'll create the template). The app will work with
 ## ⚠️ Security Notes
 
 - Never commit `.env.local` to git (already in `.gitignore`)
-- `SUPABASE_SERVICE_ROLE_KEY` and `GEMINI_API_KEY` must stay server-side only
+- `SUPABASE_SERVICE_ROLE_KEY`, `GEMINI_API_KEY`, and `RAPIDAPI_KEY` must stay server-side only
 - For production: Update OAuth callback URLs to your Vercel domain

@@ -12,16 +12,16 @@ export function PlanTimeline({ gapAnalysis }: PlanTimelineProps) {
   if (!gapAnalysis || !gapAnalysis.plan) {
     return (
       <div className="space-y-4">
-        <h2 className="text-2xl font-semibold text-white mb-4">90-Day Plan</h2>
+        <h2 className="text-2xl font-semibold text-white mb-4">3-Phase Plan</h2>
         <p className="text-zinc-400">No plan data available</p>
       </div>
     )
   }
 
   const phases = [
-    { ...(gapAnalysis.plan.phase1 || { theme: "", actions: [] }), days: "Days 1-30" },
-    { ...(gapAnalysis.plan.phase2 || { theme: "", actions: [] }), days: "Days 31-60" },
-    { ...(gapAnalysis.plan.phase3 || { theme: "", actions: [] }), days: "Days 61-90" },
+    { ...(gapAnalysis.plan.phase1 || { theme: "", actions: [] }), label: gapAnalysis.plan.phase1?.label || "Phase 1" },
+    { ...(gapAnalysis.plan.phase2 || { theme: "", actions: [] }), label: gapAnalysis.plan.phase2?.label || "Phase 2" },
+    { ...(gapAnalysis.plan.phase3 || { theme: "", actions: [] }), label: gapAnalysis.plan.phase3?.label || "Phase 3" },
   ]
 
   // Determine current phase (simplified - would calculate from actual dates)
@@ -29,7 +29,33 @@ export function PlanTimeline({ gapAnalysis }: PlanTimelineProps) {
 
   return (
     <div className="space-y-4">
-      <h2 className="text-2xl font-semibold text-white mb-4">90-Day Plan</h2>
+      <h2 className="text-2xl font-semibold text-white mb-4">3-Phase Plan</h2>
+      
+      {/* Flow Diagram */}
+      <div className="flex items-center justify-center gap-2 md:gap-4 mb-6 py-4 overflow-x-auto">
+        {phases.map((phase, index) => (
+          <div key={index} className="flex items-center gap-2 md:gap-4 flex-shrink-0">
+            <div className="flex flex-col items-center">
+              <div className={`
+                w-12 h-12 md:w-16 md:h-16 rounded-full flex items-center justify-center text-xs md:text-sm font-semibold
+                ${index === 0 ? "bg-emerald-500 text-black" : "bg-zinc-800 text-zinc-300"}
+              `}>
+                {index + 1}
+              </div>
+              <div className="text-[10px] md:text-xs text-zinc-400 mt-1 md:mt-2 text-center max-w-[80px] md:max-w-[100px] leading-tight">
+                {phase.theme || `Phase ${index + 1}`}
+              </div>
+            </div>
+            {index < phases.length - 1 && (
+              <div className="flex items-center">
+                <div className="w-6 md:w-12 h-0.5 bg-emerald-500/50" />
+                <div className="w-0 h-0 border-l-[6px] md:border-l-[8px] border-l-emerald-500/50 border-t-[3px] md:border-t-[4px] border-t-transparent border-b-[3px] md:border-b-[4px] border-b-transparent" />
+              </div>
+            )}
+          </div>
+        ))}
+      </div>
+
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4 overflow-x-auto md:overflow-visible">
         {phases.map((phase, index) => {
           const isCurrentPhase = index === currentPhaseIndex
@@ -44,30 +70,73 @@ export function PlanTimeline({ gapAnalysis }: PlanTimelineProps) {
               <CardHeader className="pb-3">
                 <div className="flex items-center justify-between mb-2">
                   <CardTitle className="text-sm font-medium text-zinc-400 uppercase tracking-wide">
-                    {phase.days}
+                    {phase.label}
                   </CardTitle>
                   {isCurrentPhase && (
                     <span className="text-xs font-medium text-emerald-500">
-                      Current
+                      Start here
                     </span>
                   )}
                 </div>
-                <h3 className="text-lg font-semibold text-white">
+                <h3 className="text-base font-semibold text-white leading-tight">
                   {phase.theme}
                 </h3>
               </CardHeader>
-              <CardContent>
-                <ul className="space-y-2">
-                  {phase.actions.map((action, actionIndex) => (
-                    <li
-                      key={actionIndex}
-                      className="text-sm text-zinc-300 flex items-start gap-2"
-                    >
-                      <span className="text-emerald-500 mt-1">•</span>
-                      <span>{action}</span>
-                    </li>
-                  ))}
-                </ul>
+              <CardContent className="space-y-3">
+                {phase.specificTasks && phase.specificTasks.length > 0 ? (
+                  <div>
+                    <div className="text-xs font-medium text-emerald-400 uppercase tracking-wide mb-2">
+                      Moves You'll Make
+                    </div>
+                    <ul className="space-y-1.5">
+                      {phase.specificTasks.slice(0, 4).map((task, taskIndex) => (
+                        <li
+                          key={taskIndex}
+                          className="text-xs text-zinc-300 flex items-start gap-2 leading-relaxed"
+                        >
+                          <span className="text-emerald-500 mt-0.5 flex-shrink-0">→</span>
+                          <span>{task.replace(/^Task:\s*/i, '')}</span>
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+                ) : phase.actions && phase.actions.length > 0 ? (
+                  <div>
+                    <div className="text-xs font-medium text-emerald-400 uppercase tracking-wide mb-2">
+                      Moves You'll Make
+                    </div>
+                    <ul className="space-y-1.5">
+                      {phase.actions.slice(0, 4).map((action, actionIndex) => (
+                        <li
+                          key={actionIndex}
+                          className="text-xs text-zinc-300 flex items-start gap-2 leading-relaxed"
+                        >
+                          <span className="text-emerald-500 mt-0.5 flex-shrink-0">→</span>
+                          <span>{action}</span>
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+                ) : null}
+
+                {phase.deliverables && phase.deliverables.length > 0 && (
+                  <div className="pt-2 border-t border-zinc-800">
+                    <div className="text-xs font-medium text-blue-400 uppercase tracking-wide mb-2">
+                      This Phase's Deliverables
+                    </div>
+                    <ul className="space-y-1">
+                      {phase.deliverables.slice(0, 5).map((deliverable, delIndex) => (
+                        <li
+                          key={delIndex}
+                          className="text-xs text-zinc-300 flex items-start gap-2 leading-relaxed"
+                        >
+                          <span className="text-blue-400 mt-0.5 flex-shrink-0">✓</span>
+                          <span>{deliverable}</span>
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+                )}
               </CardContent>
             </Card>
           )

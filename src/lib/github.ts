@@ -50,29 +50,49 @@ export async function fetchGitHubRepos(accessToken: string): Promise<GitHubRepo[
 }
 
 export function formatGitHubData(profile: GitHubProfile, repos: GitHubRepo[]): string {
-  const languages = repos
-    .map(repo => repo.language)
+  // Handle null/undefined values safely
+  const safeRepos = repos || []
+  
+  const languages = safeRepos
+    .map(repo => repo?.language)
     .filter(Boolean)
     .reduce((acc: Record<string, number>, lang) => {
-      acc[lang] = (acc[lang] || 0) + 1
+      if (lang) {
+        acc[lang] = (acc[lang] || 0) + 1
+      }
       return acc
     }, {})
 
+  // Calculate account age safely
+  let accountAge = 0
+  if (profile?.created_at) {
+    try {
+      accountAge = new Date().getFullYear() - new Date(profile.created_at).getFullYear()
+    } catch {
+      accountAge = 0
+    }
+  }
+
   return JSON.stringify({
     profile: {
-      username: profile.login,
-      name: profile.name,
-      bio: profile.bio,
-      publicRepos: profile.public_repos,
-      followers: profile.followers,
-      accountAge: new Date().getFullYear() - new Date(profile.created_at).getFullYear(),
+      username: profile?.login || 'N/A',
+      name: profile?.name || null,
+      bio: profile?.bio || null,
+      publicRepos: profile?.public_repos || 0,
+      followers: profile?.followers || 0,
+      following: profile?.following || 0,
+      accountAge: accountAge,
+      location: (profile as any)?.location || null,
+      company: (profile as any)?.company || null,
+      blog: (profile as any)?.blog || null,
     },
-    recentRepos: repos.slice(0, 10).map(repo => ({
-      name: repo.name,
-      description: repo.description,
-      language: repo.language,
-      stars: repo.stargazers_count,
-      forks: repo.forks_count,
+    recentRepos: safeRepos.slice(0, 10).map(repo => ({
+      name: repo?.name || 'N/A',
+      description: repo?.description || null,
+      language: repo?.language || null,
+      stars: repo?.stargazers_count || 0,
+      forks: repo?.forks_count || 0,
+      updated_at: repo?.updated_at || null,
     })),
     languages,
   }, null, 2)

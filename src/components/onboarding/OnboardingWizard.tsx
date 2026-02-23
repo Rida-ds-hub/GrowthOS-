@@ -16,11 +16,14 @@ interface OnboardingData {
   targetRole?: string
   yearsExp?: number
   timeline?: string
+  progressionIntent?: "same_company" | "new_company" | "founder" | "pivot"
   githubConnected?: boolean
   linkedinConnected?: boolean
   websiteUrl?: string
   githubUsername?: string
+  githubDataText?: string
   linkedinUrl?: string
+  linkedinDataText?: string
   resumeText?: string
   gapAnalysis?: any
 }
@@ -64,6 +67,7 @@ export function OnboardingWizard() {
     targetRole: string
     yearsExp: number
     timeline: string
+    progressionIntent: "same_company" | "new_company" | "founder" | "pivot"
   }) => {
     setData((prev) => ({ ...prev, ...stepData }))
     setCurrentStep(2)
@@ -74,7 +78,8 @@ export function OnboardingWizard() {
     linkedinConnected: boolean
     websiteUrl?: string
     githubUsername?: string
-    linkedinUrl?: string
+    linkedinUrl?: string // Deprecated - no longer used
+    linkedinManualData?: string
   }) => {
     setData((prev) => ({ ...prev, ...stepData }))
     setCurrentStep(3)
@@ -127,10 +132,13 @@ export function OnboardingWizard() {
       // Wait until "Mapping gaps" message timing (4.8s total)
       await new Promise((resolve) => setTimeout(resolve, 1800))
 
-      // Prepare LinkedIn text (we can't scrape it, but we can mention the profile URL)
+      // Process LinkedIn data if manually provided (authenticated users only)
       let linkedinText = ""
-      if (analysisData.linkedinUrl) {
-        linkedinText = `LinkedIn Profile: ${analysisData.linkedinUrl}\nNote: Full profile details require authentication.`
+      if (analysisData.linkedinManualData && session) {
+        // Use manual data directly (only for authenticated users)
+        setAnalysisStatus("Processing LinkedIn data...")
+        await new Promise((resolve) => setTimeout(resolve, 1000))
+        linkedinText = analysisData.linkedinManualData
       }
 
       // Trigger gap analysis (this happens during "Mapping gaps" message)
@@ -142,6 +150,7 @@ export function OnboardingWizard() {
           targetRole: analysisData.targetRole,
           yearsExperience: analysisData.yearsExp,
           timeline: analysisData.timeline,
+          progressionIntent: analysisData.progressionIntent || "same_company",
           githubData,
           resumeText: analysisData.resumeText || "",
           linkedinText,
@@ -184,7 +193,12 @@ export function OnboardingWizard() {
       console.log("OnboardingWizard - Has domainScores?", !!gapAnalysisData?.domainScores)
       console.log("OnboardingWizard - DomainScores:", gapAnalysisData?.domainScores)
       
-      const updatedData = { ...analysisData, gapAnalysis: gapAnalysisData }
+      const updatedData = { 
+        ...analysisData, 
+        gapAnalysis: gapAnalysisData,
+        githubDataText: githubData || undefined,
+        linkedinDataText: linkedinText || undefined,
+      }
       setData(updatedData)
       
       // Debug: log the final structure
@@ -228,6 +242,10 @@ export function OnboardingWizard() {
             yearsExp: analysisData.yearsExp,
             timeline: analysisData.timeline,
             websiteUrl: analysisData.websiteUrl,
+            githubDataText: analysisData.githubDataText,
+            linkedinDataText: analysisData.linkedinDataText,
+            resumeText: analysisData.resumeText,
+            gapAnalysis: analysisData.gapAnalysis,
           }),
         })
 
@@ -242,7 +260,8 @@ export function OnboardingWizard() {
   }
 
   const handleSignUpSuccess = async () => {
-    // After sign-up, save the stored data to database
+    // After sign-up, wait a moment for session to be established, then save the stored data to database
+    await new Promise((resolve) => setTimeout(resolve, 1000))
     await saveToDatabase(data)
     router.push("/dashboard")
   }
@@ -273,6 +292,10 @@ export function OnboardingWizard() {
       <>
         <ResultsShare
           analysisResult={data.gapAnalysis || data}
+          githubData={data.githubDataText || undefined}
+          linkedinData={data.linkedinDataText || data.linkedinManualData || undefined}
+          resumeText={data.resumeText || undefined}
+          websiteUrl={data.websiteUrl || undefined}
           onSignUp={() => setIsSignUpModalOpen(true)}
         />
         <SignUpModal
@@ -310,7 +333,7 @@ export function OnboardingWizard() {
               exit={{ opacity: 0, x: -20 }}
               transition={{ duration: 0.35 }}
             >
-              <StepGoal onContinue={handleStep1Continue} />
+              <StepGoal onContinue={handleStep1Continue} initialData={data} />
             </motion.div>
           )}
 

@@ -35,14 +35,17 @@ export function Hero() {
   const glowPulse = useTransform(scrollYProgress, [0, 0.3], [1, 1.2])
 
   return (
-    <section className="relative min-h-screen flex items-center justify-center overflow-hidden pt-16">
+    <section className="relative min-h-[90vh] flex items-center justify-center overflow-hidden pt-20 pb-16 border-b border-zinc-800">
+      {/* Subtle background gradient */}
+      <div className="absolute inset-0 bg-gradient-to-b from-zinc-900/50 via-[#0a0a0a] to-[#0a0a0a]" />
+      
       {/* Orbiting orbs around hero - universe effect */}
       <OrbitingOrbs />
 
       {/* Content */}
-      <div className="relative z-10 text-center px-4 max-w-4xl mx-auto">
+      <div className="relative z-10 text-center px-4 max-w-5xl mx-auto">
         <motion.h1
-          className="text-5xl md:text-7xl font-bold mb-6 leading-tight relative"
+          className="text-5xl md:text-6xl lg:text-7xl font-bold mb-6 leading-tight relative"
           initial="hidden"
           animate="visible"
         >
@@ -79,7 +82,7 @@ export function Hero() {
         </motion.h1>
 
         <motion.p
-          className="text-xl md:text-2xl text-zinc-300 mb-8 font-light"
+          className="text-xl md:text-2xl text-zinc-400 mb-10 font-light max-w-2xl mx-auto"
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.5, duration: 0.35 }}
@@ -92,7 +95,7 @@ export function Hero() {
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.7, duration: 0.35 }}
-          className="flex flex-col sm:flex-row items-center justify-center gap-3 relative"
+          className="flex flex-col items-center justify-center gap-4 relative"
         >
           <div className="relative inline-block">
             {/* Traveling perimeter glow */}
@@ -102,14 +105,14 @@ export function Hero() {
             <Button 
               size="lg" 
               onClick={handleStartJourney}
-              className="relative z-10 bg-emerald-500 text-zinc-100 hover:bg-emerald-400 font-semibold shadow-lg shadow-emerald-500/50"
+              className="relative z-10 bg-emerald-500 text-zinc-100 hover:bg-emerald-400 font-semibold shadow-lg shadow-emerald-500/50 px-8 py-6 text-lg"
             >
-              Start your journey →
+              Run your gap analysis free →
             </Button>
           </div>
+          <p className="text-sm text-white">No credit card required</p>
         </motion.div>
       </div>
-
     </section>
   )
 }

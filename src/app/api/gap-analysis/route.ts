@@ -54,6 +54,7 @@ export async function POST(request: NextRequest) {
       targetRole,
       yearsExperience,
       timeline,
+      progressionIntent,
       githubData,
       resumeText,
       linkedinText,
@@ -71,6 +72,7 @@ export async function POST(request: NextRequest) {
       targetRole: cappedTargetRole,
       yearsExperience: yearsExperience || 0,
       timeline: timeline || "",
+      progressionIntent: progressionIntent || "same_company",
       githubData: cappedGithubData,
       resumeText: cappedResumeText,
       linkedinText: cappedLinkedinText,
@@ -118,10 +120,104 @@ export async function POST(request: NextRequest) {
     }
 
     // Strip markdown code fences
-    const cleanedResponse = rawResponse
+    let cleanedResponse = rawResponse
       .replace(/```json\n?/g, "")
       .replace(/```\n?/g, "")
       .trim()
+
+    // Fix common JSON issues from AI responses
+    // Remove trailing commas before closing braces/brackets (multiple passes for nested structures)
+    for (let i = 0; i < 5; i++) {
+      cleanedResponse = cleanedResponse.replace(/,(\s*[}\]])/g, '$1')
+    }
+    
+    // Fix promotionNarrative if it's incorrectly nested inside plan
+    // The issue: "plan": { ... "promotionNarrative": ... } should be "plan": { ... }, "promotionNarrative": ...
+    if (cleanedResponse.includes('"plan"') && cleanedResponse.includes('"promotionNarrative"')) {
+      // Find the start of promotionNarrative
+      const promoStart = cleanedResponse.indexOf('"promotionNarrative"')
+      if (promoStart !== -1) {
+        // Find the opening quote of the value
+        const valueStart = cleanedResponse.indexOf('"', promoStart + '"promotionNarrative"'.length) + 1
+        if (valueStart > 0) {
+          // Parse the string value manually (handling escaped quotes)
+          let valueEnd = valueStart
+          let escapeNext = false
+          for (let i = valueStart; i < cleanedResponse.length; i++) {
+            if (escapeNext) {
+              escapeNext = false
+              continue
+            }
+            if (cleanedResponse[i] === '\\') {
+              escapeNext = true
+              continue
+            }
+            if (cleanedResponse[i] === '"') {
+              valueEnd = i
+              break
+            }
+          }
+          
+          if (valueEnd > valueStart) {
+            const promotionValue = cleanedResponse.substring(valueStart, valueEnd)
+            // Remove the incorrectly placed promotionNarrative (including any leading comma/whitespace)
+            const promoEnd = valueEnd + 1
+            const beforePromo = cleanedResponse.substring(0, promoStart)
+            const afterPromo = cleanedResponse.substring(promoEnd)
+            // Remove trailing comma if present
+            const cleanedBefore = beforePromo.replace(/,\s*$/, '')
+            cleanedResponse = cleanedBefore + afterPromo.replace(/^,?\s*/, '')
+            
+            // Find where plan object ends
+            const planStartIdx = cleanedResponse.indexOf('"plan"')
+            if (planStartIdx !== -1) {
+              let braceCount = 0
+              let inString = false
+              let escapeNext = false
+              let planEndIdx = -1
+              
+              const planOpenBrace = cleanedResponse.indexOf('{', planStartIdx)
+              if (planOpenBrace !== -1) {
+                for (let i = planOpenBrace; i < cleanedResponse.length; i++) {
+                  const char = cleanedResponse[i]
+                  if (escapeNext) {
+                    escapeNext = false
+                    continue
+                  }
+                  if (char === '\\') {
+                    escapeNext = true
+                    continue
+                  }
+                  if (char === '"') {
+                    inString = !inString
+                    continue
+                  }
+                  if (!inString) {
+                    if (char === '{') braceCount++
+                    if (char === '}') {
+                      braceCount--
+                      if (braceCount === 0) {
+                        planEndIdx = i
+                        break
+                      }
+                    }
+                  }
+                }
+                
+                if (planEndIdx !== -1) {
+                  // Insert promotionNarrative after plan closes
+                  const beforePlan = cleanedResponse.substring(0, planEndIdx + 1)
+                  const afterPlan = cleanedResponse.substring(planEndIdx + 1).replace(/^,?\s*/, '')
+                  // Properly escape the value
+                  const escapedValue = promotionValue.replace(/\\/g, '\\\\').replace(/"/g, '\\"').replace(/\n/g, '\\n').replace(/\r/g, '\\r')
+                  cleanedResponse = beforePlan + ', "promotionNarrative": "' + escapedValue + '"' + (afterPlan.startsWith('}') ? '' : ',') + afterPlan
+                }
+              }
+            }
+          }
+        }
+      }
+    }
 
     let gapAnalysis: GapAnalysis
     try {
@@ -129,13 +225,48 @@ export async function POST(request: NextRequest) {
       console.log("API: Successfully parsed gapAnalysis")
       console.log("API: Has domainScores?", !!gapAnalysis.domainScores)
       console.log("API: DomainScores keys:", gapAnalysis.domainScores ? Object.keys(gapAnalysis.domainScores) : "none")
-    } catch (parseError) {
+    } catch (parseError: any) {
       console.error("API: Failed to parse AI response:", parseError)
-      console.error("API: Cleaned response:", cleanedResponse)
-      return NextResponse.json(
-        { error: "Failed to parse analysis response" },
-        { status: 500 }
-      )
+      console.error("API: Parse error at position:", parseError.message)
+      console.error("API: Cleaned response (last 500 chars):", cleanedResponse.slice(-500))
+      
+      // Try to extract JSON more aggressively
+      try {
+        // Find the first { and last } to extract JSON
+        const firstBrace = cleanedResponse.indexOf('{')
+        const lastBrace = cleanedResponse.lastIndexOf('}')
+        if (firstBrace !== -1 && lastBrace !== -1 && lastBrace > firstBrace) {
+          const jsonCandidate = cleanedResponse.substring(firstBrace, lastBrace + 1)
+          // Remove trailing commas more aggressively
+          const fixedJson = jsonCandidate.replace(/,(\s*[}\]])/g, '$1')
+          gapAnalysis = JSON.parse(fixedJson)
+          console.log("API: Successfully parsed after aggressive cleanup")
+        } else {
+          throw new Error("Could not extract JSON structure")
+        }
+      } catch (secondAttemptError) {
+        console.error("API: Second parse attempt also failed:", secondAttemptError)
+        console.error("API: Full cleaned response length:", cleanedResponse.length)
+        console.error("API: First 1000 chars:", cleanedResponse.substring(0, 1000))
+        console.error("API: Last 1000 chars:", cleanedResponse.substring(Math.max(0, cleanedResponse.length - 1000)))
+        
+        // Try to save the problematic response for debugging
+        const errorPosition = parseError.message?.match(/position (\d+)/)?.[1]
+        if (errorPosition) {
+          const pos = parseInt(errorPosition)
+          console.error("API: Error at position", pos)
+          console.error("API: Context around error:", cleanedResponse.substring(Math.max(0, pos - 100), pos + 100))
+        }
+        
+        return NextResponse.json(
+          { 
+            error: "Failed to parse analysis response. The AI may have returned malformed JSON.",
+            details: parseError.message,
+            responseLength: cleanedResponse.length
+          },
+          { status: 500 }
+        )
+      }
     }
 
     // Validate all 5 domainScores keys exist
@@ -167,6 +298,11 @@ export async function POST(request: NextRequest) {
           gap_analysis: gapAnalysis,
           onboarding_complete: true,
           updated_at: new Date().toISOString(),
+          // Store source data for display in dashboard
+          // Note: github_data might be jsonb in schema, so we use github_data_text
+          github_data_text: cappedGithubData || null,
+          linkedin_data: cappedLinkedinText || null,
+          resume_text: cappedResumeText || null,
         })
 
       if (updateError) {

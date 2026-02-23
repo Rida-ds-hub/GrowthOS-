@@ -67,12 +67,6 @@ export function EmailSignUp({ onSuccess, onSwitchToSignIn }: EmailSignUpProps) {
 
   return (
     <form onSubmit={handleSubmit} className="space-y-4">
-      {error && (
-        <div className="p-3 bg-red-500/10 border border-red-500/20 rounded-lg text-sm text-red-400">
-          {error}
-        </div>
-      )}
-
       <div className="space-y-2">
         <Label htmlFor="signup-email">Email</Label>
         <div className="relative">
@@ -122,6 +116,12 @@ export function EmailSignUp({ onSuccess, onSwitchToSignIn }: EmailSignUpProps) {
           />
         </div>
       </div>
+
+      {error && (
+        <div className="p-3 bg-red-500/10 border border-red-500/20 rounded-lg text-sm text-red-400 -mt-2">
+          {error}
+        </div>
+      )}
 
       <Button
         type="submit"

@@ -6,9 +6,14 @@ import { AnimatedHeader } from "@/components/landing/AnimatedHeader"
 import { ReadinessScore } from "@/components/dashboard/ReadinessScore"
 import { SummaryCard } from "@/components/dashboard/SummaryCard"
 import { GapRadar } from "@/components/dashboard/GapRadar"
+import { DomainBreakdowns } from "@/components/dashboard/DomainBreakdowns"
+import { DataToScoreMapping } from "@/components/dashboard/DataToScoreMapping"
 import { GapCards } from "@/components/dashboard/GapCards"
 import { PlanTimeline } from "@/components/dashboard/PlanTimeline"
+import { UpskillingProjects } from "@/components/dashboard/UpskillingProjects"
+import { PostingStrategy } from "@/components/dashboard/PostingStrategy"
 import { PromotionNarrative } from "@/components/dashboard/PromotionNarrative"
+import { DataSources } from "@/components/dashboard/DataSources"
 import { LockedSection } from "@/components/dashboard/LockedSection"
 import { FeedbackWidget } from "@/components/dashboard/FeedbackWidget"
 import { GapAnalysis } from "@/lib/types"
@@ -77,22 +82,48 @@ export default async function DashboardPage() {
 
       {/* Dashboard content */}
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-8">
-        {/* Section A - Summary Card */}
+        {/* Section A - Data Sources */}
+        <DataSources
+          githubData={profile.github_data_text || profile.github_data}
+          linkedinData={profile.linkedin_data || profile.linkedin_raw}
+          resumeText={profile.resume_text || profile.resume_raw}
+          websiteUrl={profile.website_url}
+        />
+
+        {/* Section B - Summary Card */}
         <SummaryCard gapAnalysis={profile.gap_analysis as GapAnalysis} />
 
-        {/* Section B - Gap Radar */}
+        {/* Section C - Gap Radar */}
         <GapRadar gapAnalysis={profile.gap_analysis as GapAnalysis} />
 
-        {/* Section C - Gap Detail Cards */}
+        {/* Section D - Domain Score Breakdowns */}
+        <DomainBreakdowns gapAnalysis={profile.gap_analysis as GapAnalysis} />
+
+        {/* Section D.5 - Data to Score Mapping */}
+        <DataToScoreMapping
+          gapAnalysis={profile.gap_analysis as GapAnalysis}
+          githubData={profile.github_data_text || profile.github_data}
+          linkedinData={profile.linkedin_data || profile.linkedin_raw}
+          resumeText={profile.resume_text || profile.resume_raw}
+          websiteUrl={profile.website_url}
+        />
+
+        {/* Section E - Gap Detail Cards */}
         <GapCards gapAnalysis={profile.gap_analysis as GapAnalysis} />
 
-        {/* Section D - 90-Day Plan */}
+        {/* Section F - 90-Day Plan */}
         <PlanTimeline gapAnalysis={profile.gap_analysis as GapAnalysis} />
 
-        {/* Section E - Promotion Narrative */}
+        {/* Section G - Upskilling Projects */}
+        <UpskillingProjects gapAnalysis={profile.gap_analysis as GapAnalysis} />
+
+        {/* Section H - Posting Strategy */}
+        <PostingStrategy gapAnalysis={profile.gap_analysis as GapAnalysis} />
+
+        {/* Section I - Promotion Narrative */}
         <PromotionNarrative gapAnalysis={profile.gap_analysis as GapAnalysis} />
 
-        {/* Section F - Locked Sections */}
+        {/* Section G - Locked Sections */}
         <div className="space-y-4">
           <h2 className="text-2xl font-semibold text-primary mb-4">Coming Soon</h2>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">

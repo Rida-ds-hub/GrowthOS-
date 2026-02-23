@@ -1,6 +1,7 @@
 "use client"
 
-import { useState } from "react"
+import { useState, useEffect } from "react"
+import { createPortal } from "react-dom"
 import { signIn } from "next-auth/react"
 import { motion, AnimatePresence } from "framer-motion"
 import { X, Github, Linkedin, Mail as MailIcon } from "lucide-react"
@@ -18,6 +19,11 @@ export function SignInModal({ isOpen, onClose, callbackUrl = "/onboarding" }: Si
   const [isLoading, setIsLoading] = useState<string | null>(null)
   const [showEmailForm, setShowEmailForm] = useState(false)
   const [isSignUp, setIsSignUp] = useState(false)
+  const [mounted, setMounted] = useState(false)
+
+  useEffect(() => {
+    setMounted(true)
+  }, [])
 
   const handleSignIn = async (provider: string) => {
     setIsLoading(provider)
@@ -35,18 +41,33 @@ export function SignInModal({ isOpen, onClose, callbackUrl = "/onboarding" }: Si
     window.location.href = callbackUrl
   }
 
-  if (!isOpen) return null
+  if (!isOpen || !mounted) return null
 
-  return (
-    <AnimatePresence>
-      <div className="fixed inset-0 z-[100] flex items-center justify-center p-4">
+  const modalContent = (
+    <AnimatePresence mode="wait">
+      <motion.div
+        key="modal"
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        exit={{ opacity: 0 }}
+        className="fixed inset-0 z-[9999] flex items-center justify-center p-4 overflow-y-auto"
+        style={{ 
+          position: 'fixed', 
+          top: 0, 
+          left: 0, 
+          right: 0, 
+          bottom: 0,
+          pointerEvents: 'auto'
+        }}
+        onClick={onClose}
+      >
         {/* Backdrop */}
         <motion.div
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}
-          onClick={onClose}
-          className="absolute inset-0 bg-black/60 backdrop-blur-sm"
+          className="fixed inset-0 bg-black/60 backdrop-blur-sm"
+          style={{ position: 'fixed', top: 0, left: 0, right: 0, bottom: 0 }}
         />
 
         {/* Modal */}
@@ -54,8 +75,9 @@ export function SignInModal({ isOpen, onClose, callbackUrl = "/onboarding" }: Si
           initial={{ opacity: 0, scale: 0.95, y: 20 }}
           animate={{ opacity: 1, scale: 1, y: 0 }}
           exit={{ opacity: 0, scale: 0.95, y: 20 }}
-          className="relative bg-zinc-900 border border-zinc-800 rounded-2xl p-8 max-w-md w-full"
+          className="relative bg-zinc-900 border border-zinc-800 rounded-2xl p-8 max-w-md w-full z-[10000] my-auto"
           onClick={(e) => e.stopPropagation()}
+          style={{ position: 'relative', marginTop: 'auto', marginBottom: 'auto' }}
         >
           <button
             onClick={onClose}
@@ -157,7 +179,9 @@ export function SignInModal({ isOpen, onClose, callbackUrl = "/onboarding" }: Si
                 </>
               )}
         </motion.div>
-      </div>
+      </motion.div>
     </AnimatePresence>
   )
+
+  return createPortal(modalContent, document.body)
 }

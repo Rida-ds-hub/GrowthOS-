@@ -12,16 +12,19 @@ const items = [
 
 export function WhatItIsNot() {
   return (
-    <section className="py-24 px-4">
+    <section className="py-32 px-4 bg-[#0a0a0a] border-b border-zinc-800">
       <div className="max-w-6xl mx-auto">
-        <h2 className="text-3xl md:text-4xl font-bold text-primary mb-12 text-center">
-          What This Is Not
+        <h2 className="text-4xl md:text-5xl font-bold text-white mb-4 text-center">
+          What this is not
         </h2>
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+        <p className="text-xl text-zinc-400 mb-12 text-center max-w-2xl mx-auto">
+          Clarity on what Growth OS is and isn't.
+        </p>
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {items.map((item, index) => (
-            <Card key={index} className="p-6 bg-zinc-900/50 border-zinc-800">
-              <div className="text-zinc-500 line-through mb-2">{item.not}</div>
-              <div className="text-emerald-400 font-medium">{item.is}</div>
+            <Card key={index} className="p-6 bg-zinc-900/50 border-zinc-800 hover:border-zinc-700 transition-colors">
+              <div className="text-zinc-500 line-through mb-3 text-sm">{item.not}</div>
+              <div className="text-zinc-300 font-medium">{item.is}</div>
             </Card>
           ))}
         </div>

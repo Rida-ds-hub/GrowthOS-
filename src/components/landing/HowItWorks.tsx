@@ -12,25 +12,38 @@ const steps = [
 
 export function HowItWorks() {
   return (
-    <section className="py-24 px-4 bg-zinc-950">
-      <div className="max-w-4xl mx-auto">
-        <h2 className="text-3xl md:text-4xl font-bold text-primary mb-12 text-center">
-          How It Works
-        </h2>
-        <div className="space-y-6">
+    <section className="relative py-32 px-4 bg-[#0a0a0a] border-b border-zinc-800 overflow-hidden">
+      {/* Subtle gradient overlay */}
+      <div className="absolute inset-0 bg-gradient-to-bl from-transparent via-emerald-500/5 to-transparent pointer-events-none" />
+      <div className="max-w-4xl mx-auto relative z-10">
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true }}
+          transition={{ duration: 0.5 }}
+          className="text-center mb-16"
+        >
+          <h2 className="text-4xl md:text-5xl font-bold text-white mb-4">
+            How it works
+          </h2>
+          <p className="text-xl text-zinc-400 max-w-2xl mx-auto">
+            Get your personalized gap analysis in minutes. No sign-up required.
+          </p>
+        </motion.div>
+        <div className="space-y-8">
           {steps.map((step, index) => (
             <motion.div
               key={index}
-              className="flex items-start gap-4"
+              className="flex items-start gap-6"
               initial={{ opacity: 0, x: -20 }}
               whileInView={{ opacity: 1, x: 0 }}
               viewport={{ once: true }}
-              transition={{ duration: 0.35, delay: index * 0.1 }}
+              transition={{ duration: 0.5, delay: index * 0.1 }}
             >
-              <div className="flex-shrink-0 w-8 h-8 rounded-full bg-emerald-500/20 border border-emerald-500/40 flex items-center justify-center text-emerald-400 font-semibold text-sm">
+              <div className="flex-shrink-0 w-10 h-10 rounded-lg bg-emerald-500/10 border border-emerald-500/20 flex items-center justify-center text-emerald-400 font-semibold">
                 {index + 1}
               </div>
-              <p className="text-lg text-zinc-300 pt-1">{step}</p>
+              <p className="text-lg text-zinc-300 pt-2 leading-relaxed">{step}</p>
             </motion.div>
           ))}
         </div>

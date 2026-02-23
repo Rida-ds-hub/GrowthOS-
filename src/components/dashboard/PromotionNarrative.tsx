@@ -13,7 +13,7 @@ export function PromotionNarrative({ gapAnalysis }: PromotionNarrativeProps) {
       <Card className="bg-zinc-950 border-zinc-800 rounded-2xl">
         <CardHeader className="pb-3">
           <CardTitle className="text-lg font-semibold text-white">
-            Your Promotion Story
+            Your Progression Story
           </CardTitle>
         </CardHeader>
         <CardContent>
@@ -27,7 +27,7 @@ export function PromotionNarrative({ gapAnalysis }: PromotionNarrativeProps) {
     <Card className="bg-zinc-950 border-zinc-800 rounded-2xl">
       <CardHeader className="pb-3">
         <CardTitle className="text-lg font-semibold text-white">
-          Your Promotion Story
+            Your Progression Story
         </CardTitle>
       </CardHeader>
       <CardContent>

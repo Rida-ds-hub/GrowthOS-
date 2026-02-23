@@ -12,22 +12,36 @@ interface StepGoalProps {
     targetRole: string
     yearsExp: number
     timeline: string
+    progressionIntent: "same_company" | "new_company" | "founder" | "pivot"
   }) => void
+  initialData?: {
+    progressionIntent?: "same_company" | "new_company" | "founder" | "pivot"
+  }
 }
 
-export function StepGoal({ onContinue }: StepGoalProps) {
+export function StepGoal({ onContinue, initialData }: StepGoalProps) {
   const [currentRole, setCurrentRole] = useState("")
   const [targetRole, setTargetRole] = useState("")
   const [yearsExp, setYearsExp] = useState<number | "">("")
   const [timeline, setTimeline] = useState("")
+  const [progressionIntent, setProgressionIntent] = useState<"same_company" | "new_company" | "founder" | "pivot">(
+    initialData?.progressionIntent || "same_company"
+  )
 
   const timelines = ["3 months", "6 months", "9 months", "12 months"]
+  const progressionOptions = [
+    { value: "same_company" as const, label: "Grow in current company", desc: "Internal promotion or role expansion" },
+    { value: "new_company" as const, label: "Move to a new company", desc: "External opportunity" },
+    { value: "founder" as const, label: "Start something of my own", desc: "Build your own venture" },
+    { value: "pivot" as const, label: "Pivot role/track in tech", desc: "Switch focus area or domain" },
+  ]
 
   const isValid =
     currentRole.trim() &&
     targetRole.trim() &&
     yearsExp !== "" &&
-    timeline !== ""
+    timeline !== "" &&
+    progressionIntent !== ""
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault()
@@ -37,6 +51,7 @@ export function StepGoal({ onContinue }: StepGoalProps) {
         targetRole: targetRole.trim(),
         yearsExp: Number(yearsExp),
         timeline,
+        progressionIntent,
       })
     }
   }
@@ -113,6 +128,30 @@ export function StepGoal({ onContinue }: StepGoalProps) {
                   `}
                 >
                   {t}
+                </button>
+              ))}
+            </div>
+          </div>
+
+          <div className="space-y-2">
+            <Label>Direction of Progression</Label>
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+              {progressionOptions.map((option) => (
+                <button
+                  key={option.value}
+                  type="button"
+                  onClick={() => setProgressionIntent(option.value)}
+                  className={`
+                    p-4 rounded-lg border text-left transition-colors
+                    ${
+                      progressionIntent === option.value
+                        ? "bg-emerald-500/10 border-emerald-500 text-white"
+                        : "bg-zinc-950 border-zinc-700 text-zinc-300 hover:border-emerald-500/50"
+                    }
+                  `}
+                >
+                  <div className="font-medium mb-1">{option.label}</div>
+                  <div className="text-xs text-zinc-400">{option.desc}</div>
                 </button>
               ))}
             </div>

@@ -3,108 +3,76 @@
 import { useState } from "react"
 import { motion } from "framer-motion"
 import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
-import { Label } from "@/components/ui/label"
 import { Card, CardContent } from "@/components/ui/card"
-import { Mail, Copy, Check, Share2, Download, LogIn } from "lucide-react"
+import { Download, LogIn, Github, Linkedin, FileText, Globe } from "lucide-react"
 import { SummaryCard } from "@/components/dashboard/SummaryCard"
 import { GapRadar } from "@/components/dashboard/GapRadar"
 import { GapCards } from "@/components/dashboard/GapCards"
 import { PlanTimeline } from "@/components/dashboard/PlanTimeline"
 import { PromotionNarrative } from "@/components/dashboard/PromotionNarrative"
+import { DataSources } from "@/components/dashboard/DataSources"
 import { SignInModal } from "@/components/auth/SignInModal"
+import { useSession } from "next-auth/react"
+import { useRouter } from "next/navigation"
+import { useEffect } from "react"
+import { Badge } from "@/components/ui/badge"
 
 interface ResultsShareProps {
   analysisResult: any
+  githubData?: string | null
+  linkedinData?: string | null
+  resumeText?: string | null
+  websiteUrl?: string | null
   onSignUp?: () => void
   onViewOnly?: () => void
 }
 
-export function ResultsShare({ analysisResult, onSignUp }: ResultsShareProps) {
-  const [email, setEmail] = useState("")
-  const [isSending, setIsSending] = useState(false)
-  const [isCopied, setIsCopied] = useState(false)
-  const [shareLink, setShareLink] = useState<string | null>(null)
+export function ResultsShare({ analysisResult, githubData, linkedinData, resumeText, websiteUrl, onSignUp }: ResultsShareProps) {
+  const { data: session } = useSession()
+  const router = useRouter()
   const [isSignInModalOpen, setIsSignInModalOpen] = useState(false)
-
-  // Generate a one-time share link
-  const generateShareLink = async () => {
-    try {
-      const response = await fetch("/api/share-results", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          analysisResult,
-          expiresIn: 24 * 60 * 60 * 1000, // 24 hours
-        }),
-      })
-
-      if (response.ok) {
-        const data = await response.json()
-        const link = `${window.location.origin}/results/${data.shareId}`
-        setShareLink(link)
-        return link
-      }
-    } catch (error) {
-      console.error("Failed to generate share link:", error)
-    }
-    return null
-  }
-
-  const handleEmailShare = async () => {
-    if (!email || !email.includes("@")) {
-      alert("Please enter a valid email address")
-      return
-    }
-
-    setIsSending(true)
-    try {
-      const link = shareLink || (await generateShareLink())
-      if (!link) {
-        throw new Error("Failed to generate share link")
-      }
-
-      const response = await fetch("/api/share-results/email", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          email,
-          shareLink: link,
-          analysisResult,
-        }),
-      })
-
-      if (response.ok) {
-        alert("Results sent! Check your email.")
-        setEmail("")
-      } else {
-        throw new Error("Failed to send email")
-      }
-    } catch (error) {
-      console.error("Failed to send email:", error)
-      alert("Failed to send email. Please try again.")
-    } finally {
-      setIsSending(false)
-    }
-  }
-
-  const handleCopyLink = async () => {
-    if (!shareLink) {
-      const link = await generateShareLink()
-      if (link) {
-        setShareLink(link)
-      }
-    }
-
-    if (shareLink) {
-      await navigator.clipboard.writeText(shareLink)
-      setIsCopied(true)
-      setTimeout(() => setIsCopied(false), 2000)
-    }
-  }
 
   // Extract gap analysis data (handle both nested and flat structures)
   const gapAnalysis = analysisResult?.gapAnalysis || analysisResult
+
+  // Save data when user signs in/up
+  useEffect(() => {
+    if (session && gapAnalysis) {
+      // User just signed in/up, save the results
+      const saveResults = async () => {
+        try {
+          // Get onboarding data from localStorage
+          const storedData = localStorage.getItem("growthos_onboarding_data")
+          if (storedData) {
+            const onboardingData = JSON.parse(storedData)
+            await fetch("/api/profile", {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify({
+                currentRole: onboardingData.currentRole,
+                targetRole: onboardingData.targetRole,
+                yearsExp: onboardingData.yearsExp,
+                timeline: onboardingData.timeline,
+                websiteUrl: onboardingData.websiteUrl,
+                githubDataText: onboardingData.githubDataText,
+                linkedinDataText: onboardingData.linkedinDataText,
+                resumeText: onboardingData.resumeText,
+                gapAnalysis: onboardingData.gapAnalysis || gapAnalysis,
+              }),
+            })
+            // Clear localStorage after save
+            localStorage.removeItem("growthos_onboarding_data")
+            // Redirect to dashboard
+            router.push("/dashboard")
+          }
+        } catch (error) {
+          console.error("Failed to save results after sign in:", error)
+        }
+      }
+      saveResults()
+    }
+  }, [session, gapAnalysis, router])
+
 
   // Debug: log the structure to help diagnose issues
   if (typeof window !== "undefined") {
@@ -256,8 +224,58 @@ ${new Date().toLocaleDateString()}
           </div>
         </motion.div>
 
+        {/* Data Sources Badge */}
+        {(githubData || linkedinData || resumeText || websiteUrl) && (
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            className="flex items-center gap-3 flex-wrap"
+          >
+            <span className="text-sm text-zinc-400">Data sources used:</span>
+            {githubData && (
+              <Badge className="bg-emerald-500/10 text-emerald-400 border-emerald-500/20">
+                <Github className="w-3 h-3 mr-1" />
+                GitHub
+              </Badge>
+            )}
+            {linkedinData && (
+              <Badge className="bg-emerald-500/10 text-emerald-400 border-emerald-500/20">
+                <Linkedin className="w-3 h-3 mr-1" />
+                LinkedIn
+              </Badge>
+            )}
+            {resumeText && (
+              <Badge className="bg-emerald-500/10 text-emerald-400 border-emerald-500/20">
+                <FileText className="w-3 h-3 mr-1" />
+                Resume
+              </Badge>
+            )}
+            {websiteUrl && (
+              <Badge className="bg-emerald-500/10 text-emerald-400 border-emerald-500/20">
+                <Globe className="w-3 h-3 mr-1" />
+                Website
+              </Badge>
+            )}
+          </motion.div>
+        )}
+
         {/* Full Results Display */}
         <div className="space-y-8">
+          {(githubData || linkedinData || resumeText || websiteUrl) && (
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.05 }}
+            >
+              <DataSources
+                githubData={githubData}
+                linkedinData={linkedinData}
+                resumeText={resumeText}
+                websiteUrl={websiteUrl}
+              />
+            </motion.div>
+          )}
+
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
@@ -298,79 +316,6 @@ ${new Date().toLocaleDateString()}
             <PromotionNarrative gapAnalysis={gapAnalysis} />
           </motion.div>
         </div>
-
-        {/* Sharing Options */}
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.6 }}
-        >
-          <Card className="bg-zinc-900/50 border-zinc-800 rounded-2xl p-6">
-            <CardContent className="p-0 space-y-6">
-              <h3 className="text-lg font-semibold text-white mb-4">Share Your Results</h3>
-              
-              {/* Email Share */}
-              <div className="space-y-3">
-                <Label className="text-white">Share via Email</Label>
-                <div className="flex gap-2">
-                  <Input
-                    type="email"
-                    placeholder="your@email.com"
-                    value={email}
-                    onChange={(e) => setEmail(e.target.value)}
-                    className="bg-zinc-950 border-zinc-700 focus:border-emerald-500 text-white"
-                  />
-                  <Button
-                    onClick={handleEmailShare}
-                    disabled={isSending || !email}
-                    className="bg-emerald-500 text-black hover:bg-emerald-400 font-semibold"
-                  >
-                    {isSending ? (
-                      <div className="w-5 h-5 border-2 border-black border-t-transparent rounded-full animate-spin" />
-                    ) : (
-                      <>
-                        <Mail className="w-4 h-4 mr-2" />
-                        Send
-                      </>
-                    )}
-                  </Button>
-                </div>
-              </div>
-
-              {/* One-time Link */}
-              <div className="space-y-3">
-                <Label className="text-white">One-time View Link</Label>
-                <div className="flex gap-2">
-                  <Input
-                    readOnly
-                    value={shareLink || "Click to generate link"}
-                    className="bg-zinc-950 border-zinc-700 text-zinc-300"
-                  />
-                  <Button
-                    onClick={handleCopyLink}
-                    variant="outline"
-                    className="border-zinc-700 text-zinc-300 hover:bg-zinc-800"
-                  >
-                    {isCopied ? (
-                      <>
-                        <Check className="w-4 h-4 mr-2" />
-                        Copied!
-                      </>
-                    ) : (
-                      <>
-                        <Copy className="w-4 h-4 mr-2" />
-                        {shareLink ? "Copy" : "Generate"}
-                      </>
-                    )}
-                  </Button>
-                </div>
-                <p className="text-xs text-zinc-400">
-                  Link expires in 24 hours. Can only be viewed once.
-                </p>
-              </div>
-            </CardContent>
-          </Card>
-        </motion.div>
       </div>
 
       <SignInModal
