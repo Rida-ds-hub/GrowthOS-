@@ -1,11 +1,8 @@
 import { NextRequest, NextResponse } from "next/server"
-import { getServerSession } from "next-auth"
-import { authOptions } from "@/app/api/auth/[...nextauth]/route"
 import pdf from "pdf-parse"
 
 export async function POST(request: NextRequest) {
   try {
-    // Allow resume parsing without authentication for free tier
     const formData = await request.formData()
     const file = formData.get("file") as File
 
