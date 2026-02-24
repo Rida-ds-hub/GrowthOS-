@@ -26,6 +26,13 @@ export async function POST(request: NextRequest) {
 
     // Rate limiting: check if analysis was run in last 60 minutes (only for authenticated users)
     if (session && userId !== "anonymous") {
+      if (!supabase) {
+        return NextResponse.json(
+          { error: "Database not configured" },
+          { status: 503 }
+        )
+      }
+
       const { data: profile } = await supabase
         .from("profiles")
         .select("updated_at")
