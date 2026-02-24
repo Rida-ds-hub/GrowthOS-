@@ -146,12 +146,14 @@ export function Graph3D({ scrollProgress }: Graph3DProps) {
     const canvas = canvasRef.current
     if (!canvas) return
 
-    const ctx = canvas.getContext("2d")
+    const canvasEl = canvas
+
+    const ctx = canvasEl.getContext("2d")
     if (!ctx) return
 
     function setSize() {
-      canvas.width = window.innerWidth
-      canvas.height = window.innerHeight
+      canvasEl.width = window.innerWidth
+      canvasEl.height = window.innerHeight
     }
     setSize()
     window.addEventListener("resize", setSize)
@@ -165,8 +167,8 @@ export function Graph3D({ scrollProgress }: Graph3DProps) {
       // Increase automatic rotation for a more dynamic hero animation
       autoRYRef.current += dt * 0.12
 
-      const W = canvas.width
-      const H = canvas.height
+      const W = canvasEl.width
+      const H = canvasEl.height
       ctx.clearRect(0, 0, W, H)
 
       const cam = getCam(spRef.current)
