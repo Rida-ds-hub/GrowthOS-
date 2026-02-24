@@ -7,6 +7,7 @@ export const buildGapAnalysisPrompt = (data: {
   githubData?: string;
   resumeText?: string;
   linkedinText?: string;
+  websiteText?: string;
 }) => {
   const intentLabels: Record<string, string> = {
     same_company: "Internal promotion/growth within current company",
@@ -34,6 +35,9 @@ ${data.resumeText || "Not provided"}
 LinkedIn / Background:
 ${data.linkedinText || "Not provided"}
 
+Personal Website Content:
+${data.websiteText || "Not provided"}
+
 Analyse across 5 domains: System Design Maturity, Execution Scope, Communication & Visibility, Technical Depth, Leadership & Influence.
 
 For each domain score, provide a breakdown explaining why that score, what range it falls into, evidence from their profile, and specific next steps.
@@ -44,7 +48,7 @@ CRITICAL: For each domain, you MUST include "dataContributions" showing how each
 - If Resume was provided, explain how it contributed (e.g., "Resume demonstrates project execution across 3 companies, contributing to Execution Scope")
 Only include dataContributions for sources that were actually provided.
 
-Make a 3-phase execution plan (Phase 1, Phase 2, Phase 3). No specific calendar dates. Treat phases as ordered blocks: start with immediate fixes, then medium-term build, then proof/visibility. Each phase should have:
+Make a 3-phase execution plan (Phase 1, Phase 2, Phase 3). No specific calendar dates. Treat phases as ordered blocks **within the overall timeline above** (Timeline: ${data.timeline}): Phase 1 = first 30–40% of the timeline, Phase 2 = middle 30–40%, Phase 3 = final 20–30% (proof/visibility). Each phase should have:
 - Clear theme
 - 3-5 specific, measurable actions (not generic advice)
 - Ordered steps (specificTasks) for that phase - each step must include:
@@ -52,7 +56,7 @@ Make a 3-phase execution plan (Phase 1, Phase 2, Phase 3). No specific calendar 
   * An actionable verb title (Validate, Deploy, Launch, Publish, Architect, Network, Plan, Test, Fundraise, Pitch, Iterate, etc.)
   * Full description of what to do
   * Effort level: "high", "medium", or "low"
-  * Timeline: specific timeframe (e.g., "Weeks 1–4", "Month 5", "Months 10–12") - do NOT use "Ongoing"
+  * Timeline: specific timeframe that fits inside the overall ${data.timeline} (e.g., "Weeks 1–4", "Month 5", "Months 10–12") - do NOT use "Ongoing"
 - Deliverables (what they'll have completed)
 
 Include suggested upskilling projects (specific projects they can build/contribute to) and a posting strategy (what to post, when, where).
@@ -90,10 +94,44 @@ Return ONLY valid JSON. No text before or after. Use this exact shape:
     "Leadership & Influence": { ... }
   },
   "gaps": [
+    // Exactly 5 items - one per domain above, in this order:
+    // 1) System Design Maturity, 2) Execution Scope, 3) Communication & Visibility, 4) Technical Depth, 5) Leadership & Influence
     {
-      "domain": "string",
+      "domain": "System Design Maturity",
       "gap": "high|medium|low",
-      "title": "succinct, relevant one-liner describing the gap (e.g., 'No evidence of managing direct reports or defining strategic direction') - do NOT repeat 'Evidence Shows' or similar phrases",
+      "title": "single concise phrase describing the gap (e.g., 'Missing system design depth', 'Strong systems thinking, limited scale exposure') - must be 3-8 words maximum, no full sentences",
+      "observation": "what the evidence shows (bullet points preferred)",
+      "requirement": "what the target role needs (bullet points preferred)",
+      "closingAction": "single most effective action (specific and actionable)"
+    },
+    {
+      "domain": "Execution Scope",
+      "gap": "high|medium|low",
+      "title": "single concise phrase for execution gap/strength",
+      "observation": "what the evidence shows (bullet points preferred)",
+      "requirement": "what the target role needs (bullet points preferred)",
+      "closingAction": "single most effective action (specific and actionable)"
+    },
+    {
+      "domain": "Communication & Visibility",
+      "gap": "high|medium|low",
+      "title": "single concise phrase for communication/visibility gap/strength",
+      "observation": "what the evidence shows (bullet points preferred)",
+      "requirement": "what the target role needs (bullet points preferred)",
+      "closingAction": "single most effective action (specific and actionable)"
+    },
+    {
+      "domain": "Technical Depth",
+      "gap": "high|medium|low",
+      "title": "single concise phrase for technical depth gap/strength",
+      "observation": "what the evidence shows (bullet points preferred)",
+      "requirement": "what the target role needs (bullet points preferred)",
+      "closingAction": "single most effective action (specific and actionable)"
+    },
+    {
+      "domain": "Leadership & Influence",
+      "gap": "high|medium|low",
+      "title": "single concise phrase for leadership/influence gap/strength",
       "observation": "what the evidence shows (bullet points preferred)",
       "requirement": "what the target role needs (bullet points preferred)",
       "closingAction": "single most effective action (specific and actionable)"

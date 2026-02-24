@@ -5,10 +5,40 @@ import { GapAnalysis } from "@/lib/types"
 
 interface PlanTimelineProps {
   gapAnalysis: GapAnalysis
+  timeline?: string
 }
 
-export function PlanTimeline({ gapAnalysis }: PlanTimelineProps) {
+export function PlanTimeline({ gapAnalysis, timeline }: PlanTimelineProps) {
   const [activePhase, setActivePhase] = useState(0)
+
+  const parseMonthsFromTimeline = (value?: string): number => {
+    if (!value) return 12
+    const match = value.match(/(\d+)/)
+    if (!match) return 12
+    const months = parseInt(match[1], 10)
+    if (!Number.isFinite(months) || months <= 0) return 12
+    return Math.min(24, months)
+  }
+
+  const totalMonths = parseMonthsFromTimeline(timeline)
+
+  const makeRangeLabel = (start: number, end: number) => {
+    if (start === end) return `Month ${start}`
+    return `Months ${start}–${end}`
+  }
+
+  // Compute phase ranges across totalMonths
+  const p1End = Math.max(1, Math.round(totalMonths / 3))
+  const p2Start = Math.min(totalMonths, p1End + 1)
+  const p2End = Math.max(p2Start, Math.round((2 * totalMonths) / 3))
+  const p3Start = Math.min(totalMonths, p2End + 1)
+  const p3End = totalMonths
+
+  const phaseRanges = [
+    makeRangeLabel(1, p1End),
+    makeRangeLabel(p2Start, p2End),
+    makeRangeLabel(p3Start, p3End),
+  ]
 
   if (!gapAnalysis || !gapAnalysis.plan) {
     return (
@@ -27,26 +57,20 @@ export function PlanTimeline({ gapAnalysis }: PlanTimelineProps) {
   const phases = [
     { 
       ...(gapAnalysis.plan.phase1 || { theme: "", actions: [], deliverables: [] }), 
-      months: "Months 1–3",
+      months: phaseRanges[0],
       num: 1
     },
     { 
       ...(gapAnalysis.plan.phase2 || { theme: "", actions: [], deliverables: [] }), 
-      months: "Months 4–8",
+      months: phaseRanges[1],
       num: 2
     },
     { 
       ...(gapAnalysis.plan.phase3 || { theme: "", actions: [], deliverables: [] }), 
-      months: "Months 9–12",
+      months: phaseRanges[2],
       num: 3
     },
   ]
-
-  const getPhaseMonths = (index: number) => {
-    if (index === 0) return "Months 1–3"
-    if (index === 1) return "Months 4–8"
-    return "Months 9–12"
-  }
 
   return (
     <div className="space-y-4">
@@ -55,7 +79,9 @@ export function PlanTimeline({ gapAnalysis }: PlanTimelineProps) {
           <span className="w-4 h-px bg-zinc-500"></span>
           Your 3-Phase Plan
         </h2>
-        <span className="text-xs text-emerald-500">12 months · 3 phases</span>
+        <span className="text-xs text-emerald-500">
+          {totalMonths} month{totalMonths !== 1 ? "s" : ""} · 3 phases
+        </span>
       </div>
 
       {/* Tab Switcher */}
@@ -83,7 +109,7 @@ export function PlanTimeline({ gapAnalysis }: PlanTimelineProps) {
                 {phase.num}
               </div>
               <div className="text-[0.62rem] tracking-[0.2em] uppercase text-zinc-500">
-                {getPhaseMonths(index)}
+                {phase.months}
               </div>
             </div>
             <div className={`font-mono text-xs md:text-sm font-semibold leading-snug transition-opacity ${
@@ -108,7 +134,7 @@ export function PlanTimeline({ gapAnalysis }: PlanTimelineProps) {
             <div>
               <div className="text-[0.6rem] tracking-[0.3em] uppercase text-emerald-500 mb-2 flex items-center gap-2">
                 <span className="w-3.5 h-px bg-emerald-500"></span>
-                Phase {phase.num} · {getPhaseMonths(index)}
+                Phase {phase.num} · {phase.months}
               </div>
               <div className="font-mono text-lg md:text-xl font-semibold text-white leading-tight">
                 {phase.theme || `Phase ${phase.num}`}

@@ -1,7 +1,7 @@
 "use client"
 
 import { useState, useEffect } from "react"
-import { useRouter } from "next/navigation"
+import { useRouter, useSearchParams } from "next/navigation"
 import { useSession } from "next-auth/react"
 import { motion, AnimatePresence } from "framer-motion"
 import { StepGoal } from "./StepGoal"
@@ -32,9 +32,17 @@ const STORAGE_KEY = "growthos_onboarding_data"
 
 export function OnboardingWizard() {
   const router = useRouter()
+  const searchParams = useSearchParams()
   const { data: session } = useSession()
+  const isNewAnalysis = searchParams.get("new") === "true"
+  
   const [currentStep, setCurrentStep] = useState(1)
   const [data, setData] = useState<OnboardingData>(() => {
+    // If this is a new analysis, don't load any cached data
+    if (isNewAnalysis) {
+      return {}
+    }
+    
     // Load from localStorage on mount
     if (typeof window !== "undefined") {
       const stored = localStorage.getItem(STORAGE_KEY)
@@ -69,6 +77,11 @@ export function OnboardingWizard() {
   })
   const [isAnalyzing, setIsAnalyzing] = useState(false)
   const [showSignUpPrompt, setShowSignUpPrompt] = useState(() => {
+    // If this is a new analysis, don't show cached results
+    if (isNewAnalysis) {
+      return false
+    }
+    
     // Check if we have cached results to show immediately
     if (typeof window !== "undefined") {
       const cached = sessionStorage.getItem("growthos_results_cache")
@@ -176,6 +189,29 @@ export function OnboardingWizard() {
         linkedinText = analysisData.linkedinManualData
       }
 
+      // Fetch website content if URL provided
+      let websiteText = ""
+      if (analysisData.websiteUrl) {
+        try {
+          setAnalysisStatus("Scraping website content...")
+          const websiteResponse = await fetch("/api/website/scrape", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ url: analysisData.websiteUrl }),
+          })
+          if (websiteResponse.ok) {
+            const websiteResult = await websiteResponse.json()
+            websiteText = websiteResult.data || ""
+          } else {
+            console.error("Failed to scrape website:", await websiteResponse.text())
+            // Continue without website data if scraping fails
+          }
+        } catch (err) {
+          console.error("Failed to fetch website data:", err)
+          // Continue without website data if scraping fails
+        }
+      }
+
       // Trigger gap analysis (this happens during "Mapping gaps" message)
       const analysisResponse = await fetch("/api/gap-analysis", {
         method: "POST",
@@ -189,6 +225,7 @@ export function OnboardingWizard() {
           githubData,
           resumeText: analysisData.resumeText || "",
           linkedinText,
+          websiteText,
         }),
       })
 
@@ -258,6 +295,10 @@ export function OnboardingWizard() {
           currentRole: updatedData.currentRole,
           yearsExp: updatedData.yearsExp,
           progressionIntent: updatedData.progressionIntent,
+          githubData: githubData || undefined,
+          linkedinData: linkedinText || undefined,
+          resumeText: updatedData.resumeText || undefined,
+          websiteUrl: updatedData.websiteUrl || undefined,
           generatedAt: new Date().toISOString(),
         }
         sessionStorage.setItem("growthos_view_results", JSON.stringify(resultsData))
@@ -359,6 +400,10 @@ export function OnboardingWizard() {
         currentRole: data.currentRole,
         yearsExp: data.yearsExp,
         progressionIntent: data.progressionIntent,
+        githubData: undefined,
+        linkedinData: undefined,
+        resumeText: data.resumeText || undefined,
+        websiteUrl: data.websiteUrl || undefined,
         generatedAt: new Date().toISOString(),
       }
       sessionStorage.setItem("growthos_view_results", JSON.stringify(resultsData))

@@ -106,9 +106,15 @@ export default function ViewResultsPage() {
 
   const getDomainBadge = (score: number) => {
     if (score >= 70) return { label: "Strong", color: "text-emerald-400", bg: "bg-emerald-500/10" }
-    if (score >= 50) return { label: "Moderate", color: "text-amber-400", bg: "bg-amber-500/10" }
+    if (score >= 40) return { label: "Moderate", color: "text-amber-400", bg: "bg-amber-500/10" }
     return { label: "Needs Work", color: "text-red-400", bg: "bg-red-500/10" }
   }
+
+  // Data source presence flags (for dynamic chips)
+  const githubData = (analysisData as any).githubData || null
+  const linkedinData = (analysisData as any).linkedinData || null
+  const resumeText = (analysisData as any).resumeText || null
+  const websiteUrl = (analysisData as any).websiteUrl || null
 
   const handleDownloadResults = () => {
     if (!gapAnalysis) return
@@ -172,11 +178,21 @@ ${new Date().toLocaleDateString()}
         <Link href="/" className="flex items-center">
           <Logo variant="nav" size="nav" />
         </Link>
-        <Link href="/onboarding">
-          <Button className="font-mono text-[0.7rem] font-semibold tracking-[0.15em] uppercase bg-emerald-500 text-black hover:bg-emerald-400">
-            + New Analysis
-          </Button>
-        </Link>
+        <Button 
+          onClick={() => {
+            // Clear all stored results and onboarding data
+            if (typeof window !== "undefined") {
+              localStorage.removeItem("growthos_onboarding_data")
+              sessionStorage.removeItem("growthos_view_results")
+              sessionStorage.removeItem("growthos_results_cache")
+            }
+            // Navigate with query param to indicate fresh start
+            router.push("/onboarding?new=true")
+          }}
+          className="font-mono text-[0.7rem] font-semibold tracking-[0.15em] uppercase bg-emerald-500 text-black hover:bg-emerald-400"
+        >
+          + New Analysis
+        </Button>
       </nav>
 
       <main className="max-w-5xl md:max-w-6xl mx-auto px-4 md:px-6 py-8 md:py-10 space-y-8 md:space-y-10">
@@ -207,20 +223,52 @@ ${new Date().toLocaleDateString()}
           </div>
         </section>
 
-        {/* Data sources row (static-style chips for readability) */}
+        {/* Data sources row (dynamic chips for readability) */}
         <section className="flex flex-wrap items-center gap-2 md:gap-3 text-xs md:text-sm">
           <span className="text-zinc-400">Data sources used:</span>
-          <span className="inline-flex items-center gap-1 rounded-full border border-emerald-500/40 bg-emerald-500/10 px-3 py-1 text-emerald-400">
-            ⌥ GitHub
+
+          {/* GitHub */}
+          <span
+            className={`inline-flex items-center gap-1 rounded-full px-3 py-1 ${
+              githubData
+                ? "border border-emerald-500/40 bg-emerald-500/10 text-emerald-400"
+                : "border border-zinc-700 bg-zinc-900 text-zinc-400"
+            }`}
+          >
+            ⌥ GitHub{!githubData && " (not provided)"}
           </span>
-          <span className="inline-flex items-center gap-1 rounded-full border border-emerald-500/40 bg-emerald-500/10 px-3 py-1 text-emerald-400">
-            ≡ Resume
+
+          {/* Resume */}
+          <span
+            className={`inline-flex items-center gap-1 rounded-full px-3 py-1 ${
+              resumeText
+                ? "border border-emerald-500/40 bg-emerald-500/10 text-emerald-400"
+                : "border border-zinc-700 bg-zinc-900 text-zinc-400"
+            }`}
+          >
+            ≡ Resume{!resumeText && " (not provided)"}
           </span>
-          <span className="inline-flex items-center gap-1 rounded-full border border-zinc-700 bg-zinc-900 px-3 py-1 text-zinc-400">
-            in LinkedIn (not provided)
+
+          {/* LinkedIn */}
+          <span
+            className={`inline-flex items-center gap-1 rounded-full px-3 py-1 ${
+              linkedinData
+                ? "border border-emerald-500/40 bg-emerald-500/10 text-emerald-400"
+                : "border border-zinc-700 bg-zinc-900 text-zinc-400"
+            }`}
+          >
+            in LinkedIn{!linkedinData && " (not provided)"}
           </span>
-          <span className="inline-flex items-center gap-1 rounded-full border border-zinc-700 bg-zinc-900 px-3 py-1 text-zinc-400">
-            ⊕ Personal site (not provided)
+
+          {/* Personal site */}
+          <span
+            className={`inline-flex items-center gap-1 rounded-full px-3 py-1 ${
+              websiteUrl
+                ? "border border-emerald-500/40 bg-emerald-500/10 text-emerald-400"
+                : "border border-zinc-700 bg-zinc-900 text-zinc-400"
+            }`}
+          >
+            ⊕ Personal site{!websiteUrl && " (not provided)"}
           </span>
         </section>
 
@@ -340,7 +388,7 @@ ${new Date().toLocaleDateString()}
 
         {/* 3-phase plan */}
         <section>
-          <PlanTimeline gapAnalysis={gapAnalysis} />
+          <PlanTimeline gapAnalysis={gapAnalysis} timeline={timeline} />
         </section>
 
         {/* Progression story */}

@@ -58,6 +58,7 @@ export async function POST(request: NextRequest) {
       githubData,
       resumeText,
       linkedinText,
+      websiteText,
     } = body
 
     // Apply input caps as per spec
@@ -66,6 +67,7 @@ export async function POST(request: NextRequest) {
     const cappedResumeText = (resumeText || "").slice(0, 8000)
     const cappedLinkedinText = (linkedinText || "").slice(0, 8000)
     const cappedGithubData = (githubData || "").slice(0, 4000)
+    const cappedWebsiteText = (websiteText || "").slice(0, 4000)
 
     const prompt = buildGapAnalysisPrompt({
       currentRole: cappedCurrentRole,
@@ -76,6 +78,7 @@ export async function POST(request: NextRequest) {
       githubData: cappedGithubData,
       resumeText: cappedResumeText,
       linkedinText: cappedLinkedinText,
+      websiteText: cappedWebsiteText,
     })
 
     console.log("API: Calling Gemini API...")

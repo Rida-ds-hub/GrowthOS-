@@ -12,7 +12,7 @@ interface GapCardsProps {
 export function GapCards({ gapAnalysis }: GapCardsProps) {
   const [expanded, setExpanded] = useState<Record<number, boolean>>({})
 
-  if (!gapAnalysis || !gapAnalysis.gaps || gapAnalysis.gaps.length === 0) {
+  if (!gapAnalysis || !gapAnalysis.domainScores) {
     return (
       <div className="space-y-4">
         <h2 className="text-2xl font-semibold text-white mb-4">Gap Details</h2>
@@ -21,42 +21,51 @@ export function GapCards({ gapAnalysis }: GapCardsProps) {
     )
   }
 
-  const parseBullets = (text: string, maxItems = 3): { items: string[]; hasMore: boolean } => {
-    // Handle cases where text might not be a string
-    if (!text || typeof text !== "string") {
-      return { items: [], hasMore: false }
+  // Define all 5 domains in order
+  const allDomains = [
+    "System Design Maturity",
+    "Execution Scope",
+    "Communication & Visibility",
+    "Technical Depth",
+    "Leadership & Influence",
+  ]
+
+  // Get score-based badge (matching Score Breakdowns logic)
+  const getDomainBadge = (score: number) => {
+    if (score >= 70) {
+      return { label: "STRONG", color: "text-emerald-400", bg: "bg-emerald-500/10", border: "border-emerald-500/20", scoreColor: "#10b981" }
+    } else if (score >= 40) {
+      return { label: "MODERATE", color: "text-amber-400", bg: "bg-amber-500/10", border: "border-amber-500/20", scoreColor: "#f59e0b" }
+    } else {
+      return { label: "NEEDS WORK", color: "text-red-400", bg: "bg-red-500/10", border: "border-red-500/20", scoreColor: "#ef4444" }
     }
+  }
 
-    const bullets = text
-      .split("\n")
-      .map((line) => line.replace(/^[\s\-•]+/, "").trim())
-      .filter(Boolean)
+  // Create gap entries for all domains, using LLM gaps where available
+  const gapsMap = new Map<string, typeof gapAnalysis.gaps[0]>()
+  if (gapAnalysis.gaps) {
+    gapAnalysis.gaps.forEach((gap) => {
+      gapsMap.set(gap.domain, gap)
+    })
+  }
 
+  // Build complete gaps array for all 5 domains
+  const allGaps = allDomains.map((domain) => {
+    const score = (gapAnalysis.domainScores as any)[domain] || 0
+    const badge = getDomainBadge(score)
+    const existingGap = gapsMap.get(domain)
+
+    // If LLM provided gap data, use it; otherwise create minimal entry
     return {
-      items: bullets.slice(0, maxItems),
-      hasMore: bullets.length > maxItems,
+      domain,
+      score,
+      badge,
+      title: existingGap?.title || `${badge.label === "STRONG" ? "Strong" : badge.label === "MODERATE" ? "Moderate" : "Needs improvement"} in ${domain.split(" ")[0]}`,
+      observation: existingGap?.observation || "No detailed gap analysis available for this domain.",
+      requirement: existingGap?.requirement || "Target role requires proficiency in this domain.",
+      closingAction: existingGap?.closingAction || "Focus on building skills in this area.",
     }
-  }
-
-  const getGapLabel = (gap: string) => {
-    switch (gap) {
-      case "high": return "High Gap"
-      case "medium": return "Moderate Gap"
-      case "low": return "Low Gap"
-      default: return gap
-    }
-  }
-
-  const getGapSeverity = (gap: string) => {
-    if (gap === "high") return "high"
-    if (gap === "medium") return "mod"
-    return "low"
-  }
-
-  const getGapScore = (domain: string) => {
-    const domainScores = gapAnalysis?.domainScores || {}
-    return (domainScores as any)[domain] || 0
-  }
+  })
 
   return (
     <div className="space-y-4">
@@ -68,10 +77,9 @@ export function GapCards({ gapAnalysis }: GapCardsProps) {
         <span className="text-xs text-zinc-500">Click any row to expand</span>
       </div>
       <div className="flex flex-col gap-2">
-        {gapAnalysis.gaps.map((gap, index) => {
+        {allGaps.map((gap, index) => {
           const isExpanded = expanded[index]
-          const severity = getGapSeverity(gap.gap)
-          const score = getGapScore(gap.domain)
+          const badge = gap.badge
           
           // Ensure values are strings (handle arrays or other types)
           const observationText = Array.isArray(gap.observation) 
@@ -89,37 +97,33 @@ export function GapCards({ gapAnalysis }: GapCardsProps) {
               key={index}
               className={`
                 border border-[#1e1e1e] bg-[#111111] overflow-hidden transition-all
-                ${severity === "high" ? "hover:border-red-500/30" : severity === "mod" ? "hover:border-amber-500/30" : "hover:border-emerald-500/30"}
+                ${badge.label === "NEEDS WORK" ? "hover:border-red-500/30" : badge.label === "MODERATE" ? "hover:border-amber-500/30" : "hover:border-emerald-500/30"}
               `}
             >
               <div
                 className="flex items-center gap-4 px-4 md:px-5 py-4 cursor-pointer hover:bg-[#161616] transition-colors select-none"
                 onClick={() => setExpanded(prev => ({ ...prev, [index]: !prev[index] }))}
               >
-                <div className={`w-0.5 h-8 rounded-full flex-shrink-0 ${
-                  severity === "high" ? "bg-red-500" : severity === "mod" ? "bg-amber-500" : "bg-emerald-500"
-                }`} />
+                <div 
+                  className="w-0.5 h-8 rounded-full flex-shrink-0"
+                  style={{ backgroundColor: badge.scoreColor }}
+                />
                 <div className="font-mono text-sm md:text-base font-semibold text-white flex-1">
                   {gap.domain}
                 </div>
                 <div className="text-xs md:text-sm italic text-zinc-400 flex-2 hidden md:block">
-                  {(gap as any).title || observationText.split("\n")[0]?.substring(0, 60)}...
+                  {gap.title?.substring(0, 60)}...
                 </div>
                 <Badge 
-                  className={`text-[0.58rem] tracking-[0.15em] uppercase px-2 py-1 flex-shrink-0 ${
-                    severity === "high"
-                      ? "bg-red-500/10 text-red-400 border border-red-500/20"
-                      : severity === "mod"
-                      ? "bg-amber-500/10 text-amber-400 border border-amber-500/20"
-                      : "bg-emerald-500/10 text-emerald-400 border border-emerald-500/30"
-                  }`}
+                  className={`text-[0.58rem] tracking-[0.15em] uppercase px-2 py-1 flex-shrink-0 ${badge.bg} ${badge.color} border ${badge.border}`}
                 >
-                  {getGapLabel(gap.gap)}
+                  {badge.label}
                 </Badge>
-                <div className={`font-mono text-sm md:text-base font-semibold flex-shrink-0 min-w-[36px] text-right ${
-                  severity === "high" ? "text-red-500" : severity === "mod" ? "text-amber-500" : "text-emerald-500"
-                }`}>
-                  {score}
+                <div 
+                  className="font-mono text-sm md:text-base font-semibold flex-shrink-0 min-w-[36px] text-right"
+                  style={{ color: badge.scoreColor }}
+                >
+                  {gap.score}
                 </div>
                 <div className={`flex-shrink-0 transition-transform ${isExpanded ? "rotate-180" : ""}`}>
                   <ChevronDown className="w-4 h-4 text-zinc-500" />
@@ -162,7 +166,7 @@ export function GapCards({ gapAnalysis }: GapCardsProps) {
                       Next Move
                     </div>
                     <div className="text-sm text-emerald-400 leading-relaxed">
-                      {closingActionText.split("\n")[0]?.replace(/^[\s\-•→]+/, "").trim() || gap.closingAction}
+                      {closingActionText.split("\n")[0]?.replace(/^[\s\-•→]+/, "").trim() || "Focus on building skills in this area."}
                     </div>
                   </div>
                 </div>
