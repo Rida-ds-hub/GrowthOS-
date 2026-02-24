@@ -27,23 +27,31 @@ export default async function DashboardPage() {
 
   const userId = session.user?.email || session.user?.name || "unknown"
 
-  // Fetch user profile
-  let { data: profile } = await supabase
-    .from("profiles")
-    .select("*")
-    .eq("user_id", userId)
-    .single()
+  // Fetch user profile (only if Supabase is configured)
+  let profile: any = null
+  if (supabase) {
+    const { data } = await supabase
+      .from("profiles")
+      .select("*")
+      .eq("user_id", userId)
+      .single()
+    profile = data
 
-  // If profile doesn't exist, create a basic one
-  if (!profile) {
-    const { data: newProfile } = await supabase.from("profiles").upsert({
-      user_id: userId,
-      email: session.user?.email || null,
-      name: session.user?.name || null,
-      avatar_url: session.user?.image || null,
-      updated_at: new Date().toISOString(),
-    }).select().single()
-    profile = newProfile
+    // If profile doesn't exist, create a basic one
+    if (!profile) {
+      const { data: newProfile } = await supabase
+        .from("profiles")
+        .upsert({
+          user_id: userId,
+          email: session.user?.email || null,
+          name: session.user?.name || null,
+          avatar_url: session.user?.image || null,
+          updated_at: new Date().toISOString(),
+        })
+        .select()
+        .single()
+      profile = newProfile
+    }
   }
 
   // Check if user has completed analysis

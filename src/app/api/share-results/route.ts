@@ -1,5 +1,4 @@
 import { NextRequest, NextResponse } from "next/server"
-import { supabase } from "@/lib/supabase"
 import crypto from "crypto"
 
 // Store shared results temporarily (could use Supabase or in-memory cache)

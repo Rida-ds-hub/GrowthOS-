@@ -7,8 +7,8 @@ import { supabase } from "@/lib/supabase"
 export default async function OnboardingPage() {
   const session = await getServerSession(authOptions)
   
-  // If user is signed in, check if they already have results
-  if (session) {
+  // If user is signed in and Supabase is configured, check if they already have results
+  if (session && supabase) {
     const userId = session.user?.email || session.user?.name || "unknown"
     
     try {
