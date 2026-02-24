@@ -1,6 +1,6 @@
 import { redirect } from "next/navigation"
 import { getServerSession } from "next-auth"
-import { authOptions } from "@/app/api/auth/[...nextauth]/route"
+import { authOptions } from "@/lib/auth"
 import { supabase } from "@/lib/supabase"
 import { AnimatedHeader } from "@/components/landing/AnimatedHeader"
 import { ReadinessScore } from "@/components/dashboard/ReadinessScore"

@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server"
 import { getServerSession } from "next-auth"
-import { authOptions } from "@/app/api/auth/[...nextauth]/route"
+import { authOptions } from "@/lib/auth"
 import { model } from "@/lib/gemini"
 import { buildGapAnalysisPrompt } from "@/lib/prompts"
 import { supabase } from "@/lib/supabase"
