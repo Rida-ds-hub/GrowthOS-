@@ -106,7 +106,7 @@ export function LandingPage() {
               handleStartJourney(e)
             }}
           >
-            Start My Journey
+            Run My Analysis
           </Link>
         </div>
       </nav>
@@ -121,8 +121,8 @@ export function LandingPage() {
         <div id="sticky">
           <div className={`panel ${activePanel === 0 ? 'on' : ''}`} id="p0">
             <div className="ptag">Career Progression Engine</div>
-            <h1>Stop drifting.<br />Start <span className="g">operating.</span></h1>
-            <p>Most engineers are talented and stuck. Growth OS connects your GitHub, LinkedIn, resume, and calendar into one living system that tells you exactly what to do next and when you are ready to move.</p>
+            <h1>Stop guessing.<br />Start <span className="g">operating.</span></h1>
+            <p>You are talented. You are also flying blind. Growth OS reads your GitHub, resume, and portfolio — then maps the precise gap between where you are and the role you actually want.</p>
             <div className="brow">
               <Link 
                 href="/onboarding"
@@ -131,23 +131,23 @@ export function LandingPage() {
                   e.stopPropagation()
                 }}
               >
-                Start My Journey
+                Run My Analysis
               </Link>
             </div>
           </div>
 
           <div className={`panel ${activePanel === 1 ? 'on' : ''}`} id="p1">
             <div className="ptag">01 // Gap Analysis</div>
-            <h2>We find the<br /><span className="g">exact gap.</span></h2>
-            <p>Connect your GitHub, LinkedIn, resume, and portfolio. Growth OS reads your actual trajectory and surfaces the precise delta between where you are and the role, level, or path you are targeting.</p>
+            <h2>Five domains.<br /><span className="g">One honest score.</span></h2>
+            <p>System design, execution scope, communication, technical depth, leadership. Growth OS measures each against your target role and shows you the delta — not what sounds impressive, what actually matters.</p>
             <div className="prog-rows">
               <div className="prog-row"><span>System Design</span><div className="prog-bar"><div className="prog-fill" style={{ width: '38%' }} /></div><span className="prog-val">38%</span></div>
-              <div className="prog-row"><span>Brand Presence</span><div className="prog-bar"><div className="prog-fill" style={{ width: '15%' }} /></div><span className="prog-val">15%</span></div>
-              <div className="prog-row"><span>Leadership Signal</span><div className="prog-bar"><div className="prog-fill" style={{ width: '22%' }} /></div><span className="prog-val">22%</span></div>
-              <div className="prog-row"><span>Stakeholder Comms</span><div className="prog-bar"><div className="prog-fill" style={{ width: '48%' }} /></div><span className="prog-val">48%</span></div>
+              <div className="prog-row"><span>Communication</span><div className="prog-bar"><div className="prog-fill" style={{ width: '15%' }} /></div><span className="prog-val">15%</span></div>
+              <div className="prog-row"><span>Leadership</span><div className="prog-bar"><div className="prog-fill" style={{ width: '22%' }} /></div><span className="prog-val">22%</span></div>
+              <div className="prog-row"><span>Execution Scope</span><div className="prog-bar"><div className="prog-fill" style={{ width: '48%' }} /></div><span className="prog-val">48%</span></div>
             </div>
             <p style={{ fontSize: ".74rem", color: "var(--muted)" }}>
-              {"// Real gaps. Real data. Zero guesswork."}
+              {"// Your data in. Your blind spots out."}
             </p>
             <div className="brow" style={{ marginTop: '1.2rem' }}>
               <Link 
@@ -158,7 +158,7 @@ export function LandingPage() {
                   handleStartJourney(e)
                 }}
               >
-                Start My Journey
+                See My Gaps
               </Link>
             </div>
           </div>
@@ -166,7 +166,7 @@ export function LandingPage() {
           <div className={`panel ${activePanel === 2 ? 'on' : ''}`} id="p2">
             <div className="ptag">02 // Daily Engine</div>
             <h2>15 minutes.<br /><span className="g">Compounds daily.</span></h2>
-            <p>Micro-learning tied to your actual gaps. In-app code commits. System thinking exercises. Calendar-integrated meeting logs. Every action feeds the machine and moves your readiness score forward.</p>
+            <p>Targeted micro-lessons. Design-before-code exercises. Meeting logs that build your promotion case while you take notes. Small inputs, compounding outputs.</p>
             <div className="term">
               <div className="tbar"><div className="td td1" /><div className="td td2" /><div className="td td3" /></div>
               <div className="tl"><span className="c">$ </span><span className="o">day_47.log</span></div>
@@ -184,15 +184,15 @@ export function LandingPage() {
                   handleStartJourney(e)
                 }}
               >
-                Start My Journey
+                Start Building
               </Link>
             </div>
           </div>
 
           <div className={`panel ${activePanel === 3 ? 'on' : ''}`} id="p3">
             <div className="ptag">03 // Brand Engine</div>
-            <h2>Your work,<br /><span className="g">seen by the right people.</span></h2>
-            <p>Every merged PR becomes a resume bullet. Every 1:1 becomes evidence for your promotion case. Every week of progress becomes a LinkedIn post. Real work. Real signal. No cringe.</p>
+            <h2>Your output,<br /><span className="g">finally visible.</span></h2>
+            <p>Merged a PR? Resume bullet written. Shipped a feature? LinkedIn draft queued. Had a skip-level? Promotion evidence captured. The system turns your work into signal — automatically.</p>
             <div className="term">
               <div className="tbar"><div className="td td1" /><div className="td td2" /><div className="td td3" /></div>
               <div className="tl"><span className="w">PR #482 merged</span></div>
@@ -210,15 +210,15 @@ export function LandingPage() {
                   handleStartJourney(e)
                 }}
               >
-                Start My Journey
+                Build My Signal
               </Link>
             </div>
           </div>
 
           <div className={`panel ${activePanel === 4 ? 'on' : ''}`} id="p4">
             <div className="ptag">04 // The Jump Signal</div>
-            <h2>You will know<br /><span className="g">exactly when to move.</span></h2>
-            <p>Promotion. Pivot. New role. Founding something. Growth OS tracks your readiness signal across all domains. When the data says you are ready, it tells you. No more guessing. No more waiting too long.</p>
+            <h2>Know when<br /><span className="g">you are ready.</span></h2>
+            <p>Promotion. Pivot. New company. Your own thing. Growth OS tracks readiness across every domain and fires when the data says go — not when you feel like it, when you are actually prepared.</p>
             <div className="term">
               <div className="tbar"><div className="td td1" /><div className="td td2" /><div className="td td3" /></div>
               <div className="tl"><span className="w">Signal check: Alex Chen, Day 90</span></div>
@@ -236,7 +236,7 @@ export function LandingPage() {
                   handleStartJourney(e)
                 }}
               >
-                Start My Journey
+                Track My Readiness
               </Link>
             </div>
           </div>
@@ -247,33 +247,33 @@ export function LandingPage() {
 
       <div className="stats-bar">
         <div className="stats-items">
-          <div><div className="stat-n">3</div><div className="stat-l">Domains: skills, brand, signal</div></div>
-          <div><div className="stat-n">15m</div><div className="stat-l">Minutes of focused progress</div></div>
-          <div><div className="stat-n">90d</div><div className="stat-l">Days to your next move</div></div>
-          <div><div className="stat-n">0</div><div className="stat-l">Unstructured guesswork</div></div>
+          <div><div className="stat-n">5</div><div className="stat-l">Domains scored per analysis</div></div>
+          <div><div className="stat-n">90d</div><div className="stat-l">Personalized action plan</div></div>
+          <div><div className="stat-n">1</div><div className="stat-l">Analysis to know your gaps</div></div>
+          <div><div className="stat-n">$0</div><div className="stat-l">To get your full report</div></div>
         </div>
         <div className="stats-note">
           <div className="stats-note-label">
-            {"// Powered by your real work"}
+            {"// Built on evidence, not assumptions"}
           </div>
           <p>
-            Growth OS pulls from your GitHub, LinkedIn, calendar, and resume to keep
-            these numbers live and grounded in actual evidence.
+            Growth OS ingests your GitHub, resume, and portfolio to generate
+            a gap analysis grounded in what you have actually built and shipped.
           </p>
         </div>
       </div>
 
       <div className="sec" id="system">
         <div className="sec-tag">The System</div>
-        <h2 className="sec-h">Six engines.<br /><span className="g">One OS.</span></h2>
-        <p className="sec-p">Each piece is useful alone. Together they create a flywheel. Every commit updates the resume. Every meeting feeds the promotion case. Every day of progress generates your brand. Nothing is wasted.</p>
+        <h2 className="sec-h">Six engines.<br /><span className="g">One closed loop.</span></h2>
+        <p className="sec-p">Each engine solves one problem. Together they form a flywheel: what you build feeds what you learn, what you learn shapes what you ship, and everything compounds into a promotion-ready narrative.</p>
         <div className="feat-grid">
-          <div className="feat"><div className="feat-bar" /><div className="feat-num">01 // connect</div><div className="feat-title">Gap Analysis Engine</div><p className="feat-desc">Ingests GitHub, LinkedIn, resume, and portfolio. Runs a full gap analysis against your target role. Surfaces what actually matters, not what sounds impressive.</p><div className="feat-tag">Connect, Analyze, Act</div></div>
-          <div className="feat"><div className="feat-bar" /><div className="feat-num">02 // learn</div><div className="feat-title">Micro-Learning + Code</div><p className="feat-desc">15 minutes of targeted learning per day. In-app code commits tied to real projects. Streak tracking. System thinking exercises. Learning that compounds into genuine expertise.</p><div className="feat-tag">15 min / day</div></div>
-          <div className="feat"><div className="feat-bar" /><div className="feat-num">03 // resume</div><div className="feat-title">Living Resume</div><p className="feat-desc">Every PR merged, every feature shipped, every win captured. Automatically written as impact-first bullets. Your resume is always current and always promotion-ready.</p><div className="feat-tag">Always Current</div></div>
-          <div className="feat"><div className="feat-bar" /><div className="feat-num">04 // memory</div><div className="feat-title">Meeting Second Brain</div><p className="feat-desc">Calendar-integrated. Logs and analyzes every 1:1, skip-level, standup, and retro. Surfaces patterns in your influence and builds your promotion narrative from actual evidence.</p><div className="feat-tag">Calendar Integrated</div></div>
-          <div className="feat"><div className="feat-bar" /><div className="feat-num">05 // brand</div><div className="feat-title">LinkedIn on Autopilot</div><p className="feat-desc">Real progress becomes real posts. Drafted from your actual commits, milestones, and learning. Specific, technical, never generic. Presence without the performance anxiety.</p><div className="feat-tag">Presence Without Performance</div></div>
-          <div className="feat"><div className="feat-bar" /><div className="feat-num">06 // signal</div><div className="feat-title">The Jump Signal</div><p className="feat-desc">Promotion, pivot, new role, or founding something. Readiness signals tracked across all six domains. You always know exactly where you stand and what to do next.</p><div className="feat-tag">Promote, Pivot, Found</div></div>
+          <div className="feat"><div className="feat-bar" /><div className="feat-num">01 // analyze</div><div className="feat-title">Gap Analysis Engine</div><p className="feat-desc">Ingests your GitHub, resume, and portfolio. Maps strengths and blind spots against your target role across five domains. No assumptions — only evidence.</p><div className="feat-tag">Free · Live Now</div></div>
+          <div className="feat"><div className="feat-bar" /><div className="feat-num">02 // learn</div><div className="feat-title">Daily Design Drill</div><p className="feat-desc">Targeted exercises tied to your specific gaps. Design-before-code methodology. The kind of thinking that separates senior from staff.</p><div className="feat-tag">Coming Soon</div></div>
+          <div className="feat"><div className="feat-bar" /><div className="feat-num">03 // capture</div><div className="feat-title">Living Resume</div><p className="feat-desc">Your resume updates itself. Shipped features, merged PRs, and measurable outcomes become impact-first bullets — written automatically, always current.</p><div className="feat-tag">Coming Soon</div></div>
+          <div className="feat"><div className="feat-bar" /><div className="feat-num">04 // remember</div><div className="feat-title">Meeting Second Brain</div><p className="feat-desc">Logs every 1:1, standup, and skip-level. Surfaces influence patterns and assembles your promotion narrative from actual conversations.</p><div className="feat-tag">Coming Soon</div></div>
+          <div className="feat"><div className="feat-bar" /><div className="feat-num">05 // amplify</div><div className="feat-title">LinkedIn on Autopilot</div><p className="feat-desc">Turns milestones into specific, technical posts drafted from what you actually did — not from templates. Visibility without performance.</p><div className="feat-tag">Coming Soon</div></div>
+          <div className="feat"><div className="feat-bar" /><div className="feat-num">06 // signal</div><div className="feat-title">The Jump Signal</div><p className="feat-desc">Readiness tracked across all domains. When you cross the threshold the system tells you — promotion, pivot, or exit. You will know when.</p><div className="feat-tag">Coming Soon</div></div>
         </div>
       </div>
 
@@ -282,7 +282,7 @@ export function LandingPage() {
         <h2 className="sec-h">
           Day one to
           <br />
-          <span className="g">your next jump.</span>
+          <span className="g">your next move.</span>
         </h2>
 
         <div className="how-grid">
@@ -295,10 +295,10 @@ export function LandingPage() {
               <div className="step-n">01</div>
               <div className="step-body">
                 <div className="step-label">Connect</div>
-                <div className="step-h">Link your professional surface area</div>
+                <div className="step-h">Bring your professional footprint</div>
                 <p className="step-p">
-                  GitHub, LinkedIn, resume, portfolio. Takes minutes. Growth OS immediately begins
-                  building your career graph and identifying the gaps you have been guessing at.
+                  GitHub, resume, portfolio, website. Two minutes. Growth OS starts mapping
+                  your career graph and surfacing what you cannot see yourself.
                 </p>
               </div>
             </div>
@@ -310,11 +310,10 @@ export function LandingPage() {
               <div className="step-n">02</div>
               <div className="step-body">
                 <div className="step-label">Analyze</div>
-                <div className="step-h">Get your gap analysis</div>
+                <div className="step-h">See where you actually stand</div>
                 <p className="step-p">
-                  A precise breakdown of skill gaps, brand gaps, and trajectory gaps mapped against
-                  your actual target. Not what a coach assumes you want. What the data shows you
-                  need.
+                  A five-domain breakdown of skills, design maturity, execution, communication,
+                  and leadership — measured against your target role. Not opinions. Measurements.
                 </p>
               </div>
             </div>
@@ -326,10 +325,10 @@ export function LandingPage() {
               <div className="step-n">03</div>
               <div className="step-body">
                 <div className="step-label">Plan</div>
-                <div className="step-h">Receive your 90-day roadmap</div>
+                <div className="step-h">Get a roadmap built from your gaps</div>
                 <p className="step-p">
-                  A 30-60-90 day plan across upskilling, branding, and positioning. Built from your
-                  specific gaps. Adapts as you make progress. Never stale, never generic.
+                  Three phases of concrete actions across upskilling, positioning, and visibility.
+                  Generated from your specific weaknesses. Not a template — a prescription.
                 </p>
               </div>
             </div>
@@ -341,11 +340,10 @@ export function LandingPage() {
               <div className="step-n">04</div>
               <div className="step-body">
                 <div className="step-label">Execute</div>
-                <div className="step-h">15 minutes a day. Watch it compound.</div>
+                <div className="step-h">15 minutes a day. The system does the rest.</div>
                 <p className="step-p">
-                  Daily micro-learning, code tasks, and reflections. The system logs your meetings,
-                  updates your resume, drafts your LinkedIn posts. You just do the work. Growth OS
-                  handles the rest.
+                  Daily lessons, design exercises, and meeting logs. Auto-generated resume bullets
+                  and LinkedIn drafts. You focus on the work. Growth OS captures the evidence.
                 </p>
               </div>
             </div>
@@ -357,11 +355,10 @@ export function LandingPage() {
               <div className="step-n">05</div>
               <div className="step-body">
                 <div className="step-label">Move</div>
-                <div className="step-h">Make your jump when the signal fires</div>
+                <div className="step-h">The system tells you when</div>
                 <p className="step-p">
-                  When your readiness score hits the threshold, Growth OS tells you. Promotion ask,
-                  job search, pivot, or starting something of your own. You will know. And you will
-                  be ready.
+                  When your readiness score crosses the threshold — promotion ask, new role, pivot,
+                  or founding — Growth OS fires the signal. No more wondering if it is the right time.
                 </p>
               </div>
             </div>
@@ -723,77 +720,80 @@ export function LandingPage() {
         <div className="sec-tag">Why Growth OS</div>
         <div className="why-grid">
           <div>
-            <div className="why-quote">Most engineers manage their career the way they manage email.<br /><br /><span className="g">Reactively. Hoping someone notices. Guessing when to move.</span><br /><br />Your career deserves the same rigor as your codebase.</div>
+            <div className="why-quote">Most engineers manage their career the way they manage their inbox.<br /><br /><span className="g">Reactively. One notification at a time. Hoping the right person notices the right thing at the right moment.</span><br /><br />Your career deserves the same architecture as your systems.</div>
           </div>
           <ul className="belief-list">
-            <li>Your commits should build your resume in real time</li>
-            <li>Your 1:1 notes should feed your promotion case automatically</li>
-            <li>Your learning should be tied to actual gaps, not trending courses</li>
-            <li>Your LinkedIn should reflect real work, not performed thought leadership</li>
-            <li>You should always know what your next move is and whether you are ready</li>
-            <li>Your career should be a system, not a series of accidents</li>
-            <li>The best engineers ship great code and manage their trajectory deliberately</li>
+            <li>Your commits should write your resume while you sleep</li>
+            <li>Your 1:1 notes should feed your promotion case without extra effort</li>
+            <li>Your learning should close specific gaps, not chase trending topics</li>
+            <li>Your LinkedIn should show evidence, not performance</li>
+            <li>You should know your next move before anyone asks</li>
+            <li>Your career should be engineered, not improvised</li>
           </ul>
         </div>
       </div>
 
       <div className="sec alt" id="pricing">
         <div className="sec-tag">Pricing</div>
-        <h2 className="sec-h">Simple pricing.<br /><span className="g">No surprises.</span></h2>
-        <p className="sec-p">Start free. Upgrade when you see the value. All plans include the core gap analysis and roadmap generator.</p>
+        <h2 className="sec-h">Start free.<br /><span className="g">No card required.</span></h2>
+        <p className="sec-p">Run a full gap analysis today at zero cost. Upgrade when the daily engine launches.</p>
         <div className="pricing-grid">
           <div className="plan">
             <span className="plan-badge">
-              {"// free tier"}
+              {"// free forever"}
             </span>
             <div className="plan-name">Explorer</div>
-            <div className="plan-price">$0<span> / month</span></div>
-            <div className="plan-desc">Connect, analyze your gaps, and see your roadmap. No card required.</div>
+            <div className="plan-price">$0<span> / forever</span></div>
+            <div className="plan-desc">Full gap analysis. Personalized plan. No sign-up required.</div>
             <ul className="plan-features">
-              <li>Gap analysis (1 target role)</li><li>90-day roadmap generated</li>
-              <li>5 micro-learning sessions / month</li><li>Resume snapshot</li><li>Community access</li>
+              <li>Gap analysis across 5 domains</li>
+              <li>Readiness score + domain breakdowns</li>
+              <li>Personalized 90-day action plan</li>
+              <li>Upskilling project recommendations</li>
+              <li>Posting strategy + promotion narrative</li>
+              <li>Downloadable results report</li>
             </ul>
-            <a href="#access" className="plan-cta outline" onClick={handleStartJourney}>Start Free</a>
+            <a href="/onboarding" className="plan-cta outline" onClick={handleStartJourney}>Start Free</a>
           </div>
           <div className="plan featured">
             <span className="plan-badge">
-              {"// most popular"}
+              {"// coming soon"}
             </span>
             <div className="plan-name">Operator</div>
             <div className="plan-price">$29<span> / month</span></div>
-            <div className="plan-desc">The full OS. For engineers serious about their next jump.</div>
+            <div className="plan-desc">The full operating system. Daily actions, living resume, and your jump signal.</div>
             <ul className="plan-features">
-              <li>Unlimited gap analyses</li><li>Live adaptive roadmap</li>
-              <li>Daily micro-learning + code tasks</li><li>Living resume (auto-updates)</li>
-              <li>Meeting second brain + calendar sync</li><li>LinkedIn post drafts (weekly)</li>
+              <li>Everything in Explorer</li>
+              <li>Unlimited gap analysis re-runs</li>
+              <li>Daily Design Drill (micro-learning + code)</li>
+              <li>Living Resume (auto-updates from work)</li>
+              <li>Impact Bank (real outcome capture)</li>
+              <li>Meeting Second Brain + Calendar Sync</li>
+              <li>LinkedIn Post Generator (weekly drafts)</li>
               <li>Jump Signal readiness tracker</li>
             </ul>
-            <a href="#access" className="plan-cta solid" onClick={handleGetAccess}>Get Early Access</a>
+            <a href="#access" className="plan-cta solid" onClick={handleGetAccess}>Join Waitlist</a>
           </div>
           <div className="plan">
             <span className="plan-badge">
-              {"// for teams"}
+              {"// enterprise"}
             </span>
-            <div className="plan-name">Team OS</div>
-            <div className="plan-price">$79<span> / seat / mo</span></div>
-            <div className="plan-desc">For engineering managers who want their whole team moving deliberately.</div>
-            <ul className="plan-features">
-              <li>Everything in Operator</li><li>Team-level gap dashboard</li>
-              <li>Manager view and coaching prompts</li><li>Aggregate readiness signals</li>
-              <li>Custom target role templates</li><li>Slack integration</li><li>Priority support</li>
-            </ul>
-            <a href="#access" className="plan-cta outline" onClick={handleGetAccess}>Contact Us</a>
+            <div className="plan-name">Enterprise</div>
+            <div className="plan-price" style={{ fontSize: '1.6rem' }}>Custom</div>
+            <div className="plan-desc">For engineering orgs that want structured progression at scale. Tailored onboarding, team dashboards, and dedicated support.</div>
+            <div style={{ flex: 1 }} />
+            <a href="mailto:hello@growthos.dev" className="plan-cta outline">Let&apos;s Talk</a>
           </div>
         </div>
       </div>
 
       <div className="sec" id="access">
-        <div className="sec-tag">Get Access</div>
+        <div className="sec-tag">Get Started</div>
         <div className="cta-inner">
-          <h2>Start your<br /><span className="g">gap analysis today.</span></h2>
-          <p>Join engineers, PMs, and designers who are done drifting. Early access is open now. No credit card. No fluff.</p>
+          <h2>See your gaps.<br /><span className="g">Close them.</span></h2>
+          <p>One analysis. Five domains. A plan built from your actual work. Free — no sign-up, no card, no catch.</p>
           <div className="brow" style={{ marginTop: '1.8rem' }}>
-            <a href="/onboarding" className="bp" onClick={handleStartJourney}>Start My Journey</a>
+            <a href="/onboarding" className="bp" onClick={handleStartJourney}>Run My Analysis</a>
           </div>
         </div>
       </div>
@@ -802,7 +802,7 @@ export function LandingPage() {
         <div className="footer-top">
           <div className="footer-brand">
             <span className="f-logo">growth<span className="g">_os</span></span>
-            <p>The career progression engine for engineers, PMs, and designers who refuse to drift.</p>
+            <p>The structured progression engine for people who build things.</p>
           </div>
           <div className="footer-col"><h4>Product</h4><a href="#system">The System</a><a href="#how">How It Works</a><a href="#pricing">Pricing</a><a href="#access">Get Access</a></div>
           <div className="footer-col"><h4>Company</h4><a href="#">About</a><a href="#">Blog</a><a href="#">Careers</a><a href="#">Contact</a></div>

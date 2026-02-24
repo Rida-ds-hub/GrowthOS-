@@ -6,58 +6,52 @@ import Link from "next/link"
 
 const plans = [
   {
-    badge: "// free tier",
+    badge: "// free forever",
     name: "Explorer",
     price: "$0",
-    period: " / month",
+    period: " / forever",
     description:
-      "Connect, analyze your gaps, and see your roadmap. No card required.",
+      "Full gap analysis. Personalized plan. No sign-up required.",
     features: [
-      "Gap analysis (1 target role)",
-      "90-day roadmap generated",
-      "5 micro-learning sessions / month",
-      "Resume snapshot",
-      "Community access",
+      "Gap analysis across 5 domains",
+      "Readiness score + domain breakdowns",
+      "Personalized 90-day action plan",
+      "Upskilling project recommendations",
+      "Posting strategy + promotion narrative",
+      "Downloadable results report",
     ],
     cta: "Start Free",
     ctaType: "outline",
   },
   {
-    badge: "// most popular",
+    badge: "// coming soon",
     name: "Operator",
     price: "$29",
     period: " / month",
-    description: "The full OS. For engineers serious about their next jump.",
+    description: "The full operating system. Daily actions, living resume, and your jump signal.",
     features: [
-      "Unlimited gap analyses",
-      "Live adaptive roadmap",
-      "Daily micro-learning + code tasks",
-      "Living resume (auto-updates)",
-      "Meeting second brain + calendar sync",
-      "LinkedIn post drafts (weekly)",
+      "Everything in Explorer",
+      "Unlimited gap analysis re-runs",
+      "Daily Design Drill (micro-learning + code)",
+      "Living Resume (auto-updates from work)",
+      "Impact Bank (real outcome capture)",
+      "Meeting Second Brain + Calendar Sync",
+      "LinkedIn Post Generator (weekly drafts)",
       "Jump Signal readiness tracker",
     ],
-    cta: "Get Early Access",
+    cta: "Join Waitlist",
     ctaType: "solid",
     featured: true,
   },
   {
-    badge: "// for teams",
-    name: "Team OS",
-    price: "$79",
-    period: " / seat / mo",
+    badge: "// enterprise",
+    name: "Enterprise",
+    price: "Custom",
+    period: "",
     description:
-      "For engineering managers who want their whole team moving deliberately.",
-    features: [
-      "Everything in Operator",
-      "Team-level gap dashboard",
-      "Manager view and coaching prompts",
-      "Aggregate readiness signals",
-      "Custom target role templates",
-      "Slack integration",
-      "Priority support",
-    ],
-    cta: "Contact Us",
+      "For engineering orgs that want structured progression at scale. Tailored onboarding, team dashboards, and dedicated support.",
+    features: [],
+    cta: "Let\u2019s Talk",
     ctaType: "outline",
   },
 ]
@@ -89,8 +83,7 @@ export function Pricing() {
           <span className="text-emerald-500">No surprises.</span>
         </h2>
         <p className="text-sm leading-relaxed text-zinc-400 font-light max-w-[520px] mb-12">
-          Start free. Upgrade when you see the value. All plans include the core
-          gap analysis and roadmap generator.
+          Run a full gap analysis today at zero cost. Upgrade when the daily engine launches.
         </p>
 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-px bg-zinc-800 border border-zinc-800">
@@ -120,23 +113,26 @@ export function Pricing() {
               <p className="text-xs leading-relaxed text-zinc-500 mb-6">
                 {plan.description}
               </p>
-              <ul className="list-none mb-8 space-y-1">
-                {plan.features.map((feature, idx) => (
-                  <li
-                    key={idx}
-                    className="text-xs text-zinc-400 flex items-center gap-2.5 py-1 border-b border-zinc-800 leading-snug"
-                  >
-                    <span className="text-emerald-500 text-[0.65rem] opacity-70 flex-shrink-0">
-                      {"//"}
-                    </span>
-                    <span>{feature}</span>
-                  </li>
-                ))}
-              </ul>
+              {plan.features.length > 0 && (
+                <ul className="list-none mb-8 space-y-1">
+                  {plan.features.map((feature, idx) => (
+                    <li
+                      key={idx}
+                      className="text-xs text-zinc-400 flex items-center gap-2.5 py-1 border-b border-zinc-800 leading-snug"
+                    >
+                      <span className="text-emerald-500 text-[0.65rem] opacity-70 flex-shrink-0">
+                        {"//"}
+                      </span>
+                      <span>{feature}</span>
+                    </li>
+                  ))}
+                </ul>
+              )}
+              {plan.features.length === 0 && <div className="flex-1" />}
               <Link
-                href={plan.cta === "Contact Us" ? "#" : "/onboarding"}
+                href={plan.cta === "Let\u2019s Talk" ? "mailto:hello@growthos.dev" : "/onboarding"}
                 onClick={(e) => {
-                  if (plan.cta !== "Contact Us") {
+                  if (plan.cta !== "Let\u2019s Talk") {
                     e.preventDefault()
                     handleCTA(plan.cta)
                   }
