@@ -28,6 +28,13 @@ export async function POST(request: NextRequest) {
       )
     }
 
+    if (!supabase) {
+      return NextResponse.json(
+        { error: "Database not configured" },
+        { status: 503 }
+      )
+    }
+
     const { error } = await supabase.from("feedback").insert({
       user_id: userId,
       type,
