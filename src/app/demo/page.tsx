@@ -60,7 +60,7 @@ const demoGapAnalysis: GapAnalysis = {
   gaps: [
     {
       domain: "System Design Maturity",
-      gap: "moderate",
+      gap: "medium",
       observation: "Strong foundation in microservices architecture, but limited experience with distributed systems at scale.",
       requirement: "Design and implement a distributed caching layer for a high-traffic service handling 1M+ requests/day.",
       closingAction: "Build a distributed caching system project and document design decisions."
