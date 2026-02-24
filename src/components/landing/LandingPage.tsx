@@ -146,7 +146,9 @@ export function LandingPage() {
               <div className="prog-row"><span>Leadership Signal</span><div className="prog-bar"><div className="prog-fill" style={{ width: '22%' }} /></div><span className="prog-val">22%</span></div>
               <div className="prog-row"><span>Stakeholder Comms</span><div className="prog-bar"><div className="prog-fill" style={{ width: '48%' }} /></div><span className="prog-val">48%</span></div>
             </div>
-            <p style={{ fontSize: '.74rem', color: 'var(--muted)' }}>// Real gaps. Real data. Zero guesswork.</p>
+            <p style={{ fontSize: ".74rem", color: "var(--muted)" }}>
+              {"// Real gaps. Real data. Zero guesswork."}
+            </p>
             <div className="brow" style={{ marginTop: '1.2rem' }}>
               <Link 
                 href="/onboarding"
@@ -589,7 +591,7 @@ export function LandingPage() {
 
             {/* STEP 4: Execute */}
             <div className={`how-visual ${activeHowStep === 4 ? "active" : ""}`} id="hv-4">
-              <div className="hv-eyebrow">Today's activity</div>
+              <div className="hv-eyebrow">Today&apos;s activity</div>
               <div className="hv-chrome">
                 <div className="hv-topbar">
                   <div className="hv-dots">
@@ -741,7 +743,9 @@ export function LandingPage() {
         <p className="sec-p">Start free. Upgrade when you see the value. All plans include the core gap analysis and roadmap generator.</p>
         <div className="pricing-grid">
           <div className="plan">
-            <span className="plan-badge">// free tier</span>
+            <span className="plan-badge">
+              {"// free tier"}
+            </span>
             <div className="plan-name">Explorer</div>
             <div className="plan-price">$0<span> / month</span></div>
             <div className="plan-desc">Connect, analyze your gaps, and see your roadmap. No card required.</div>
@@ -752,7 +756,9 @@ export function LandingPage() {
             <a href="#access" className="plan-cta outline" onClick={handleStartJourney}>Start Free</a>
           </div>
           <div className="plan featured">
-            <span className="plan-badge">// most popular</span>
+            <span className="plan-badge">
+              {"// most popular"}
+            </span>
             <div className="plan-name">Operator</div>
             <div className="plan-price">$29<span> / month</span></div>
             <div className="plan-desc">The full OS. For engineers serious about their next jump.</div>
@@ -765,7 +771,9 @@ export function LandingPage() {
             <a href="#access" className="plan-cta solid" onClick={handleGetAccess}>Get Early Access</a>
           </div>
           <div className="plan">
-            <span className="plan-badge">// for teams</span>
+            <span className="plan-badge">
+              {"// for teams"}
+            </span>
             <div className="plan-name">Team OS</div>
             <div className="plan-price">$79<span> / seat / mo</span></div>
             <div className="plan-desc">For engineering managers who want their whole team moving deliberately.</div>
