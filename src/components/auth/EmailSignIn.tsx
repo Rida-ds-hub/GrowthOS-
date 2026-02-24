@@ -109,7 +109,7 @@ export function EmailSignIn({ onSuccess, onSwitchToSignUp }: EmailSignInProps) {
 
       {onSwitchToSignUp && (
         <p className="text-center text-sm text-zinc-400">
-          Don't have an account?{" "}
+          Don&apos;t have an account?{" "}
           <button
             type="button"
             onClick={onSwitchToSignUp}

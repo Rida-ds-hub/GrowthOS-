@@ -60,7 +60,7 @@ export function Footer() {
       </div>
       <div className="border-t border-zinc-800 px-12 py-6 flex justify-between items-center">
         <div className="text-[0.68rem] text-zinc-800 tracking-[0.12em]">
-          // growth_os · v1.0 · 2025 · all rights reserved
+          {"// growth_os · v1.0 · 2025 · all rights reserved"}
         </div>
         <div className="flex gap-6">
           <a

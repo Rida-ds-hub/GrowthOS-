@@ -158,7 +158,7 @@ export function StickyHero() {
                 )}
                 {panel.progress && (
                   <p className="text-[0.74rem] text-zinc-500">
-                    // Real gaps. Real data. Zero guesswork.
+                    {"// Real gaps. Real data. Zero guesswork."}
                   </p>
                 )}
 

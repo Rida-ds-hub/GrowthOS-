@@ -35,7 +35,9 @@ export function Logo({ variant = "horizontal", size = "header", className, showB
           <span className="text-emerald-500">os</span>
         </div>
         <div className="text-[10px] font-mono font-normal text-muted tracking-widest uppercase mt-3.5 flex items-center gap-2">
-          <span className="text-emerald-500 opacity-50">//</span>
+          <span className="text-emerald-500 opacity-50">
+            {"//"}
+          </span>
           <span>career progression engine</span>
         </div>
       </div>

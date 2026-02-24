@@ -251,7 +251,9 @@ export function LandingPage() {
           <div><div className="stat-n">0</div><div className="stat-l">Unstructured guesswork</div></div>
         </div>
         <div className="stats-note">
-          <div className="stats-note-label">// Powered by your real work</div>
+          <div className="stats-note-label">
+            {"// Powered by your real work"}
+          </div>
           <p>
             Growth OS pulls from your GitHub, LinkedIn, calendar, and resume to keep
             these numbers live and grounded in actual evidence.
@@ -799,7 +801,11 @@ export function LandingPage() {
           <div className="footer-col"><h4>Legal</h4><a href="#">Privacy Policy</a><a href="#">Terms of Service</a><a href="#">Security</a></div>
         </div>
         <div className="footer-bottom">
-          <div className="footer-copy">// growth_os · v1.0 · {new Date().getFullYear()} · all rights reserved</div>
+          <div className="footer-copy">
+            {"// growth_os · v1.0 · "} 
+            {new Date().getFullYear()}
+            {" · all rights reserved"}
+          </div>
           <div className="footer-socials"><a href="#">Twitter</a><a href="#">GitHub</a><a href="#">LinkedIn</a></div>
         </div>
       </footer>

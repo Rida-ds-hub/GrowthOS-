@@ -46,7 +46,7 @@ export function CTA() {
             </Button>
           </form>
           <p className="text-[0.68rem] text-zinc-500 mt-3">
-            // Early access. No credit card. No spam. Cancel anytime.
+            {"// Early access. No credit card. No spam. Cancel anytime."}
           </p>
         </div>
       </div>

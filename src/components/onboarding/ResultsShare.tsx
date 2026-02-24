@@ -182,7 +182,9 @@ ${new Date().toLocaleDateString()}
             <span className="text-red-500 text-2xl">⚠️</span>
           </div>
           <h2 className="text-2xl font-semibold text-white">No Analysis Data Available</h2>
-          <p className="text-zinc-400">The analysis may have failed or data wasn't received properly.</p>
+          <p className="text-zinc-400">
+            The analysis may have failed or data wasn&apos;t received properly.
+          </p>
           <p className="text-zinc-500 text-sm">Check browser console (F12) and server terminal for error details</p>
           <div className="mt-6 p-4 bg-zinc-900 rounded-lg text-left">
             <p className="text-xs text-zinc-400 mb-2">Raw data received:</p>

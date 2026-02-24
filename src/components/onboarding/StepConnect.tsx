@@ -105,7 +105,7 @@ export function StepConnect({ onContinue }: StepConnectProps) {
             Connect Your Accounts
           </h2>
           <p className="text-zinc-300">
-            Connect additional accounts to enhance your gap analysis. If you signed in with GitHub or LinkedIn, they're already connected. All fields are optional.
+            Connect additional accounts to enhance your gap analysis. If you signed in with GitHub or LinkedIn, they&apos;re already connected. All fields are optional.
           </p>
         </div>
 
@@ -178,7 +178,7 @@ export function StepConnect({ onContinue }: StepConnectProps) {
                   <>
                     <div className="p-4 bg-zinc-950 border border-zinc-700 rounded-lg">
                       <p className="text-sm text-zinc-300 mb-3">
-                        To comply with LinkedIn's Terms of Service, we only accept manually provided profile data.
+                        To comply with LinkedIn&apos;s Terms of Service, we only accept manually provided profile data.
                       </p>
                       <Button
                         type="button"
@@ -221,7 +221,9 @@ export function StepConnect({ onContinue }: StepConnectProps) {
                       Sign in required
                     </p>
                     <p className="text-xs text-zinc-400">
-                      LinkedIn data can only be added after signing in. This ensures compliance with LinkedIn's Terms of Service. Gap analysis works great with just GitHub and Resume data.
+                      LinkedIn data can only be added after signing in. This ensures compliance
+                      with LinkedIn&apos;s Terms of Service. Gap analysis works great with just
+                      GitHub and Resume data.
                     </p>
                   </div>
                 </div>

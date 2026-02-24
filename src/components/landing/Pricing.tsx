@@ -127,7 +127,7 @@ export function Pricing() {
                     className="text-xs text-zinc-400 flex items-center gap-2.5 py-1 border-b border-zinc-800 leading-snug"
                   >
                     <span className="text-emerald-500 text-[0.65rem] opacity-70 flex-shrink-0">
-                      //
+                      {"//"}
                     </span>
                     <span>{feature}</span>
                   </li>
