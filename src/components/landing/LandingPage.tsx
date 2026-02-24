@@ -97,6 +97,16 @@ export function LandingPage() {
           <a href="#how">How It Works</a>
           <a href="#why">Why</a>
           <a href="#pricing">Pricing</a>
+          <Link 
+            href="/onboarding"
+            className="cta" 
+            onClick={(e) => {
+              e.stopPropagation()
+              handleStartJourney(e)
+            }}
+          >
+            Start My Journey
+          </Link>
         </div>
       </nav>
 
@@ -136,6 +146,18 @@ export function LandingPage() {
               <div className="prog-row"><span>Stakeholder Comms</span><div className="prog-bar"><div className="prog-fill" style={{ width: '48%' }} /></div><span className="prog-val">48%</span></div>
             </div>
             <p style={{ fontSize: '.74rem', color: 'var(--muted)' }}>// Real gaps. Real data. Zero guesswork.</p>
+            <div className="brow" style={{ marginTop: '1.2rem' }}>
+              <Link 
+                href="/onboarding"
+                className="bp" 
+                onClick={(e) => {
+                  e.stopPropagation()
+                  handleStartJourney(e)
+                }}
+              >
+                Start My Journey
+              </Link>
+            </div>
           </div>
 
           <div className={`panel ${activePanel === 2 ? 'on' : ''}`} id="p2">
@@ -150,6 +172,18 @@ export function LandingPage() {
               <div className="tl"><span className="o">1:1 with Priya logged ................... </span><span className="c">done</span></div>
               <div className="tl"><span className="w">Readiness score: </span><span className="c">65% (+3 today)</span></div>
             </div>
+            <div className="brow" style={{ marginTop: '1.2rem' }}>
+              <Link 
+                href="/onboarding"
+                className="bp" 
+                onClick={(e) => {
+                  e.stopPropagation()
+                  handleStartJourney(e)
+                }}
+              >
+                Start My Journey
+              </Link>
+            </div>
           </div>
 
           <div className={`panel ${activePanel === 3 ? 'on' : ''}`} id="p3">
@@ -163,6 +197,18 @@ export function LandingPage() {
               <div className="tl"><span className="o">LinkedIn draft ready ...... </span><span className="c">done</span></div>
               <div className="tl"><span className="o">Promo narrative updated ... </span><span className="c">done</span></div>
               <div className="tl"><span className="c">$ </span><span className="tc" /></div>
+            </div>
+            <div className="brow" style={{ marginTop: '1.2rem' }}>
+              <Link 
+                href="/onboarding"
+                className="bp" 
+                onClick={(e) => {
+                  e.stopPropagation()
+                  handleStartJourney(e)
+                }}
+              >
+                Start My Journey
+              </Link>
             </div>
           </div>
 
@@ -179,7 +225,16 @@ export function LandingPage() {
               <div className="tl" style={{ marginTop: '4px', borderTop: '1px solid #1e1e1e', paddingTop: '6px' }}><span className="c">READY. Time to make your move.</span></div>
             </div>
             <div className="brow" style={{ marginTop: '1.2rem' }}>
-              <a href="/onboarding" className="bp" onClick={handleStartJourney}>Start My Journey</a>
+              <Link 
+                href="/onboarding"
+                className="bp" 
+                onClick={(e) => {
+                  e.stopPropagation()
+                  handleStartJourney(e)
+                }}
+              >
+                Start My Journey
+              </Link>
             </div>
           </div>
 

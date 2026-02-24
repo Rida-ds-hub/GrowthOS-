@@ -38,12 +38,20 @@ export function LandingHeader() {
     <header className="fixed top-0 left-0 right-0 z-[200] bg-[rgba(10,10,10,0.95)] backdrop-blur-[20px] border-b border-[#1e1e1e]">
       <div className="max-w-7xl mx-auto px-12">
         <div className="flex items-center justify-between h-16">
-          {/* Logo - Left */}
-          <Link href="/" className="flex items-center gap-1.5 font-['var(--font-jetbrains-mono)'] text-[15px] font-bold text-white">
-            <span className="text-emerald-500 opacity-45 font-light text-[17px]">[</span>
-            growth<span className="text-emerald-500">_os</span>
-            <span className="text-emerald-500 opacity-45 font-light text-[17px]">]</span>
-          </Link>
+          {/* Logo and Start Journey Button - Left */}
+          <div className="flex items-center gap-4">
+            <Link href="/" className="flex items-center gap-1.5 font-['var(--font-jetbrains-mono)'] text-[15px] font-bold text-white">
+              <span className="text-emerald-500 opacity-45 font-light text-[17px]">[</span>
+              growth<span className="text-emerald-500">_os</span>
+              <span className="text-emerald-500 opacity-45 font-light text-[17px]">]</span>
+            </Link>
+            <Button
+              onClick={handleStartJourney}
+              className="bg-emerald-500 text-[#0a0a0a] hover:opacity-82 font-['var(--font-jetbrains-mono)'] font-bold text-[0.67rem] tracking-[0.15em] uppercase px-4 py-2"
+            >
+              Start My Journey
+            </Button>
+          </div>
 
           {/* Navigation - Center */}
           <nav className="hidden md:flex items-center gap-9">
