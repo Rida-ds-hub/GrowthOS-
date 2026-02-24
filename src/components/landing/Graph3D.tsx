@@ -202,8 +202,8 @@ export function Graph3D({ scrollProgress }: Graph3DProps) {
       // Draw edges
       ;[...EDGES]
         .sort((a, b) => {
-          const za = P[a[0]] ? P[a[0]].sz : 0
-          const zb = P[b[0]] ? P[b[0]].sz : 0
+          const za = P[a[0]]?.sz ?? 0
+          const zb = P[b[0]]?.sz ?? 0
           return zb - za
         })
         .forEach(([ai, bi]) => {

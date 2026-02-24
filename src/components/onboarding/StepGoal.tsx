@@ -39,7 +39,7 @@ export function StepGoal({ onContinue, initialData }: StepGoalProps) {
     targetRole.trim() &&
     yearsExp !== "" &&
     timelineMonths > 0 &&
-    progressionIntent !== ""
+    !!progressionIntent
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault()

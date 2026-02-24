@@ -24,6 +24,7 @@ interface OnboardingData {
   githubDataText?: string
   linkedinUrl?: string
   linkedinDataText?: string
+  linkedinManualData?: string
   resumeText?: string
   gapAnalysis?: any
 }
@@ -99,6 +100,7 @@ export function OnboardingWizard() {
     return false
   })
   const [isSignUpModalOpen, setIsSignUpModalOpen] = useState(false)
+  const [analysisStatus, setAnalysisStatus] = useState("")
 
   // Save to localStorage whenever data changes
   useEffect(() => {

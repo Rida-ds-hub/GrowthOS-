@@ -8,7 +8,7 @@ const generateOrbs = () => {
   for (let i = 0; i < 20; i++) {
     // Random starting position (from edges of screen)
     const startSide = Math.floor(Math.random() * 4) // 0: top, 1: right, 2: bottom, 3: left
-    let startX, startY, endX, endY
+    let startX = 0, startY = 0, endX = 0, endY = 0
 
     switch (startSide) {
       case 0: // Top
@@ -29,7 +29,7 @@ const generateOrbs = () => {
         endX = Math.random() * 100
         endY = -10
         break
-      case 3: // Left
+      default: // Left
         startX = -10
         startY = Math.random() * 100
         endX = 110

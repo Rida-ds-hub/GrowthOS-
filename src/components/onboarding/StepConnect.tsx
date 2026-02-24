@@ -14,6 +14,8 @@ interface StepConnectProps {
     githubConnected: boolean
     linkedinConnected: boolean
     websiteUrl?: string
+    githubUsername?: string
+    linkedinManualData?: string
   }) => void
 }
 
@@ -79,7 +81,7 @@ export function StepConnect({ onContinue }: StepConnectProps) {
   const handleContinue = () => {
     const continueData = {
       githubConnected: githubConnected || !!githubUsername.trim(),
-      linkedinConnected: linkedinConnected || (session && !!linkedinManualData.trim()), // Only if authenticated
+      linkedinConnected: linkedinConnected || !!(session && linkedinManualData.trim()), // Only if authenticated
       websiteUrl: websiteUrl.trim() || undefined,
       githubUsername: githubUsername.trim() || undefined,
       // linkedinUrl removed - only manual data allowed
