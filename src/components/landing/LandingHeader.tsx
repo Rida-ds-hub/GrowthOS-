@@ -5,17 +5,16 @@ import Link from "next/link"
 import { useRouter } from "next/navigation"
 import { useSession } from "next-auth/react"
 import { motion } from "framer-motion"
-import { Logo } from "@/components/logo/Logo"
 import { Button } from "@/components/ui/button"
 import { Menu, X } from "lucide-react"
 import { SignInModal } from "@/components/auth/SignInModal"
 import { SignUpModal } from "@/components/auth/SignUpModal"
 
 const navItems = [
-  { label: "Features", href: "#features" },
-  { label: "How It Works", href: "#how-it-works" },
+  { label: "The System", href: "#system" },
+  { label: "How It Works", href: "#how" },
+  { label: "Why", href: "#why" },
   { label: "Pricing", href: "#pricing" },
-  { label: "Resources", href: "#resources" },
 ]
 
 export function LandingHeader() {
@@ -36,21 +35,23 @@ export function LandingHeader() {
   }
 
   return (
-    <header className="fixed top-0 left-0 right-0 z-50 bg-[#0a0a0a]/95 backdrop-blur-md border-b border-zinc-800">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    <header className="fixed top-0 left-0 right-0 z-[200] bg-[rgba(10,10,10,0.95)] backdrop-blur-[20px] border-b border-[#1e1e1e]">
+      <div className="max-w-7xl mx-auto px-12">
         <div className="flex items-center justify-between h-16">
           {/* Logo - Left */}
-          <Link href="/" className="flex items-center">
-            <Logo variant="nav" size="nav" />
+          <Link href="/" className="flex items-center gap-1.5 font-['var(--font-jetbrains-mono)'] text-[15px] font-bold text-white">
+            <span className="text-emerald-500 opacity-45 font-light text-[17px]">[</span>
+            growth<span className="text-emerald-500">_os</span>
+            <span className="text-emerald-500 opacity-45 font-light text-[17px]">]</span>
           </Link>
 
           {/* Navigation - Center */}
-          <nav className="hidden md:flex items-center gap-8 flex-1 justify-center">
+          <nav className="hidden md:flex items-center gap-9">
             {navItems.map((item) => (
               <Link
                 key={item.href}
                 href={item.href}
-                className="text-sm font-medium text-zinc-300 hover:text-white transition-colors"
+                className="text-[0.67rem] tracking-[0.2em] uppercase text-zinc-500 hover:text-white transition-colors"
               >
                 {item.label}
               </Link>
@@ -68,9 +69,9 @@ export function LandingHeader() {
             </Button>
             <Button
               onClick={handleStartJourney}
-              className="bg-emerald-500 text-black hover:bg-emerald-400 font-semibold"
+              className="bg-emerald-500 text-[#0a0a0a] hover:opacity-82 font-['var(--font-jetbrains-mono)'] font-bold text-[0.67rem] tracking-[0.15em] uppercase px-5 py-2"
             >
-              Start your journey
+              Get Access
             </Button>
 
             {/* Mobile menu button */}

@@ -1,32 +1,53 @@
 "use client"
 
-import { Card } from "@/components/ui/card"
-
-const items = [
-  { not: "Course Platform", is: "We train thinking, not deliver content" },
-  { not: "Resume Builder", is: "Resumes are an output, not the product" },
-  { not: "Job Board", is: "Out of scope entirely" },
-  { not: "Motivational App", is: "No streaks, no confetti, no guru tone" },
-  { not: "Mentorship Marketplace", is: "Mentors coming soon, but not the core" },
+const beliefs = [
+  "Your commits should build your resume in real time",
+  "Your 1:1 notes should feed your promotion case automatically",
+  "Your learning should be tied to actual gaps, not trending courses",
+  "Your LinkedIn should reflect real work, not performed thought leadership",
+  "You should always know what your next move is and whether you are ready",
+  "Your career should be a system, not a series of accidents",
+  "The best engineers ship great code and manage their trajectory deliberately",
 ]
 
 export function WhatItIsNot() {
   return (
-    <section className="py-32 px-4 bg-[#0a0a0a] border-b border-zinc-800">
-      <div className="max-w-6xl mx-auto">
-        <h2 className="text-4xl md:text-5xl font-bold text-white mb-4 text-center">
-          What this is not
-        </h2>
-        <p className="text-xl text-zinc-400 mb-12 text-center max-w-2xl mx-auto">
-          Clarity on what Growth OS is and isn't.
-        </p>
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {items.map((item, index) => (
-            <Card key={index} className="p-6 bg-zinc-900/50 border-zinc-800 hover:border-zinc-700 transition-colors">
-              <div className="text-zinc-500 line-through mb-3 text-sm">{item.not}</div>
-              <div className="text-zinc-300 font-medium">{item.is}</div>
-            </Card>
-          ))}
+    <section
+      id="why"
+      className="relative z-10 bg-[#0a0a0a] border-t border-[#1e1e1e] py-28 px-12"
+    >
+      <div className="max-w-7xl mx-auto">
+        <div className="flex items-center gap-3 mb-5">
+          <div className="w-4 h-px bg-emerald-500" />
+          <span className="text-[0.62rem] tracking-[0.4em] uppercase text-emerald-500">
+            Why Growth OS
+          </span>
+        </div>
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-20 items-start mt-10">
+          <div>
+            <div className="font-['var(--font-jetbrains-mono)'] text-[clamp(1.1rem,2vw,1.6rem)] font-bold text-white leading-[1.4] tracking-[-0.02em]">
+              Most engineers manage their career the way they manage email.
+              <br />
+              <br />
+              <span className="text-emerald-500">
+                Reactively. Hoping someone notices. Guessing when to move.
+              </span>
+              <br />
+              <br />
+              Your career deserves the same rigor as your codebase.
+            </div>
+          </div>
+          <ul className="list-none">
+            {beliefs.map((belief, index) => (
+              <li
+                key={index}
+                className="text-sm leading-none text-[#a1a1aa] font-light flex items-center gap-3 border-b border-[#1e1e1e] py-[0.85rem]"
+              >
+                <div className="w-[3px] h-[3px] bg-emerald-500 rounded-full flex-shrink-0" />
+                <span>{belief}</span>
+              </li>
+            ))}
+          </ul>
         </div>
       </div>
     </section>

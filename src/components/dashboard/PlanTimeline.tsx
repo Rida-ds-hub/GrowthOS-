@@ -32,38 +32,38 @@ export function PlanTimeline({ gapAnalysis }: PlanTimelineProps) {
       <h2 className="text-2xl font-semibold text-white mb-4">3-Phase Plan</h2>
       
       {/* Flow Diagram */}
-      <div className="flex items-center justify-center gap-2 md:gap-4 mb-6 py-4 overflow-x-auto">
+      <div className="flex items-center justify-center gap-6 md:gap-12 lg:gap-16 mb-8 py-6 overflow-x-auto">
         {phases.map((phase, index) => (
-          <div key={index} className="flex items-center gap-2 md:gap-4 flex-shrink-0">
+          <div key={index} className="flex items-center gap-6 md:gap-12 lg:gap-16 flex-shrink-0">
             <div className="flex flex-col items-center">
               <div className={`
-                w-12 h-12 md:w-16 md:h-16 rounded-full flex items-center justify-center text-xs md:text-sm font-semibold
+                w-16 h-16 md:w-20 md:h-20 lg:w-24 lg:h-24 rounded-full flex items-center justify-center text-base md:text-lg lg:text-xl font-semibold
                 ${index === 0 ? "bg-emerald-500 text-black" : "bg-zinc-800 text-zinc-300"}
               `}>
                 {index + 1}
               </div>
-              <div className="text-[10px] md:text-xs text-zinc-400 mt-1 md:mt-2 text-center max-w-[80px] md:max-w-[100px] leading-tight">
+              <div className="text-xs md:text-sm lg:text-base text-zinc-400 mt-2 md:mt-3 text-center max-w-[120px] md:max-w-[160px] lg:max-w-[200px] leading-tight">
                 {phase.theme || `Phase ${index + 1}`}
               </div>
             </div>
             {index < phases.length - 1 && (
               <div className="flex items-center">
-                <div className="w-6 md:w-12 h-0.5 bg-emerald-500/50" />
-                <div className="w-0 h-0 border-l-[6px] md:border-l-[8px] border-l-emerald-500/50 border-t-[3px] md:border-t-[4px] border-t-transparent border-b-[3px] md:border-b-[4px] border-b-transparent" />
+                <div className="w-12 md:w-20 lg:w-24 h-0.5 bg-emerald-500/50" />
+                <div className="w-0 h-0 border-l-[8px] md:border-l-[12px] lg:border-l-[16px] border-l-emerald-500/50 border-t-[4px] md:border-t-[6px] lg:border-t-[8px] border-t-transparent border-b-[4px] md:border-b-[6px] lg:border-b-[8px] border-b-transparent" />
               </div>
             )}
           </div>
         ))}
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-4 overflow-x-auto md:overflow-visible">
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-6 md:gap-8 overflow-x-auto md:overflow-visible">
         {phases.map((phase, index) => {
           const isCurrentPhase = index === currentPhaseIndex
           return (
             <Card
               key={index}
               className={cn(
-                "bg-zinc-900/50 border-zinc-800 rounded-2xl min-w-[280px]",
+                "bg-zinc-900/50 border-zinc-800 rounded-2xl",
                 isCurrentPhase && "border-emerald-500 border-2"
               )}
             >

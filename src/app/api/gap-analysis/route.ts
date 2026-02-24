@@ -125,6 +125,12 @@ export async function POST(request: NextRequest) {
       .replace(/```\n?/g, "")
       .trim()
 
+    // Remove any leading/trailing whitespace and newlines
+    cleanedResponse = cleanedResponse.trim()
+
+    // Remove control characters that break JSON (keep \n, \r, \t)
+    cleanedResponse = cleanedResponse.replace(/[\x00-\x08\x0B\x0C\x0E-\x1F\x7F]/g, '')
+
     // Fix common JSON issues from AI responses
     // Remove trailing commas before closing braces/brackets (multiple passes for nested structures)
     for (let i = 0; i < 5; i++) {
@@ -258,14 +264,36 @@ export async function POST(request: NextRequest) {
           console.error("API: Context around error:", cleanedResponse.substring(Math.max(0, pos - 100), pos + 100))
         }
         
-        return NextResponse.json(
-          { 
-            error: "Failed to parse analysis response. The AI may have returned malformed JSON.",
-            details: parseError.message,
-            responseLength: cleanedResponse.length
-          },
-          { status: 500 }
-        )
+        // Try one more time with even more aggressive cleanup
+        try {
+          // Remove all control characters except \n, \r, \t
+          let ultraCleaned = cleanedResponse.replace(/[\x00-\x08\x0B\x0C\x0E-\x1F\x7F]/g, '')
+          
+          // Try to fix any remaining issues
+          ultraCleaned = ultraCleaned
+            .replace(/,(\s*[}\]])/g, '$1') // Remove trailing commas
+            .replace(/([{,]\s*)([a-zA-Z_][a-zA-Z0-9_]*)\s*:/g, '$1"$2":') // Quote unquoted keys
+            .replace(/:\s*([^",\[\]{}]+)\s*([,}\]])/g, (match, value, suffix) => {
+              // Quote unquoted string values
+              if (!value.match(/^(true|false|null|\d+)$/)) {
+                return `: "${value.replace(/"/g, '\\"')}"${suffix}`
+              }
+              return match
+            })
+          
+          gapAnalysis = JSON.parse(ultraCleaned)
+          console.log("API: Successfully parsed after ultra-aggressive cleanup")
+        } catch (thirdAttemptError) {
+          console.error("API: Third parse attempt also failed:", thirdAttemptError)
+          return NextResponse.json(
+            { 
+              error: "Failed to parse analysis response. The AI may have returned malformed JSON. Please try again.",
+              details: parseError.message,
+              responseLength: cleanedResponse.length
+            },
+            { status: 500 }
+          )
+        }
       }
     }
 

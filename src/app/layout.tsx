@@ -1,11 +1,19 @@
 import type { Metadata } from "next"
-import { Inter } from "next/font/google"
-import "@fontsource/jetbrains-mono/400.css"
-import "@fontsource/jetbrains-mono/700.css"
+import { IBM_Plex_Mono, JetBrains_Mono } from "next/font/google"
 import "./globals.css"
 import { SessionProvider } from "@/components/providers/session-provider"
 
-const inter = Inter({ subsets: ["latin"] })
+const ibmPlexMono = IBM_Plex_Mono({
+  subsets: ["latin"],
+  weight: ["300", "400", "500", "600", "700"],
+  variable: "--font-ibm-plex-mono",
+})
+
+const jetbrainsMono = JetBrains_Mono({
+  subsets: ["latin"],
+  weight: ["300", "400", "500", "600", "700"],
+  variable: "--font-jetbrains-mono",
+})
 
 export const metadata: Metadata = {
   title: "Growth OS - Career Progression Engine",
@@ -19,7 +27,7 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en" className="dark">
-      <body className={inter.className}>
+      <body className={`${ibmPlexMono.variable} ${jetbrainsMono.variable} font-mono`}>
         <SessionProvider>
           {children}
         </SessionProvider>

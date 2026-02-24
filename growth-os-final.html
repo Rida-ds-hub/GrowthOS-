@@ -1,0 +1,1125 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>growth_os — Career Progression Engine</title>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@300;400;500;600;700&family=JetBrains+Mono:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg: #0a0a0a; --surface: #111111; --border: #1e1e1e;
+  --em: #10b981; --em-dim: rgba(16,185,129,0.12); --em-mid: rgba(16,185,129,0.3);
+  --white: #f0f0f0; --muted: #52525b; --dim: #27272a; --text: #a1a1aa;
+}
+*,*::before,*::after { box-sizing:border-box; margin:0; padding:0; }
+html { scroll-behavior:smooth; }
+body {
+  background:var(--bg); color:var(--white);
+  font-family:'IBM Plex Mono',monospace;
+  overflow-x:hidden; cursor:none;
+}
+
+/* CURSOR */
+#cur { position:fixed; width:6px; height:6px; background:var(--em); border-radius:50%; pointer-events:none; z-index:9999; transform:translate(-50%,-50%); }
+#cur-ring { position:fixed; width:24px; height:24px; border:1px solid var(--em-mid); border-radius:50%; pointer-events:none; z-index:9998; transform:translate(-50%,-50%); }
+
+/* CANVAS — explicitly sized */
+#scene {
+  position: fixed;
+  top: 0; left: 0;
+  width: 100vw;
+  height: 100vh;
+  z-index: 1;
+  pointer-events: none;
+}
+
+/* NAV */
+nav {
+  position:fixed; top:0; left:0; right:0; z-index:200;
+  display:flex; align-items:center; justify-content:space-between;
+  padding:0 3rem; height:64px;
+  border-bottom:1px solid var(--border);
+  background:rgba(10,10,10,0.95);
+  backdrop-filter:blur(20px);
+}
+.nav-logo { font-family:'JetBrains Mono',monospace; font-size:15px; font-weight:700; color:var(--white); text-decoration:none; display:flex; align-items:center; gap:6px; }
+.lb { color:var(--em); opacity:.45; font-weight:300; font-size:17px; }
+.los { color:var(--em); }
+.nav-links { display:flex; align-items:center; gap:2.2rem; }
+.nav-links a { font-size:.67rem; letter-spacing:.2em; color:var(--muted); text-decoration:none; transition:color .2s; text-transform:uppercase; cursor:none; }
+.nav-links a:hover { color:var(--white); }
+.nav-links .cta { background:var(--em); color:var(--bg)!important; padding:.5rem 1.3rem; font-weight:700; letter-spacing:.15em; }
+.nav-links .cta:hover { opacity:.82; }
+
+/* PROGRESS DOTS */
+#pdots { position:fixed; right:2rem; top:50%; transform:translateY(-50%); z-index:50; display:flex; flex-direction:column; gap:.5rem; pointer-events:none; }
+.pdot { width:4px; height:4px; border-radius:50%; background:var(--dim); border:1px solid var(--muted); transition:all .35s; }
+.pdot.on { background:var(--em); border-color:var(--em); transform:scale(1.7); }
+
+/* SCROLL DRIVER */
+#driver { height:600vh; position:relative; z-index:2; }
+
+/* STICKY PANEL LAYER */
+#sticky { position:sticky; top:0; height:100vh; display:flex; align-items:center; z-index:10; pointer-events:none; }
+
+/* PANELS */
+.panel { position:absolute; left:4rem; max-width:420px; pointer-events:all; opacity:0; transform:translateY(16px); transition:opacity .5s,transform .5s; }
+.panel.on { opacity:1; transform:translateY(0); }
+
+.ptag { font-size:.63rem; letter-spacing:.35em; text-transform:uppercase; color:var(--em); margin-bottom:1rem; display:flex; align-items:center; gap:.7rem; }
+.ptag::before { content:''; width:20px; height:1px; background:var(--em); }
+
+.panel h1 { font-family:'JetBrains Mono',monospace; font-size:clamp(2.4rem,4vw,3.8rem); font-weight:700; line-height:1.0; letter-spacing:-.03em; color:var(--white); margin-bottom:1rem; }
+.panel h2 { font-family:'JetBrains Mono',monospace; font-size:clamp(1.6rem,3vw,2.4rem); font-weight:700; line-height:1.05; letter-spacing:-.03em; color:var(--white); margin-bottom:.9rem; }
+.g { color:var(--em); }
+.panel p { font-size:.85rem; line-height:2; color:var(--text); font-weight:300; margin-bottom:1.4rem; max-width:380px; }
+
+/* Terminal */
+.term { background:var(--surface); border:1px solid var(--border); padding:1.1rem 1.3rem; margin-bottom:1.4rem; position:relative; }
+.term::before { content:''; position:absolute; top:0; left:0; right:0; height:1px; background:var(--em); }
+.tbar { display:flex; gap:5px; margin-bottom:.75rem; }
+.td { width:7px; height:7px; border-radius:50%; }
+.td1{background:#ff5f57;} .td2{background:#febc2e;} .td3{background:var(--em);}
+.tl { font-size:.73rem; color:var(--muted); line-height:2.2; }
+.tl .c { color:var(--em); } .tl .o { color:var(--text); } .tl .w { color:#e8a838; }
+.tc { display:inline-block; width:5px; height:11px; background:var(--em); vertical-align:middle; animation:blink 1s step-end infinite; }
+@keyframes blink { 50%{opacity:0;} }
+
+/* Progress bars */
+.prog-rows { display:flex; flex-direction:column; gap:.4rem; margin-bottom:1.4rem; }
+.prog-row { display:flex; align-items:center; gap:.7rem; font-size:.7rem; color:var(--muted); }
+.prog-bar { flex:1; height:2px; background:var(--dim); position:relative; overflow:hidden; }
+.prog-fill { height:100%; background:var(--em); position:absolute; left:0; top:0; }
+.prog-val { color:var(--em); min-width:28px; text-align:right; }
+
+/* Buttons */
+.brow { display:flex; gap:.75rem; flex-wrap:wrap; }
+.bp { font-family:'JetBrains Mono',monospace; font-size:.72rem; letter-spacing:.15em; text-transform:uppercase; font-weight:700; background:var(--em); color:var(--bg); padding:.82rem 1.7rem; border:none; cursor:none; transition:opacity .2s; text-decoration:none; display:inline-block; }
+.bp:hover { opacity:.8; }
+.bs { font-family:'JetBrains Mono',monospace; font-size:.72rem; letter-spacing:.15em; text-transform:uppercase; background:transparent; color:var(--muted); padding:.82rem 1.4rem; border:1px solid var(--border); cursor:none; transition:all .2s; text-decoration:none; display:inline-block; }
+.bs:hover { color:var(--em); border-color:var(--em-mid); }
+
+/* Scroll hint */
+.shint { position:absolute; bottom:2.5rem; left:4rem; font-size:.6rem; letter-spacing:.3em; color:var(--muted); text-transform:uppercase; display:flex; align-items:center; gap:.6rem; pointer-events:none; opacity:0; animation:shintIn .5s ease 2s forwards; }
+.shint::before { content:''; width:1px; height:30px; background:linear-gradient(to bottom,var(--em),transparent); }
+@keyframes shintIn { to { opacity:.6; } }
+
+/* STATIC SECTIONS */
+.stats-bar { position:relative; z-index:10; border-top:1px solid var(--border); border-bottom:1px solid var(--border); background:var(--surface); padding:2.5rem 3rem; display:flex; gap:5rem; flex-wrap:wrap; }
+.stat-n { font-family:'JetBrains Mono',monospace; font-size:2.5rem; font-weight:700; color:var(--em); line-height:1; }
+.stat-l { font-size:.62rem; letter-spacing:.2em; color:var(--muted); text-transform:uppercase; margin-top:.25rem; }
+
+.sec { position:relative; z-index:10; background:var(--bg); border-top:1px solid var(--border); padding:7rem 3rem; }
+.sec.alt { background:var(--surface); }
+.sec-tag { font-size:.62rem; letter-spacing:.4em; color:var(--em); text-transform:uppercase; margin-bottom:1.2rem; display:flex; align-items:center; gap:.7rem; }
+.sec-tag::before { content:''; width:16px; height:1px; background:var(--em); }
+.sec-h { font-family:'JetBrains Mono',monospace; font-size:clamp(1.7rem,3.5vw,2.8rem); font-weight:700; letter-spacing:-.03em; color:var(--white); line-height:1.05; margin-bottom:1rem; }
+.sec-p { font-size:.86rem; line-height:1.95; color:var(--text); font-weight:300; max-width:520px; }
+
+.feat-grid { display:grid; grid-template-columns:repeat(3,1fr); gap:1px; background:var(--border); border:1px solid var(--border); margin-top:3rem; }
+.feat { background:var(--bg); padding:2rem 1.7rem; position:relative; overflow:hidden; transition:background .3s; }
+.feat-bar { position:absolute; top:0; left:0; right:0; height:2px; background:var(--em); transform:scaleX(0); transform-origin:left; transition:transform .4s ease; }
+.feat:hover { background:var(--surface); }
+.feat:hover .feat-bar { transform:scaleX(1); }
+.feat-num { font-size:.6rem; letter-spacing:.35em; color:var(--muted); margin-bottom:.6rem; text-transform:uppercase; }
+.feat-title { font-family:'JetBrains Mono',monospace; font-size:.92rem; font-weight:700; color:var(--white); margin-bottom:.55rem; }
+.feat-desc { font-size:.81rem; line-height:1.85; color:var(--muted); font-weight:300; }
+.feat-tag { margin-top:.9rem; font-size:.6rem; letter-spacing:.25em; text-transform:uppercase; color:var(--em); border-left:2px solid var(--em); padding-left:.5rem; display:inline-block; }
+
+.steps { display:flex; flex-direction:column; gap:0; margin-top:3rem; max-width:680px; }
+.step { display:grid; grid-template-columns:48px 1fr; gap:1.5rem; padding-bottom:2.5rem; position:relative; }
+.step:not(:last-child)::before { content:''; position:absolute; left:23px; top:48px; bottom:0; width:1px; background:var(--border); }
+.step-n { width:48px; height:48px; border:1px solid var(--border); display:flex; align-items:center; justify-content:center; font-size:.72rem; letter-spacing:.1em; color:var(--muted); background:var(--bg); flex-shrink:0; transition:all .3s; }
+.step:hover .step-n { border-color:var(--em); color:var(--em); box-shadow:0 0 16px var(--em-dim); }
+.step-body { padding-top:.6rem; }
+.step-label { font-size:.62rem; letter-spacing:.35em; text-transform:uppercase; color:var(--em); margin-bottom:.4rem; }
+.step-h { font-family:'JetBrains Mono',monospace; font-size:1.1rem; font-weight:700; color:var(--white); margin-bottom:.5rem; }
+.step-p { font-size:.83rem; line-height:1.9; color:var(--muted); font-weight:300; }
+
+.why-grid { display:grid; grid-template-columns:1fr 1fr; gap:5rem; align-items:start; margin-top:2.5rem; }
+.why-quote { font-family:'JetBrains Mono',monospace; font-size:clamp(1.1rem,2vw,1.6rem); font-weight:700; color:var(--white); line-height:1.4; letter-spacing:-.02em; }
+.belief-list { list-style:none; }
+.belief-list li { font-size:.82rem; line-height:1; color:var(--text); font-weight:300; display:flex; align-items:center; gap:.8rem; border-bottom:1px solid var(--border); padding:.85rem 0; }
+.belief-list li::before { content:''; width:3px; height:3px; background:var(--em); border-radius:50%; flex-shrink:0; }
+
+.pricing-grid { display:grid; grid-template-columns:repeat(3,1fr); gap:1px; background:var(--border); border:1px solid var(--border); margin-top:3rem; }
+.plan { background:var(--bg); padding:2.5rem 2rem; position:relative; }
+.plan.featured { background:var(--surface); border-top:2px solid var(--em); }
+.plan-badge { font-size:.6rem; letter-spacing:.3em; text-transform:uppercase; color:var(--em); margin-bottom:1.2rem; display:block; }
+.plan-name { font-family:'JetBrains Mono',monospace; font-size:1rem; font-weight:700; color:var(--white); }
+.plan-price { font-family:'JetBrains Mono',monospace; font-size:2.2rem; font-weight:700; color:var(--white); line-height:1; margin:1rem 0 .3rem; }
+.plan-price span { font-size:.8rem; font-weight:300; color:var(--muted); }
+.plan-desc { font-size:.78rem; color:var(--muted); line-height:1.7; margin-bottom:1.5rem; }
+.plan-features { list-style:none; margin-bottom:2rem; }
+.plan-features li { font-size:.78rem; color:var(--text); display:flex; align-items:center; gap:.7rem; padding:.45rem 0; border-bottom:1px solid var(--border); line-height:1.4; }
+.plan-features li::before { content:'//'; color:var(--em); font-size:.65rem; opacity:.7; flex-shrink:0; }
+.plan-cta { display:block; text-align:center; font-family:'JetBrains Mono',monospace; font-size:.72rem; letter-spacing:.15em; text-transform:uppercase; font-weight:700; padding:.82rem 1rem; text-decoration:none; cursor:none; transition:all .2s; }
+.plan-cta.solid { background:var(--em); color:var(--bg); }
+.plan-cta.solid:hover { opacity:.82; }
+.plan-cta.outline { border:1px solid var(--border); color:var(--muted); }
+.plan-cta.outline:hover { border-color:var(--em-mid); color:var(--em); }
+
+.cta-inner { border:1px solid var(--border); padding:4rem; max-width:580px; position:relative; background:var(--surface); }
+.cta-inner::before { content:''; position:absolute; top:-1px; left:0; right:0; height:2px; background:linear-gradient(to right,var(--em),transparent); }
+.cta-inner h2 { font-family:'JetBrains Mono',monospace; font-size:clamp(1.5rem,3vw,2.2rem); font-weight:700; letter-spacing:-.02em; margin-bottom:.7rem; }
+.cta-inner p { font-size:.84rem; line-height:1.9; color:var(--muted); margin-bottom:1.8rem; }
+.input-row { display:flex; }
+.em-in { flex:1; background:var(--bg); border:1px solid var(--border); border-right:none; padding:.82rem 1rem; font-family:'IBM Plex Mono',monospace; font-size:.78rem; color:var(--white); outline:none; }
+.em-in::placeholder { color:var(--muted); }
+.em-in:focus { border-color:var(--em-mid); }
+.em-sub { background:var(--em); color:var(--bg); border:none; padding:.82rem 1.4rem; font-family:'IBM Plex Mono',monospace; font-size:.7rem; letter-spacing:.2em; text-transform:uppercase; font-weight:700; cursor:none; transition:opacity .2s; white-space:nowrap; }
+.em-sub:hover { opacity:.82; }
+.cta-note { font-size:.68rem; color:var(--muted); margin-top:.75rem; }
+
+footer { position:relative; z-index:10; border-top:1px solid var(--border); background:var(--bg); }
+.footer-top { padding:3.5rem 3rem; display:grid; grid-template-columns:1.2fr 1fr 1fr 1fr; gap:3rem; }
+.f-logo { font-family:'JetBrains Mono',monospace; font-weight:700; font-size:1rem; color:var(--white); margin-bottom:.8rem; display:block; }
+.footer-brand p { font-size:.76rem; line-height:1.8; color:var(--muted); max-width:200px; }
+.footer-col h4 { font-size:.65rem; letter-spacing:.3em; text-transform:uppercase; color:var(--em); margin-bottom:1rem; }
+.footer-col a { display:block; font-size:.78rem; color:var(--muted); text-decoration:none; margin-bottom:.5rem; transition:color .2s; cursor:none; }
+.footer-col a:hover { color:var(--white); }
+.footer-bottom { border-top:1px solid var(--border); padding:1.5rem 3rem; display:flex; justify-content:space-between; align-items:center; }
+.footer-copy { font-size:.68rem; color:var(--dim); letter-spacing:.12em; }
+.footer-socials { display:flex; gap:1.5rem; }
+.footer-socials a { font-size:.68rem; color:var(--muted); text-decoration:none; letter-spacing:.1em; cursor:none; transition:color .2s; }
+.footer-socials a:hover { color:var(--em); }
+
+/* HOW IT WORKS — two column */
+.how-grid {
+  display:grid; grid-template-columns:1fr 1fr;
+  gap:5rem; align-items:start; margin-top:3rem;
+}
+.how-visual-wrap { position:sticky; top:100px; }
+
+.how-visual { display:none; animation:hvFade .4s ease; }
+.how-visual.active { display:flex; flex-direction:column; gap:.8rem; }
+@keyframes hvFade { from{opacity:0;transform:translateY(10px);} to{opacity:1;transform:none;} }
+
+/* Shared app chrome */
+.hv-chrome {
+  border:1px solid var(--border); background:var(--surface);
+  overflow:hidden; position:relative;
+}
+.hv-chrome::before {
+  content:''; position:absolute; top:0; left:0; right:0; height:1px;
+  background:linear-gradient(90deg, var(--em) 0%, transparent 60%);
+}
+.hv-topbar {
+  display:flex; align-items:center; justify-content:space-between;
+  padding:.6rem 1rem; border-bottom:1px solid var(--border);
+  background:rgba(0,0,0,.25);
+}
+.hv-dots { display:flex; gap:5px; }
+.hv-dot { width:7px; height:7px; border-radius:50%; }
+.hv-topbar-title { font-size:.65rem; letter-spacing:.2em; text-transform:uppercase; color:var(--muted); }
+.hv-body { padding:1.3rem; }
+
+.hv-eyebrow {
+  font-size:.6rem; letter-spacing:.35em; text-transform:uppercase;
+  color:var(--em); margin-bottom:.7rem; display:flex; align-items:center; gap:.5rem;
+}
+.hv-eyebrow::before { content:''; width:14px; height:1px; background:var(--em); }
+
+/* Step 1 — source cards */
+.hv-src-grid { display:grid; grid-template-columns:1fr 1fr; gap:.5rem; }
+.hv-src {
+  display:flex; align-items:center; gap:.7rem;
+  border:1px solid var(--border); background:var(--bg); padding:.75rem .9rem;
+  animation:hvUp .35s ease both;
+}
+.hv-src.s1{animation-delay:.0s} .hv-src.s2{animation-delay:.09s}
+.hv-src.s3{animation-delay:.18s} .hv-src.s4{animation-delay:.27s}
+@keyframes hvUp { from{opacity:0;transform:translateY(6px);} to{opacity:1;transform:none;} }
+.hv-src-ico { font-size:.95rem; opacity:.55; }
+.hv-src-name { font-size:.76rem; color:var(--white); font-weight:600; }
+.hv-src-detail { font-size:.62rem; color:var(--muted); margin-top:.1rem; }
+.hv-src-badge {
+  margin-left:auto; font-size:.58rem; letter-spacing:.1em; padding:.18rem .45rem;
+  background:var(--em-dim); color:var(--em); border:1px solid var(--em-mid); white-space:nowrap;
+}
+
+/* Step 2 — gap bars */
+.hv-gap-list { display:flex; flex-direction:column; gap:.65rem; }
+.hv-gap-top { display:flex; justify-content:space-between; margin-bottom:.28rem; }
+.hv-gap-name { font-size:.72rem; color:var(--text); }
+.hv-gap-val { font-family:'JetBrains Mono',monospace; font-size:.72rem; font-weight:700; }
+.hv-gap-track { height:4px; background:var(--dim); border-radius:2px; overflow:hidden; }
+.hv-gap-bar { height:100%; border-radius:2px; animation:grow .7s cubic-bezier(.4,0,.2,1) both; }
+@keyframes grow { from{width:0!important;} }
+.hv-gap-footer {
+  display:flex; justify-content:space-between; align-items:center;
+  margin-top:1rem; padding-top:.9rem; border-top:1px solid var(--border);
+}
+.hv-gap-footer-label { font-size:.6rem; letter-spacing:.2em; text-transform:uppercase; color:var(--muted); }
+.hv-overall { font-family:'JetBrains Mono',monospace; font-size:1.5rem; font-weight:700; color:#f59e0b; }
+
+/* Step 3 — phase timeline */
+.hv-phases { display:flex; flex-direction:column; }
+.hv-ph { display:grid; grid-template-columns:14px 1fr; gap:0 .9rem; }
+.hv-ph-track { display:flex; flex-direction:column; align-items:center; }
+.hv-ph-node {
+  width:12px; height:12px; border-radius:50%; flex-shrink:0;
+  border:2px solid var(--border); background:var(--bg); margin-top:3px;
+}
+.hv-ph.lit .hv-ph-node { background:var(--em); border-color:var(--em); box-shadow:0 0 8px var(--em-dim); }
+.hv-ph-line { flex:1; width:1px; background:var(--border); min-height:10px; margin:3px 0; }
+.hv-ph-content { padding-bottom:.9rem; }
+.hv-ph-label { font-size:.58rem; letter-spacing:.2em; text-transform:uppercase; color:var(--muted); margin-bottom:.2rem; }
+.hv-ph-name { font-size:.8rem; font-weight:700; color:var(--white); margin-bottom:.3rem; }
+.hv-ph.dim .hv-ph-name,.hv-ph.dim .hv-ph-label { color:var(--muted); opacity:.5; }
+.hv-ph-items { display:flex; flex-direction:column; gap:.15rem; }
+.hv-ph-item { font-size:.7rem; color:var(--text); display:flex; align-items:center; gap:.4rem; }
+.hv-ph-item::before { content:'·'; color:var(--em); flex-shrink:0; }
+.hv-ph.dim .hv-ph-item { color:var(--dim); }
+.hv-ph.dim .hv-ph-item::before { color:var(--dim); }
+
+/* Step 4 — activity feed */
+.hv-feed { display:flex; flex-direction:column; gap:.45rem; }
+.hv-feed-item {
+  display:flex; align-items:center; gap:.75rem;
+  padding:.65rem .85rem; background:var(--bg); border:1px solid var(--border);
+  animation:hvUp .3s ease both;
+}
+.hv-fi1{animation-delay:.0s}.hv-fi2{animation-delay:.08s}
+.hv-fi3{animation-delay:.16s}.hv-fi4{animation-delay:.24s}
+.hv-feed-ico {
+  width:28px; height:28px; flex-shrink:0; border-radius:3px;
+  display:flex; align-items:center; justify-content:center; font-size:.85rem;
+  background:var(--em-dim); border:1px solid var(--em-mid);
+}
+.hv-feed-title { font-size:.74rem; color:var(--white); font-weight:600; flex:1; }
+.hv-feed-meta { font-size:.62rem; color:var(--muted); }
+.hv-feed-ok { font-size:.62rem; color:var(--em); white-space:nowrap; }
+.hv-streak-bar {
+  display:flex; align-items:center; justify-content:space-between;
+  padding:.65rem .9rem; border:1px solid var(--border); background:var(--bg);
+}
+.hv-streak-left { font-size:.68rem; color:var(--muted); }
+.hv-streak-num { font-family:'JetBrains Mono',monospace; font-size:1.4rem; font-weight:700; color:var(--em); }
+
+/* Step 5 — readiness */
+.hv-ready-top { display:flex; align-items:center; gap:1.4rem; margin-bottom:1rem; }
+.hv-ring-wrap { position:relative; flex-shrink:0; }
+.hv-ring-pct {
+  position:absolute; top:50%; left:50%; transform:translate(-50%,-50%);
+  font-family:'JetBrains Mono',monospace; font-size:.95rem; font-weight:700; color:var(--em);
+}
+@keyframes ringDraw { from{stroke-dashoffset:251;} to{stroke-dashoffset:37;} }
+.hv-ready-scores { flex:1; display:flex; flex-direction:column; gap:.4rem; }
+.hv-rs-row {
+  display:flex; justify-content:space-between; align-items:center;
+  font-size:.72rem; color:var(--muted);
+  padding:.32rem 0; border-bottom:1px solid var(--border);
+}
+.hv-rs-val { font-family:'JetBrains Mono',monospace; color:var(--em); font-weight:700; }
+.hv-ready-signal {
+  font-family:'JetBrains Mono',monospace; font-size:.9rem; font-weight:700;
+  color:var(--em); padding:.8rem 1rem;
+  border:1px solid var(--em-mid); background:var(--em-dim);
+  text-align:center;
+}
+.hv-blink { animation:blink 1s step-end infinite; }
+
+/* Active step highlight */
+.how-step { cursor:default; }
+.how-step.active-step .step-n { border-color:var(--em); color:var(--em); box-shadow:0 0 12px var(--em-dim); }
+.how-step:not(.active-step) { opacity:.4; transition:opacity .2s; }
+.how-step:not(.active-step):hover { opacity:.7; }
+
+@media(max-width:960px) {
+  .how-grid { grid-template-columns:1fr; gap:2.5rem; }
+  .how-visual-wrap { position:static; }
+  .how-step:not(.active-step) { opacity:1; }
+}
+</style>
+</head>
+<body>
+
+<div id="cur"></div>
+<div id="cur-ring"></div>
+<canvas id="scene"></canvas>
+
+<nav>
+  <a class="nav-logo" href="#"><span class="lb">[</span>growth<span class="los">_os</span><span class="lb">]</span></a>
+  <div class="nav-links">
+    <a href="#system">The System</a>
+    <a href="#how">How It Works</a>
+    <a href="#why">Why</a>
+    <a href="#pricing">Pricing</a>
+    <a href="#access" class="cta">Get Access</a>
+  </div>
+</nav>
+
+<div id="pdots">
+  <div class="pdot on"></div><div class="pdot"></div>
+  <div class="pdot"></div><div class="pdot"></div><div class="pdot"></div>
+</div>
+
+<div id="driver">
+  <div id="sticky">
+
+    <div class="panel on" id="p0">
+      <div class="ptag">Career Progression Engine</div>
+      <h1>Stop drifting.<br>Start <span class="g">operating.</span></h1>
+      <p>Most engineers are talented and stuck. Growth OS connects your GitHub, LinkedIn, resume, and calendar into one living system that tells you exactly what to do next and when you are ready to move.</p>
+      <div class="brow">
+        <a href="#access" class="bp">Get Early Access</a>
+        <a href="#system" class="bs">See How It Works</a>
+      </div>
+    </div>
+
+    <div class="panel" id="p1">
+      <div class="ptag">01 // Gap Analysis</div>
+      <h2>We find the<br><span class="g">exact gap.</span></h2>
+      <p>Connect your GitHub, LinkedIn, resume, and portfolio. Growth OS reads your actual trajectory and surfaces the precise delta between where you are and the role, level, or path you are targeting.</p>
+      <div class="prog-rows">
+        <div class="prog-row"><span>System Design</span><div class="prog-bar"><div class="prog-fill" style="width:38%"></div></div><span class="prog-val">38%</span></div>
+        <div class="prog-row"><span>Brand Presence</span><div class="prog-bar"><div class="prog-fill" style="width:15%"></div></div><span class="prog-val">15%</span></div>
+        <div class="prog-row"><span>Leadership Signal</span><div class="prog-bar"><div class="prog-fill" style="width:22%"></div></div><span class="prog-val">22%</span></div>
+        <div class="prog-row"><span>Stakeholder Comms</span><div class="prog-bar"><div class="prog-fill" style="width:48%"></div></div><span class="prog-val">48%</span></div>
+      </div>
+      <p style="font-size:.74rem;color:var(--muted);">// Real gaps. Real data. Zero guesswork.</p>
+    </div>
+
+    <div class="panel" id="p2">
+      <div class="ptag">02 // Daily Engine</div>
+      <h2>15 minutes.<br><span class="g">Compounds daily.</span></h2>
+      <p>Micro-learning tied to your actual gaps. In-app code commits. System thinking exercises. Calendar-integrated meeting logs. Every action feeds the machine and moves your readiness score forward.</p>
+      <div class="term">
+        <div class="tbar"><div class="td td1"></div><div class="td td2"></div><div class="td td3"></div></div>
+        <div class="tl"><span class="c">$ </span><span class="o">day_47.log</span></div>
+        <div class="tl"><span class="o">Micro-lesson: System design tradeoffs ... </span><span class="c">done</span></div>
+        <div class="tl"><span class="o">PR #482 merged, resume updated .......... </span><span class="c">done</span></div>
+        <div class="tl"><span class="o">1:1 with Priya logged ................... </span><span class="c">done</span></div>
+        <div class="tl"><span class="w">Readiness score: </span><span class="c">65% (+3 today)</span></div>
+      </div>
+    </div>
+
+    <div class="panel" id="p3">
+      <div class="ptag">03 // Brand Engine</div>
+      <h2>Your work,<br><span class="g">seen by the right people.</span></h2>
+      <p>Every merged PR becomes a resume bullet. Every 1:1 becomes evidence for your promotion case. Every week of progress becomes a LinkedIn post. Real work. Real signal. No cringe.</p>
+      <div class="term">
+        <div class="tbar"><div class="td td1"></div><div class="td td2"></div><div class="td td3"></div></div>
+        <div class="tl"><span class="w">PR #482 merged</span></div>
+        <div class="tl"><span class="o">Resume bullet generated ... </span><span class="c">done</span></div>
+        <div class="tl"><span class="o">LinkedIn draft ready ...... </span><span class="c">done</span></div>
+        <div class="tl"><span class="o">Promo narrative updated ... </span><span class="c">done</span></div>
+        <div class="tl"><span class="c">$ </span><span class="tc"></span></div>
+      </div>
+    </div>
+
+    <div class="panel" id="p4">
+      <div class="ptag">04 // The Jump Signal</div>
+      <h2>You will know<br><span class="g">exactly when to move.</span></h2>
+      <p>Promotion. Pivot. New role. Founding something. Growth OS tracks your readiness signal across all domains. When the data says you are ready, it tells you. No more guessing. No more waiting too long.</p>
+      <div class="term">
+        <div class="tbar"><div class="td td1"></div><div class="td td2"></div><div class="td td3"></div></div>
+        <div class="tl"><span class="w">Signal check: Alex Chen, Day 90</span></div>
+        <div class="tl"><span class="o">Skill readiness ........ </span><span class="c">84%</span></div>
+        <div class="tl"><span class="o">Brand signal ........... </span><span class="c">73%</span></div>
+        <div class="tl"><span class="o">Evidence portfolio ..... </span><span class="c">91%</span></div>
+        <div class="tl" style="margin-top:4px;border-top:1px solid #1e1e1e;padding-top:6px;"><span class="c">READY. Time to make your move.</span></div>
+      </div>
+      <div class="brow" style="margin-top:1.2rem;"><a href="#access" class="bp">Start My Journey</a></div>
+    </div>
+
+    <div class="shint">scroll to explore</div>
+  </div>
+</div>
+
+<!-- STATIC SECTIONS -->
+<div class="stats-bar">
+  <div><div class="stat-n">3</div><div class="stat-l">Domains tracked daily</div></div>
+  <div><div class="stat-n">15m</div><div class="stat-l">Daily commitment</div></div>
+  <div><div class="stat-n">90d</div><div class="stat-l">Average to next jump</div></div>
+  <div><div class="stat-n">0</div><div class="stat-l">Guesswork required</div></div>
+</div>
+
+<div class="sec" id="system">
+  <div class="sec-tag">The System</div>
+  <h2 class="sec-h">Six engines.<br><span class="g">One OS.</span></h2>
+  <p class="sec-p">Each piece is useful alone. Together they create a flywheel. Every commit updates the resume. Every meeting feeds the promotion case. Every day of progress generates your brand. Nothing is wasted.</p>
+  <div class="feat-grid">
+    <div class="feat"><div class="feat-bar"></div><div class="feat-num">01 // connect</div><div class="feat-title">Gap Analysis Engine</div><p class="feat-desc">Ingests GitHub, LinkedIn, resume, and portfolio. Runs a full gap analysis against your target role. Surfaces what actually matters, not what sounds impressive.</p><div class="feat-tag">Connect, Analyze, Act</div></div>
+    <div class="feat"><div class="feat-bar"></div><div class="feat-num">02 // learn</div><div class="feat-title">Micro-Learning + Code</div><p class="feat-desc">15 minutes of targeted learning per day. In-app code commits tied to real projects. Streak tracking. System thinking exercises. Learning that compounds into genuine expertise.</p><div class="feat-tag">15 min / day</div></div>
+    <div class="feat"><div class="feat-bar"></div><div class="feat-num">03 // resume</div><div class="feat-title">Living Resume</div><p class="feat-desc">Every PR merged, every feature shipped, every win captured. Automatically written as impact-first bullets. Your resume is always current and always promotion-ready.</p><div class="feat-tag">Always Current</div></div>
+    <div class="feat"><div class="feat-bar"></div><div class="feat-num">04 // memory</div><div class="feat-title">Meeting Second Brain</div><p class="feat-desc">Calendar-integrated. Logs and analyzes every 1:1, skip-level, standup, and retro. Surfaces patterns in your influence and builds your promotion narrative from actual evidence.</p><div class="feat-tag">Calendar Integrated</div></div>
+    <div class="feat"><div class="feat-bar"></div><div class="feat-num">05 // brand</div><div class="feat-title">LinkedIn on Autopilot</div><p class="feat-desc">Real progress becomes real posts. Drafted from your actual commits, milestones, and learning. Specific, technical, never generic. Presence without the performance anxiety.</p><div class="feat-tag">Presence Without Performance</div></div>
+    <div class="feat"><div class="feat-bar"></div><div class="feat-num">06 // signal</div><div class="feat-title">The Jump Signal</div><p class="feat-desc">Promotion, pivot, new role, or founding something. Readiness signals tracked across all six domains. You always know exactly where you stand and what to do next.</p><div class="feat-tag">Promote, Pivot, Found</div></div>
+  </div>
+</div>
+
+<div class="sec alt" id="how">
+  <div class="sec-tag">How It Works</div>
+  <h2 class="sec-h">Day one to<br><span class="g">your next jump.</span></h2>
+
+  <div class="how-grid">
+    <!-- LEFT: STEPS -->
+    <div class="steps">
+      <div class="step how-step active-step" data-step="1"
+           onmouseenter="setStep(1)">
+        <div class="step-n">01</div>
+        <div class="step-body">
+          <div class="step-label">Connect</div>
+          <div class="step-h">Link your professional surface area</div>
+          <p class="step-p">GitHub, LinkedIn, resume, portfolio. Takes minutes. Growth OS immediately begins building your career graph and identifying the gaps you have been guessing at.</p>
+        </div>
+      </div>
+      <div class="step how-step" data-step="2"
+           onmouseenter="setStep(2)">
+        <div class="step-n">02</div>
+        <div class="step-body">
+          <div class="step-label">Analyze</div>
+          <div class="step-h">Get your gap analysis</div>
+          <p class="step-p">A precise breakdown of skill gaps, brand gaps, and trajectory gaps mapped against your actual target. Not what a coach assumes you want. What the data shows you need.</p>
+        </div>
+      </div>
+      <div class="step how-step" data-step="3"
+           onmouseenter="setStep(3)">
+        <div class="step-n">03</div>
+        <div class="step-body">
+          <div class="step-label">Plan</div>
+          <div class="step-h">Receive your 90-day roadmap</div>
+          <p class="step-p">A 30-60-90 day plan across upskilling, branding, and positioning. Built from your specific gaps. Adapts as you make progress. Never stale, never generic.</p>
+        </div>
+      </div>
+      <div class="step how-step" data-step="4"
+           onmouseenter="setStep(4)">
+        <div class="step-n">04</div>
+        <div class="step-body">
+          <div class="step-label">Execute</div>
+          <div class="step-h">15 minutes a day. Watch it compound.</div>
+          <p class="step-p">Daily micro-learning, code tasks, and reflections. The system logs your meetings, updates your resume, drafts your LinkedIn posts. You just do the work. Growth OS handles the rest.</p>
+        </div>
+      </div>
+      <div class="step how-step" data-step="5"
+           onmouseenter="setStep(5)">
+        <div class="step-n">05</div>
+        <div class="step-body">
+          <div class="step-label">Move</div>
+          <div class="step-h">Make your jump when the signal fires</div>
+          <p class="step-p">When your readiness score hits the threshold, Growth OS tells you. Promotion ask, job search, pivot, or starting something of your own. You will know. And you will be ready.</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- RIGHT: VISUAL PANEL -->
+    <div class="how-visual-wrap">
+
+      <!-- STEP 1: Connect -->
+      <div class="how-visual active" id="hv-1">
+        <div class="hv-eyebrow">Connecting your data</div>
+        <div class="hv-chrome">
+          <div class="hv-topbar">
+            <div class="hv-dots">
+              <div class="hv-dot" style="background:#ff5f57"></div>
+              <div class="hv-dot" style="background:#febc2e"></div>
+              <div class="hv-dot" style="background:#10b981"></div>
+            </div>
+            <div class="hv-topbar-title">growth_os // connect</div>
+            <div></div>
+          </div>
+          <div class="hv-body">
+            <div class="hv-src-grid">
+              <div class="hv-src s1">
+                <span class="hv-src-ico">⌥</span>
+                <div><div class="hv-src-name">GitHub</div><div class="hv-src-detail">9 repos · 2 languages</div></div>
+                <span class="hv-src-badge">✓ linked</span>
+              </div>
+              <div class="hv-src s2">
+                <span class="hv-src-ico">in</span>
+                <div><div class="hv-src-name">LinkedIn</div><div class="hv-src-detail">Profile connected</div></div>
+                <span class="hv-src-badge">✓ linked</span>
+              </div>
+              <div class="hv-src s3">
+                <span class="hv-src-ico">≡</span>
+                <div><div class="hv-src-name">Resume</div><div class="hv-src-detail">3,555 chars extracted</div></div>
+                <span class="hv-src-badge">✓ linked</span>
+              </div>
+              <div class="hv-src s4">
+                <span class="hv-src-ico">⊕</span>
+                <div><div class="hv-src-name">Portfolio</div><div class="hv-src-detail">Site indexed</div></div>
+                <span class="hv-src-badge">✓ linked</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- STEP 2: Analyze -->
+      <div class="how-visual" id="hv-2">
+        <div class="hv-eyebrow">Gap analysis results</div>
+        <div class="hv-chrome">
+          <div class="hv-topbar">
+            <div class="hv-dots">
+              <div class="hv-dot" style="background:#ff5f57"></div>
+              <div class="hv-dot" style="background:#febc2e"></div>
+              <div class="hv-dot" style="background:#10b981"></div>
+            </div>
+            <div class="hv-topbar-title">growth_os // analysis</div>
+            <div></div>
+          </div>
+          <div class="hv-body">
+            <div class="hv-gap-list">
+              <div class="hv-gap-item">
+                <div class="hv-gap-top"><span class="hv-gap-name">Technical Depth</span><span class="hv-gap-val" style="color:var(--em)">80%</span></div>
+                <div class="hv-gap-track"><div class="hv-gap-bar" style="width:80%;background:var(--em)"></div></div>
+              </div>
+              <div class="hv-gap-item">
+                <div class="hv-gap-top"><span class="hv-gap-name">Execution Scope</span><span class="hv-gap-val" style="color:var(--em)">75%</span></div>
+                <div class="hv-gap-track"><div class="hv-gap-bar" style="width:75%;background:var(--em)"></div></div>
+              </div>
+              <div class="hv-gap-item">
+                <div class="hv-gap-top"><span class="hv-gap-name">System Design</span><span class="hv-gap-val" style="color:#f59e0b">55%</span></div>
+                <div class="hv-gap-track"><div class="hv-gap-bar" style="width:55%;background:#f59e0b"></div></div>
+              </div>
+              <div class="hv-gap-item">
+                <div class="hv-gap-top"><span class="hv-gap-name">Brand Presence</span><span class="hv-gap-val" style="color:#ef4444">22%</span></div>
+                <div class="hv-gap-track"><div class="hv-gap-bar" style="width:22%;background:#ef4444"></div></div>
+              </div>
+              <div class="hv-gap-item">
+                <div class="hv-gap-top"><span class="hv-gap-name">Leadership</span><span class="hv-gap-val" style="color:#ef4444">35%</span></div>
+                <div class="hv-gap-track"><div class="hv-gap-bar" style="width:35%;background:#ef4444"></div></div>
+              </div>
+            </div>
+            <div class="hv-gap-footer">
+              <span class="hv-gap-footer-label">Overall readiness</span>
+              <span class="hv-overall">60<span style="font-size:.8rem;color:var(--muted);font-weight:400">/100</span></span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- STEP 3: Plan -->
+      <div class="how-visual" id="hv-3">
+        <div class="hv-eyebrow">Your 90-day roadmap</div>
+        <div class="hv-chrome">
+          <div class="hv-topbar">
+            <div class="hv-dots">
+              <div class="hv-dot" style="background:#ff5f57"></div>
+              <div class="hv-dot" style="background:#febc2e"></div>
+              <div class="hv-dot" style="background:#10b981"></div>
+            </div>
+            <div class="hv-topbar-title">growth_os // roadmap</div>
+            <div></div>
+          </div>
+          <div class="hv-body">
+            <div class="hv-phases">
+              <div class="hv-ph lit">
+                <div class="hv-ph-track"><div class="hv-ph-node"></div><div class="hv-ph-line"></div></div>
+                <div class="hv-ph-content">
+                  <div class="hv-ph-label">Phase 1 · Days 1–30</div>
+                  <div class="hv-ph-name">Validate &amp; Build Foundation</div>
+                  <div class="hv-ph-items">
+                    <div class="hv-ph-item">20+ customer interviews</div>
+                    <div class="hv-ph-item">Deploy full-stack app on AWS</div>
+                    <div class="hv-ph-item">Optimize LinkedIn presence</div>
+                  </div>
+                </div>
+              </div>
+              <div class="hv-ph dim">
+                <div class="hv-ph-track"><div class="hv-ph-node"></div><div class="hv-ph-line"></div></div>
+                <div class="hv-ph-content">
+                  <div class="hv-ph-label">Phase 2 · Days 31–60</div>
+                  <div class="hv-ph-name">MVP &amp; Team Building</div>
+                  <div class="hv-ph-items">
+                    <div class="hv-ph-item">Build core MVP features</div>
+                    <div class="hv-ph-item">Identify co-founders</div>
+                  </div>
+                </div>
+              </div>
+              <div class="hv-ph dim">
+                <div class="hv-ph-track"><div class="hv-ph-node"></div></div>
+                <div class="hv-ph-content">
+                  <div class="hv-ph-label">Phase 3 · Days 61–90</div>
+                  <div class="hv-ph-name">Launch &amp; Traction</div>
+                  <div class="hv-ph-items">
+                    <div class="hv-ph-item">Public launch · Pitch investors</div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- STEP 4: Execute -->
+      <div class="how-visual" id="hv-4">
+        <div class="hv-eyebrow">Today's activity</div>
+        <div class="hv-chrome">
+          <div class="hv-topbar">
+            <div class="hv-dots">
+              <div class="hv-dot" style="background:#ff5f57"></div>
+              <div class="hv-dot" style="background:#febc2e"></div>
+              <div class="hv-dot" style="background:#10b981"></div>
+            </div>
+            <div class="hv-topbar-title">growth_os // day 47</div>
+            <div></div>
+          </div>
+          <div class="hv-body">
+            <div class="hv-feed">
+              <div class="hv-feed-item hv-fi1">
+                <div class="hv-feed-ico">📚</div>
+                <div class="hv-feed-title">System design micro-lesson</div>
+                <div class="hv-feed-ok">✓ done</div>
+              </div>
+              <div class="hv-feed-item hv-fi2">
+                <div class="hv-feed-ico">⌥</div>
+                <div class="hv-feed-title">PR #482 merged → resume updated</div>
+                <div class="hv-feed-ok">✓ done</div>
+              </div>
+              <div class="hv-feed-item hv-fi3">
+                <div class="hv-feed-ico">🗒</div>
+                <div class="hv-feed-title">1:1 with Priya → promo case logged</div>
+                <div class="hv-feed-ok">✓ done</div>
+              </div>
+              <div class="hv-feed-item hv-fi4">
+                <div class="hv-feed-ico">in</div>
+                <div class="hv-feed-title">LinkedIn draft ready for review</div>
+                <div class="hv-feed-ok">✓ done</div>
+              </div>
+            </div>
+            <div class="hv-streak-bar" style="margin-top:.6rem">
+              <span class="hv-streak-left">Current streak</span>
+              <div style="display:flex;align-items:baseline;gap:.3rem">
+                <span class="hv-streak-num">47</span>
+                <span style="font-size:.65rem;color:var(--muted)">days</span>
+              </div>
+              <span style="font-size:.68rem;color:var(--em)">Readiness +3 today</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- STEP 5: Move -->
+      <div class="how-visual" id="hv-5">
+        <div class="hv-eyebrow">Your jump signal</div>
+        <div class="hv-chrome">
+          <div class="hv-topbar">
+            <div class="hv-dots">
+              <div class="hv-dot" style="background:#ff5f57"></div>
+              <div class="hv-dot" style="background:#febc2e"></div>
+              <div class="hv-dot" style="background:#10b981"></div>
+            </div>
+            <div class="hv-topbar-title">growth_os // signal · day 90</div>
+            <div></div>
+          </div>
+          <div class="hv-body">
+            <div class="hv-ready-top">
+              <div class="hv-ring-wrap">
+                <svg viewBox="0 0 90 90" width="90" height="90">
+                  <circle cx="45" cy="45" r="38" fill="none" stroke="var(--border)" stroke-width="5"/>
+                  <circle cx="45" cy="45" r="38" fill="none" stroke="var(--em)" stroke-width="5"
+                    stroke-dasharray="239" stroke-dashoffset="36"
+                    stroke-linecap="round" transform="rotate(-90 45 45)"
+                    style="animation:ringDraw 1.2s ease-out forwards"/>
+                </svg>
+                <div class="hv-ring-pct">85%</div>
+              </div>
+              <div class="hv-ready-scores">
+                <div class="hv-rs-row"><span>Skill readiness</span><span class="hv-rs-val">84%</span></div>
+                <div class="hv-rs-row"><span>Brand signal</span><span class="hv-rs-val">73%</span></div>
+                <div class="hv-rs-row"><span>Evidence portfolio</span><span class="hv-rs-val">91%</span></div>
+              </div>
+            </div>
+            <div class="hv-ready-signal">READY<span class="hv-blink">_</span> &nbsp;Make your move.</div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<div class="sec" id="why">
+  <div class="sec-tag">Why Growth OS</div>
+  <div class="why-grid">
+    <div>
+      <div class="why-quote">Most engineers manage their career the way they manage email.<br><br><span class="g">Reactively. Hoping someone notices. Guessing when to move.</span><br><br>Your career deserves the same rigor as your codebase.</div>
+    </div>
+    <ul class="belief-list">
+      <li>Your commits should build your resume in real time</li>
+      <li>Your 1:1 notes should feed your promotion case automatically</li>
+      <li>Your learning should be tied to actual gaps, not trending courses</li>
+      <li>Your LinkedIn should reflect real work, not performed thought leadership</li>
+      <li>You should always know what your next move is and whether you are ready</li>
+      <li>Your career should be a system, not a series of accidents</li>
+      <li>The best engineers ship great code and manage their trajectory deliberately</li>
+    </ul>
+  </div>
+</div>
+
+<div class="sec alt" id="pricing">
+  <div class="sec-tag">Pricing</div>
+  <h2 class="sec-h">Simple pricing.<br><span class="g">No surprises.</span></h2>
+  <p class="sec-p">Start free. Upgrade when you see the value. All plans include the core gap analysis and roadmap generator.</p>
+  <div class="pricing-grid">
+    <div class="plan">
+      <span class="plan-badge">// free tier</span>
+      <div class="plan-name">Explorer</div>
+      <div class="plan-price">$0<span> / month</span></div>
+      <div class="plan-desc">Connect, analyze your gaps, and see your roadmap. No card required.</div>
+      <ul class="plan-features">
+        <li>Gap analysis (1 target role)</li><li>90-day roadmap generated</li>
+        <li>5 micro-learning sessions / month</li><li>Resume snapshot</li><li>Community access</li>
+      </ul>
+      <a href="#access" class="plan-cta outline">Start Free</a>
+    </div>
+    <div class="plan featured">
+      <span class="plan-badge">// most popular</span>
+      <div class="plan-name">Operator</div>
+      <div class="plan-price">$29<span> / month</span></div>
+      <div class="plan-desc">The full OS. For engineers serious about their next jump.</div>
+      <ul class="plan-features">
+        <li>Unlimited gap analyses</li><li>Live adaptive roadmap</li>
+        <li>Daily micro-learning + code tasks</li><li>Living resume (auto-updates)</li>
+        <li>Meeting second brain + calendar sync</li><li>LinkedIn post drafts (weekly)</li>
+        <li>Jump Signal readiness tracker</li>
+      </ul>
+      <a href="#access" class="plan-cta solid">Get Early Access</a>
+    </div>
+    <div class="plan">
+      <span class="plan-badge">// for teams</span>
+      <div class="plan-name">Team OS</div>
+      <div class="plan-price">$79<span> / seat / mo</span></div>
+      <div class="plan-desc">For engineering managers who want their whole team moving deliberately.</div>
+      <ul class="plan-features">
+        <li>Everything in Operator</li><li>Team-level gap dashboard</li>
+        <li>Manager view and coaching prompts</li><li>Aggregate readiness signals</li>
+        <li>Custom target role templates</li><li>Slack integration</li><li>Priority support</li>
+      </ul>
+      <a href="#access" class="plan-cta outline">Contact Us</a>
+    </div>
+  </div>
+</div>
+
+<div class="sec" id="access">
+  <div class="sec-tag">Get Access</div>
+  <div class="cta-inner">
+    <h2>Start your<br><span class="g">gap analysis today.</span></h2>
+    <p>Join engineers, PMs, and designers who are done drifting. Early access is open now. No credit card. No fluff.</p>
+    <div class="input-row">
+      <input type="email" class="em-in" placeholder="you@company.com">
+      <button class="em-sub">Request Access</button>
+    </div>
+    <div class="cta-note">// Early access. No credit card. No spam. Cancel anytime.</div>
+  </div>
+</div>
+
+<footer>
+  <div class="footer-top">
+    <div class="footer-brand">
+      <span class="f-logo">growth<span class="g">_os</span></span>
+      <p>The career progression engine for engineers, PMs, and designers who refuse to drift.</p>
+    </div>
+    <div class="footer-col"><h4>Product</h4><a href="#system">The System</a><a href="#how">How It Works</a><a href="#pricing">Pricing</a><a href="#access">Get Access</a></div>
+    <div class="footer-col"><h4>Company</h4><a href="#">About</a><a href="#">Blog</a><a href="#">Careers</a><a href="#">Contact</a></div>
+    <div class="footer-col"><h4>Legal</h4><a href="#">Privacy Policy</a><a href="#">Terms of Service</a><a href="#">Security</a></div>
+  </div>
+  <div class="footer-bottom">
+    <div class="footer-copy">// growth_os · v1.0 · 2025 · all rights reserved</div>
+    <div class="footer-socials"><a href="#">Twitter</a><a href="#">GitHub</a><a href="#">LinkedIn</a></div>
+  </div>
+</footer>
+
+<script>
+// ─── CURSOR ───
+const cur = document.getElementById('cur');
+const ring = document.getElementById('cur-ring');
+let mx = window.innerWidth / 2, my = window.innerHeight / 2;
+let rx = mx, ry = my;
+document.addEventListener('mousemove', e => { mx = e.clientX; my = e.clientY; });
+(function ac() {
+  cur.style.left = mx + 'px'; cur.style.top = my + 'px';
+  rx += (mx - rx) * 0.08; ry += (my - ry) * 0.08;
+  ring.style.left = rx + 'px'; ring.style.top = ry + 'px';
+  requestAnimationFrame(ac);
+})();
+
+// ─── 3D GRAPH ───
+// Completely fresh approach: no DPR scaling, no transforms.
+// Canvas pixel = screen pixel. Simple and bulletproof.
+
+const canvas = document.getElementById('scene');
+const ctx = canvas.getContext('2d');
+
+function setSize() {
+  canvas.width = window.innerWidth;
+  canvas.height = window.innerHeight;
+}
+setSize();
+window.addEventListener('resize', setSize);
+
+// NODES — bx/by/bz are 3D world coordinates.
+// Centroid deliberately at 0,0,0 so no offset needed.
+// x range: -280 to +300 (spread of 580)
+// y range: -230 to +350 (spread of 580)
+const N = [
+  // inputs — left cluster
+  { id:0,  lbl:'github',      grp:'input',  bx:-240, by:-90,  bz: 50 },
+  { id:1,  lbl:'linkedin',    grp:'input',  bx:-260, by: 30,  bz:-30 },
+  { id:2,  lbl:'resume',      grp:'input',  bx:-210, by:120,  bz: 70 },
+  { id:3,  lbl:'portfolio',   grp:'input',  bx:-230, by:-180, bz:-40 },
+  // core
+  { id:4,  lbl:'gap analysis',grp:'core',   bx: -50, by:-20,  bz:  0 },
+  { id:5,  lbl:'roadmap',     grp:'core',   bx:  20, by: 80,  bz: 25 },
+  { id:6,  lbl:'daily',       grp:'core',   bx:  -5, by:-110, bz:-15 },
+  { id:7,  lbl:'memory',      grp:'core',   bx:  60, by: 10,  bz: 45 },
+  // skills
+  { id:8,  lbl:'sys design',  grp:'skill',  bx: 130, by:-160, bz:-25 },
+  { id:9,  lbl:'open source', grp:'skill',  bx: 180, by: -80, bz: 60 },
+  { id:10, lbl:'leadership',  grp:'skill',  bx: 120, by: -45, bz:-60 },
+  { id:11, lbl:'commits',     grp:'skill',  bx: 160, by:-220, bz: 15 },
+  // brand
+  { id:12, lbl:'li posts',    grp:'brand',  bx: 210, by: 55,  bz:-25 },
+  { id:13, lbl:'resume upd',  grp:'brand',  bx: 170, by:140,  bz: 45 },
+  { id:14, lbl:'promo case',  grp:'brand',  bx: 140, by:225,  bz:-15 },
+  // ops
+  { id:15, lbl:'1:1 notes',   grp:'ops',    bx: 100, by:290,  bz: 55 },
+  { id:16, lbl:'standups',    grp:'ops',    bx:  40, by:345,  bz:-25 },
+  { id:17, lbl:'calendar',    grp:'ops',    bx: -10, by:285,  bz: 65 },
+  // signal/output
+  { id:18, lbl:'readiness',   grp:'signal', bx: 270, by:  0,  bz:  0 },
+  { id:19, lbl:'promotion',   grp:'output', bx: 330, by: -75, bz:-25 },
+  { id:20, lbl:'pivot',       grp:'output', bx: 335, by: 20,  bz: 45 },
+  { id:21, lbl:'new role',    grp:'output', bx: 320, by: 95,  bz:-15 },
+  { id:22, lbl:'found',       grp:'output', bx: 310, by:170,  bz: 35 },
+];
+
+const E = [
+  [0,4],[1,4],[2,4],[3,4],
+  [4,5],[4,6],[4,7],
+  [5,8],[5,9],[5,10],[5,11],
+  [6,8],[6,9],[6,11],[6,17],
+  [7,15],[7,16],[7,17],[7,13],[7,14],
+  [8,18],[9,18],[10,18],[10,12],[11,13],
+  [15,14],[16,14],[17,15],
+  [12,18],[13,18],[14,18],
+  [18,19],[18,20],[18,21],[18,22],
+];
+
+// Node brightness per scroll phase
+function bright(node, t) {
+  const g = node.grp;
+  const flicker = 0.06 * Math.sin(Date.now() * 0.0009 + node.id * 1.3);
+  // Hero: all nodes visible but dim, showing the full graph
+  if (t < 0.15) return 0.45 + flicker;
+  // Phase 1: inputs + core light up
+  if (t < 0.35) {
+    if (g === 'input' || g === 'core') return Math.min(0.95, 0.45 + ((t - 0.15) / 0.2) * 0.5 + flicker);
+    return 0.18 + flicker * 0.3;
+  }
+  // Phase 2: skills light up
+  if (t < 0.55) {
+    if (g === 'skill' || g === 'core') return Math.min(0.95, 0.5 + ((t - 0.35) / 0.2) * 0.45 + flicker);
+    if (g === 'input') return 0.55 + flicker * 0.3;
+    return 0.18 + flicker * 0.3;
+  }
+  // Phase 3: brand + ops light up
+  if (t < 0.75) {
+    if (g === 'brand' || g === 'ops') return Math.min(0.95, 0.5 + ((t - 0.55) / 0.2) * 0.45 + flicker);
+    if (g === 'skill' || g === 'core') return 0.6 + flicker * 0.3;
+    if (g === 'input') return 0.45 + flicker * 0.3;
+    return 0.18 + flicker * 0.3;
+  }
+  // Phase 4: signal + output ignite
+  if (g === 'signal' || g === 'output') return Math.min(1, 0.5 + ((t - 0.75) / 0.25) * 0.5 + flicker);
+  return 0.45 + flicker * 0.3;
+}
+
+// 3D rotation
+function ry3(v, a) {
+  return [v[0]*Math.cos(a) + v[2]*Math.sin(a), v[1], -v[0]*Math.sin(a) + v[2]*Math.cos(a)];
+}
+function rx3(v, a) {
+  return [v[0], v[1]*Math.cos(a) - v[2]*Math.sin(a), v[1]*Math.sin(a) + v[2]*Math.cos(a)];
+}
+
+// Scroll tracking
+let sp = 0, ts = 0;
+window.addEventListener('scroll', () => {
+  const d = document.getElementById('driver');
+  const total = d.offsetHeight - window.innerHeight;
+  ts = Math.max(0, Math.min(1, -d.getBoundingClientRect().top / total));
+});
+
+// Camera: zoomed out at t=0 (see full graph), zooms into clusters as you scroll
+const KF = [
+  { t: 0,    camZ: 900, rox: 0.07, roy: -0.06 },
+  { t: 0.18, camZ: 600, rox: 0.04,  roy:  0.10 },
+  { t: 0.38, camZ: 580, rox:-0.05,  roy: -0.12 },
+  { t: 0.58, camZ: 600, rox: 0.08,  roy:  0.13 },
+  { t: 0.78, camZ: 650, rox:-0.03,  roy: -0.07 },
+  { t: 1,    camZ: 850, rox: 0.04,  roy: -0.04 },
+];
+
+function getCam(t) {
+  let a = KF[0], b = KF[KF.length - 1];
+  for (let i = 0; i < KF.length - 1; i++) {
+    if (t >= KF[i].t && t <= KF[i+1].t) { a = KF[i]; b = KF[i+1]; break; }
+  }
+  const span = b.t - a.t;
+  let f = span === 0 ? 0 : (t - a.t) / span;
+  f = f < 0.5 ? 2*f*f : 1 - Math.pow(-2*f+2, 2)/2;
+  return {
+    camZ: a.camZ + (b.camZ - a.camZ) * f,
+    rox:  a.rox  + (b.rox  - a.rox)  * f,
+    roy:  a.roy  + (b.roy  - a.roy)  * f,
+  };
+}
+
+const GS = { input:5.5, core:8, skill:4.5, brand:4.5, ops:4, signal:6.5, output:6 };
+
+let autoRY = 0, lastT = performance.now();
+
+function draw() {
+  const now = performance.now();
+  const dt = Math.min((now - lastT) / 1000, 0.05);
+  lastT = now;
+
+  sp += (ts - sp) * 0.055;
+  autoRY += dt * 0.04;
+
+  const W = canvas.width;
+  const H = canvas.height;
+  ctx.clearRect(0, 0, W, H);
+
+  const cam = getCam(sp);
+  const ROY = cam.roy + autoRY;
+  const ROX = cam.rox + Math.sin(now * 0.00022) * 0.025;
+
+  // Projection center: right half of screen
+  // Graph world coords centered at 0,0 → projects to CX,CY
+  const FOV = 700;
+  const CX = W * 0.68;   // center of right half
+  const CY = H * 0.47;
+
+  // Project all nodes
+  const P = N.map(node => {
+    let v = [node.bx, node.by, node.bz];
+    v = ry3(v, ROY);
+    v = rx3(v, ROX);
+    const dz = v[2] + cam.camZ;
+    if (dz < 1) return null;
+    const s = FOV / dz;
+    return {
+      sx: CX + v[0] * s,
+      sy: CY + v[1] * s,
+      sz: dz, s,
+      br: bright(node, sp),
+      node
+    };
+  });
+
+  // Draw edges
+  [...E]
+    .sort((a, b) => {
+      const za = P[a[0]] ? P[a[0]].sz : 0;
+      const zb = P[b[0]] ? P[b[0]].sz : 0;
+      return zb - za;
+    })
+    .forEach(([ai, bi]) => {
+      const a = P[ai], b = P[bi];
+      if (!a || !b) return;
+      const br = Math.min(a.br, b.br);
+      if (br < 0.06) return;
+      ctx.beginPath();
+      ctx.moveTo(a.sx, a.sy);
+      ctx.lineTo(b.sx, b.sy);
+      ctx.strokeStyle = `rgba(16,185,129,${br * 0.38})`;
+      ctx.lineWidth = br > 0.7 ? 1.2 : 0.6;
+      ctx.stroke();
+      if (br > 0.78) {
+        ctx.beginPath();
+        ctx.moveTo(a.sx, a.sy);
+        ctx.lineTo(b.sx, b.sy);
+        ctx.strokeStyle = `rgba(110,231,183,${(br - 0.78) * 0.6})`;
+        ctx.lineWidth = 0.4;
+        ctx.stroke();
+      }
+    });
+
+  // Draw nodes (back to front)
+  [...P].filter(Boolean)
+    .sort((a, b) => b.sz - a.sz)
+    .forEach(p => {
+      const { sx, sy, s, br, node } = p;
+      const baseR = GS[node.grp] || 4;
+      const r = Math.max(2, baseR * s * 0.9) * (0.6 + br * 0.4);
+
+      // Glow
+      if (br > 0.3) {
+        const grd = ctx.createRadialGradient(sx, sy, 0, sx, sy, r * 5);
+        grd.addColorStop(0, `rgba(16,185,129,${br * 0.18})`);
+        grd.addColorStop(1, 'transparent');
+        ctx.beginPath(); ctx.arc(sx, sy, r * 5, 0, Math.PI * 2);
+        ctx.fillStyle = grd; ctx.fill();
+      }
+
+      // Node dot
+      ctx.beginPath(); ctx.arc(sx, sy, r, 0, Math.PI * 2);
+      if (node.grp === 'core') {
+        ctx.fillStyle = `rgba(240,240,240,${0.12 + br * 0.88})`;
+      } else {
+        ctx.fillStyle = `rgba(16,185,129,${0.1 + br * 0.8})`;
+      }
+      ctx.fill();
+
+      // Ring for prominent nodes
+      if ((node.grp === 'core' || node.grp === 'output' || node.grp === 'signal') && br > 0.3) {
+        ctx.beginPath(); ctx.arc(sx, sy, r + 3, 0, Math.PI * 2);
+        ctx.strokeStyle = `rgba(16,185,129,${br * 0.3})`;
+        ctx.lineWidth = 0.8; ctx.stroke();
+      }
+
+      // Label: appears when bright and close enough
+      if (br > 0.5 && s > 0.35) {
+        const la = Math.min(1, (br - 0.5) * 4) * Math.min(1, (s - 0.35) * 5);
+        if (la > 0.05) {
+          const fs = Math.max(9, Math.min(12, s * 13));
+          ctx.font = `${fs}px "IBM Plex Mono"`;
+          const isLight = node.grp === 'core' || node.grp === 'output';
+          ctx.fillStyle = isLight
+            ? `rgba(240,240,240,${la})`
+            : `rgba(110,231,183,${la * 0.9})`;
+          ctx.fillText(node.lbl, sx + r + 4, sy + 4);
+        }
+      }
+    });
+
+  // Output cluster glow when near end
+  if (sp > 0.82) {
+    const grd = ctx.createRadialGradient(CX + 250, CY, 0, CX + 250, CY, 220);
+    grd.addColorStop(0, `rgba(16,185,129,${(sp - 0.82) * 0.12})`);
+    grd.addColorStop(1, 'transparent');
+    ctx.fillStyle = grd;
+    ctx.fillRect(0, 0, W, H);
+  }
+
+  requestAnimationFrame(draw);
+}
+draw();
+
+// ─── HOW IT WORKS STEP SWITCHER ───
+function setStep(n) {
+  document.querySelectorAll('.how-step').forEach((s, i) => s.classList.toggle('active-step', i === n - 1));
+  document.querySelectorAll('.how-visual').forEach((v, i) => v.classList.toggle('active', i === n - 1));
+}
+
+// ─── PANEL + DOT SWITCHING ───
+const panels = document.querySelectorAll('.panel');
+const dots = document.querySelectorAll('.pdot');
+const THRESH = [0, 0.18, 0.38, 0.58, 0.78];
+
+function updatePanels() {
+  let active = 0;
+  THRESH.forEach((t, i) => { if (ts >= t) active = i; });
+  panels.forEach((p, i) => p.classList.toggle('on', i === active));
+  dots.forEach((d, i) => d.classList.toggle('on', i === active));
+}
+window.addEventListener('scroll', updatePanels);
+updatePanels();
+</script>
+</body>
+</html>

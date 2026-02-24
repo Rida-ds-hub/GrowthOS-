@@ -1,148 +1,157 @@
 "use client"
 
 import { motion } from "framer-motion"
-import { Button } from "@/components/ui/button"
-import { Check } from "lucide-react"
 import { useRouter } from "next/navigation"
+import Link from "next/link"
 
 const plans = [
   {
-    name: "Free",
+    badge: "// free tier",
+    name: "Explorer",
     price: "$0",
-    period: "forever",
-    description: "Get started with your career gap analysis",
+    period: " / month",
+    description:
+      "Connect, analyze your gaps, and see your roadmap. No card required.",
     features: [
-      "One-time gap analysis",
-      "5-domain assessment",
-      "90-day action plan",
-      "Results via email",
-      "No account required",
+      "Gap analysis (1 target role)",
+      "90-day roadmap generated",
+      "5 micro-learning sessions / month",
+      "Resume snapshot",
+      "Community access",
     ],
-    cta: "Run free analysis",
-    highlight: false,
+    cta: "Start Free",
+    ctaType: "outline",
   },
   {
-    name: "Growth",
+    badge: "// most popular",
+    name: "Operator",
     price: "$29",
-    period: "month",
-    description: "Track your progress and unlock advanced features",
+    period: " / month",
+    description: "The full OS. For engineers serious about their next jump.",
     features: [
-      "Everything in Free",
       "Unlimited gap analyses",
-      "Progress tracking dashboard",
-      "Daily design drills",
-      "Impact bank",
-      "Promotion readiness score",
-      "LinkedIn post generator",
-      "Resume impact bullets",
+      "Live adaptive roadmap",
+      "Daily micro-learning + code tasks",
+      "Living resume (auto-updates)",
+      "Meeting second brain + calendar sync",
+      "LinkedIn post drafts (weekly)",
+      "Jump Signal readiness tracker",
+    ],
+    cta: "Get Early Access",
+    ctaType: "solid",
+    featured: true,
+  },
+  {
+    badge: "// for teams",
+    name: "Team OS",
+    price: "$79",
+    period: " / seat / mo",
+    description:
+      "For engineering managers who want their whole team moving deliberately.",
+    features: [
+      "Everything in Operator",
+      "Team-level gap dashboard",
+      "Manager view and coaching prompts",
+      "Aggregate readiness signals",
+      "Custom target role templates",
+      "Slack integration",
       "Priority support",
     ],
-    cta: "Start your journey",
-    highlight: true,
+    cta: "Contact Us",
+    ctaType: "outline",
   },
 ]
 
 export function Pricing() {
   const router = useRouter()
 
-  const handleCTA = (planName: string) => {
-    if (planName === "Free") {
-      router.push("/onboarding")
-    } else {
+  const handleCTA = (cta: string) => {
+    if (cta === "Start Free" || cta === "Get Early Access") {
       router.push("/onboarding")
     }
   }
 
   return (
-    <section id="pricing" className="py-24 px-4 bg-[#0a0a0a]">
-      <div className="max-w-6xl mx-auto">
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true }}
-          transition={{ duration: 0.5 }}
-          className="text-center mb-16"
-        >
-          <h2 className="text-4xl md:text-5xl font-bold text-white mb-4">
-            Simple, transparent pricing
-          </h2>
-          <p className="text-xl text-zinc-400 max-w-2xl mx-auto">
-            Start free. Upgrade when you're ready to accelerate your growth.
-          </p>
-        </motion.div>
+    <section
+      id="pricing"
+      className="relative z-10 bg-zinc-900 border-t border-zinc-800 py-28 px-12"
+    >
+      <div className="max-w-7xl mx-auto">
+        <div className="flex items-center gap-3 mb-5">
+          <div className="w-4 h-px bg-emerald-500" />
+          <span className="text-[0.62rem] tracking-[0.4em] uppercase text-emerald-500">
+            Pricing
+          </span>
+        </div>
+        <h2 className="font-['JetBrains_Mono'] text-3xl md:text-4xl font-bold text-white leading-tight mb-4 tracking-tight">
+          Simple pricing.
+          <br />
+          <span className="text-emerald-500">No surprises.</span>
+        </h2>
+        <p className="text-sm leading-relaxed text-zinc-400 font-light max-w-[520px] mb-12">
+          Start free. Upgrade when you see the value. All plans include the core
+          gap analysis and roadmap generator.
+        </p>
 
-        <div className="grid md:grid-cols-2 gap-8 max-w-4xl mx-auto">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-px bg-zinc-800 border border-zinc-800">
           {plans.map((plan, index) => (
             <motion.div
-              key={plan.name}
+              key={index}
+              className={`bg-[#0a0a0a] p-10 relative ${
+                plan.featured ? "bg-zinc-900 border-t-2 border-emerald-500" : ""
+              }`}
               initial={{ opacity: 0, y: 20 }}
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
               transition={{ duration: 0.5, delay: index * 0.1 }}
-              className={`
-                relative rounded-2xl border p-8
-                ${
-                  plan.highlight
-                    ? "border-emerald-500 bg-zinc-900/50 shadow-lg shadow-emerald-500/10"
-                    : "border-zinc-800 bg-zinc-950/50"
-                }
-              `}
             >
-              {plan.highlight && (
-                <div className="absolute -top-4 left-1/2 -translate-x-1/2">
-                  <span className="bg-emerald-500 text-black text-xs font-semibold px-3 py-1 rounded-full">
-                    Most Popular
-                  </span>
-                </div>
-              )}
-
-              <div className="mb-6">
-                <h3 className="text-2xl font-semibold text-white mb-2">{plan.name}</h3>
-                <div className="flex items-baseline gap-2 mb-2">
-                  <span className="text-4xl font-bold text-white">{plan.price}</span>
-                  {plan.period !== "forever" && (
-                    <span className="text-zinc-400">/{plan.period}</span>
-                  )}
-                </div>
-                <p className="text-zinc-400 text-sm">{plan.description}</p>
+              <span className="text-[0.6rem] tracking-[0.3em] uppercase text-emerald-500 mb-5 block">
+                {plan.badge}
+              </span>
+              <div className="font-['var(--font-jetbrains-mono)'] text-base font-bold text-white mb-3">
+                {plan.name}
               </div>
-
-              <ul className="space-y-3 mb-8">
+              <div className="font-['var(--font-jetbrains-mono)'] text-3xl font-bold text-white leading-none my-4">
+                {plan.price}
+                <span className="text-sm font-light text-zinc-500">
+                  {plan.period}
+                </span>
+              </div>
+              <p className="text-xs leading-relaxed text-zinc-500 mb-6">
+                {plan.description}
+              </p>
+              <ul className="list-none mb-8 space-y-1">
                 {plan.features.map((feature, idx) => (
-                  <li key={idx} className="flex items-start gap-3">
-                    <Check className="w-5 h-5 text-emerald-500 flex-shrink-0 mt-0.5" />
-                    <span className="text-zinc-300 text-sm">{feature}</span>
+                  <li
+                    key={idx}
+                    className="text-xs text-zinc-400 flex items-center gap-2.5 py-1 border-b border-zinc-800 leading-snug"
+                  >
+                    <span className="text-emerald-500 text-[0.65rem] opacity-70 flex-shrink-0">
+                      //
+                    </span>
+                    <span>{feature}</span>
                   </li>
                 ))}
               </ul>
-
-              <Button
-                onClick={() => handleCTA(plan.name)}
-                className={`
-                  w-full
-                  ${
-                    plan.highlight
-                      ? "bg-emerald-500 text-black hover:bg-emerald-400"
-                      : "bg-zinc-800 text-white hover:bg-zinc-700 border border-zinc-700"
+              <Link
+                href={plan.cta === "Contact Us" ? "#" : "/onboarding"}
+                onClick={(e) => {
+                  if (plan.cta !== "Contact Us") {
+                    e.preventDefault()
+                    handleCTA(plan.cta)
                   }
-                  font-semibold
-                `}
+                }}
+                className={`block text-center font-['var(--font-jetbrains-mono)'] text-xs tracking-wider uppercase font-bold py-3 px-4 transition-all ${
+                  plan.ctaType === "solid"
+                    ? "bg-emerald-500 text-black hover:opacity-82"
+                    : "border border-zinc-800 text-zinc-500 hover:border-emerald-500/30 hover:text-emerald-500"
+                }`}
               >
                 {plan.cta}
-              </Button>
+              </Link>
             </motion.div>
           ))}
         </div>
-
-        <motion.p
-          initial={{ opacity: 0 }}
-          whileInView={{ opacity: 1 }}
-          viewport={{ once: true }}
-          transition={{ duration: 0.5, delay: 0.3 }}
-          className="text-center text-zinc-500 text-sm mt-12"
-        >
-          All plans include access to our core gap analysis engine. No credit card required for free tier.
-        </motion.p>
       </div>
     </section>
   )

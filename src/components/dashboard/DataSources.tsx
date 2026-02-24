@@ -137,7 +137,7 @@ export function DataSources({ githubData, linkedinData, resumeText, websiteUrl }
     }
   }
 
-  const getStatusBadge = (status: DataSource["status"]) => {
+  const getStatusBadge = (status: DataSource["status"], type?: DataSource["type"]) => {
     switch (status) {
       case "connected":
         return (
@@ -157,7 +157,7 @@ export function DataSources({ githubData, linkedinData, resumeText, websiteUrl }
         return (
           <Badge variant="outline" className="text-zinc-400 border-zinc-700">
             <X className="w-3 h-3 mr-1" />
-            Not Provided
+            {type === "linkedin" ? "Not Provided (Requires Sign In)" : "Not Provided"}
           </Badge>
         )
     }
@@ -216,7 +216,7 @@ export function DataSources({ githubData, linkedinData, resumeText, websiteUrl }
                     <h3 className="font-semibold text-white">{source.name}</h3>
                   </div>
                 </div>
-                {getStatusBadge(source.status)}
+                {getStatusBadge(source.status, source.type)}
               </div>
               
               {source.preview && (

@@ -1,115 +1,95 @@
 "use client"
 
-import React from "react"
 import { motion } from "framer-motion"
-import { Card } from "@/components/ui/card"
-import { Target, Code, Radio, Brain } from "lucide-react"
-import { Badge } from "@/components/ui/badge"
 
 const features = [
   {
-    principle: "Plan or Fail",
-    title: "Gap Analysis & Custom Plan",
-    description: "AI-powered analysis of your current skills versus target role requirements. Get a 90-day structured progression plan tailored to your career goals with daily execution tasks.",
-    icon: Target,
-    available: true,
+    num: "01 // connect",
+    title: "Gap Analysis Engine",
+    description: "Ingests GitHub, LinkedIn, resume, and portfolio. Runs a full gap analysis against your target role. Surfaces what actually matters, not what sounds impressive.",
+    tag: "Connect, Analyze, Act",
   },
   {
-    principle: "Human Thinks. AI Executes.",
-    title: "Tech Commits & System Design",
-    description: "Make tech commits directly from the app. Learn system design tradeoffs and code based on your gap analysis. Track LeetCode progress and skill development metrics.",
-    icon: Code,
-    available: true,
+    num: "02 // learn",
+    title: "Micro-Learning + Code",
+    description: "15 minutes of targeted learning per day. In-app code commits tied to real projects. Streak tracking. System thinking exercises. Learning that compounds into genuine expertise.",
+    tag: "15 min / day",
   },
   {
-    principle: "Depth Without Visibility Is Invisible",
-    title: "LinkedIn Network & Impact Tracking",
-    description: "Connect LinkedIn for network audit. Post project and work updates from the app. Add project impact to your resume. Calendar integration tracks meetings and surveys you for impact delivered. Your career second brain.",
-    icon: Radio,
-    available: false,
+    num: "03 // resume",
+    title: "Living Resume",
+    description: "Every PR merged, every feature shipped, every win captured. Automatically written as impact-first bullets. Your resume is always current and always promotion-ready.",
+    tag: "Always Current",
+  },
+  {
+    num: "04 // memory",
+    title: "Meeting Second Brain",
+    description: "Calendar-integrated. Logs and analyzes every 1:1, skip-level, standup, and retro. Surfaces patterns in your influence and builds your promotion narrative from actual evidence.",
+    tag: "Calendar Integrated",
+  },
+  {
+    num: "05 // brand",
+    title: "LinkedIn on Autopilot",
+    description: "Real progress becomes real posts. Drafted from your actual commits, milestones, and learning. Specific, technical, never generic. Presence without the performance anxiety.",
+    tag: "Presence Without Performance",
+  },
+  {
+    num: "06 // signal",
+    title: "The Jump Signal",
+    description: "Promotion, pivot, new role, or founding something. Readiness signals tracked across all six domains. You always know exactly where you stand and what to do next.",
+    tag: "Promote, Pivot, Found",
   },
 ]
 
 export function Philosophy() {
-  const cardRefs = [React.useRef<HTMLDivElement>(null), React.useRef<HTMLDivElement>(null), React.useRef<HTMLDivElement>(null)]
-
   return (
-    <section className="relative py-32 px-4 bg-[#0a0a0a] border-b border-zinc-800 overflow-hidden">
-      {/* Subtle gradient overlay */}
-      <div className="absolute inset-0 bg-gradient-to-br from-emerald-500/5 via-transparent to-transparent pointer-events-none" />
-      <div className="max-w-6xl mx-auto relative z-10">
-        {/* Features Title */}
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true }}
-          transition={{ duration: 0.5 }}
-          className="text-center mb-16"
-        >
-          <h2 className="text-4xl md:text-5xl font-bold text-white mb-4">
-            Built for engineering professionals
-          </h2>
-          <p className="text-xl text-zinc-400 max-w-2xl mx-auto">
-            Structured progression tools that help you close the gap between where you are and where you want to be.
-          </p>
-        </motion.div>
+    <section
+      id="system"
+      className="relative z-10 bg-[#0a0a0a] border-t border-zinc-800 py-28 px-12"
+    >
+      <div className="max-w-7xl mx-auto">
+        <div className="flex items-center gap-3 mb-5">
+          <div className="w-4 h-px bg-emerald-500" />
+          <span className="text-[0.62rem] tracking-[0.4em] uppercase text-emerald-500">
+            The System
+          </span>
+        </div>
+        <h2 className="font-['var(--font-jetbrains-mono)'] text-3xl md:text-4xl font-bold text-white leading-tight mb-4 tracking-tight">
+          Six engines.
+          <br />
+          <span className="text-emerald-500">One OS.</span>
+        </h2>
+        <p className="text-sm leading-relaxed text-zinc-400 font-light max-w-[520px] mb-12">
+          Each piece is useful alone. Together they create a flywheel. Every
+          commit updates the resume. Every meeting feeds the promotion case.
+          Every day of progress generates your brand. Nothing is wasted.
+        </p>
 
-        {/* Features Grid */}
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mt-12">
-          {features.map((feature, index) => {
-            const Icon = feature.icon
-            return (
-              <motion.div
-                key={index}
-                ref={cardRefs[index]}
-                data-feature-card
-                initial={{ opacity: 0, y: 20 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true }}
-                transition={{ duration: 0.35, delay: index * 0.1 }}
-              >
-                <Card className={`p-6 h-full border transition-colors ${
-                  feature.available 
-                    ? "bg-zinc-900/50 border-zinc-800 hover:border-emerald-500/50" 
-                    : "bg-zinc-900/30 border-zinc-800/50 opacity-75"
-                }`}>
-                  <div className="mb-4">
-                    <div className="flex items-start justify-between mb-3">
-                      <div className={`p-3 rounded-lg flex-shrink-0 ${
-                        feature.available 
-                          ? "bg-emerald-500/10 border border-emerald-500/20" 
-                          : "bg-zinc-800/50 border border-zinc-700/50"
-                      }`}>
-                        <Icon className={`w-6 h-6 ${
-                          feature.available ? "text-emerald-400" : "text-zinc-500"
-                        }`} />
-                      </div>
-                      {!feature.available && (
-                        <Badge variant="outline" className="text-xs border-zinc-700 text-zinc-400">
-                          Coming Soon
-                        </Badge>
-                      )}
-                    </div>
-                    <h3 className={`text-lg font-semibold mb-2 ${
-                      feature.available ? "text-emerald-400" : "text-zinc-500"
-                    }`}>
-                      {feature.principle}
-                    </h3>
-                    <h4 className={`text-xl font-semibold mb-3 ${
-                      feature.available ? "text-white" : "text-zinc-400"
-                    }`}>
-                      {feature.title}
-                    </h4>
-                  </div>
-                  <p className={`leading-relaxed text-sm ${
-                    feature.available ? "text-zinc-300" : "text-zinc-500"
-                  }`}>
-                    {feature.description}
-                  </p>
-                </Card>
-              </motion.div>
-            )
-          })}
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-px bg-zinc-800 border border-zinc-800">
+          {features.map((feature, index) => (
+            <motion.div
+              key={index}
+              className="bg-[#0a0a0a] p-8 relative overflow-hidden group hover:bg-zinc-900 transition-colors"
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.35, delay: index * 0.05 }}
+            >
+              <div className="absolute top-0 left-0 right-0 h-0.5 bg-emerald-500 scale-x-0 group-hover:scale-x-100 transition-transform duration-400 origin-left" />
+              <div className="text-[0.6rem] tracking-[0.35em] text-zinc-500 uppercase mb-2.5">
+                {feature.num}
+              </div>
+              <h3 className="font-['var(--font-jetbrains-mono)'] text-sm font-bold text-white mb-2.5">
+                {feature.title}
+              </h3>
+              <p className="text-xs leading-relaxed text-zinc-500 font-light mb-4">
+                {feature.description}
+              </p>
+              <div className="text-[0.6rem] tracking-[0.25em] uppercase text-emerald-500 border-l-2 border-emerald-500 pl-2 inline-block">
+                {feature.tag}
+              </div>
+            </motion.div>
+          ))}
         </div>
       </div>
     </section>

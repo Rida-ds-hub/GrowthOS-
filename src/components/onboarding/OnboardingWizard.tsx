@@ -45,11 +45,46 @@ export function OnboardingWizard() {
           return {}
         }
       }
+      // Also check sessionStorage for cached results (for back button navigation)
+      const cached = sessionStorage.getItem("growthos_results_cache")
+      if (cached) {
+        try {
+          const cachedData = JSON.parse(cached)
+          // Check if cache is less than 1 hour old
+          if (Date.now() - cachedData.timestamp < 3600000 && cachedData.gapAnalysis) {
+            return {
+              gapAnalysis: cachedData.gapAnalysis,
+              githubDataText: cachedData.githubData,
+              linkedinDataText: cachedData.linkedinData,
+              resumeText: cachedData.resumeText,
+              websiteUrl: cachedData.websiteUrl,
+            }
+          }
+        } catch {
+          // Ignore cache parse errors
+        }
+      }
     }
     return {}
   })
   const [isAnalyzing, setIsAnalyzing] = useState(false)
-  const [showSignUpPrompt, setShowSignUpPrompt] = useState(false)
+  const [showSignUpPrompt, setShowSignUpPrompt] = useState(() => {
+    // Check if we have cached results to show immediately
+    if (typeof window !== "undefined") {
+      const cached = sessionStorage.getItem("growthos_results_cache")
+      if (cached) {
+        try {
+          const cachedData = JSON.parse(cached)
+          if (Date.now() - cachedData.timestamp < 3600000 && cachedData.gapAnalysis) {
+            return true // Show results immediately if cached
+          }
+        } catch {
+          // Ignore cache parse errors
+        }
+      }
+    }
+    return false
+  })
   const [isSignUpModalOpen, setIsSignUpModalOpen] = useState(false)
 
   // Save to localStorage whenever data changes
@@ -175,7 +210,11 @@ export function OnboardingWizard() {
         })
         
         // Show user-friendly error
-        alert(`Analysis failed: ${errorMessage}\n\nCheck terminal for server logs.`)
+        const friendlyMessage = errorMessage.includes("parse") || errorMessage.includes("JSON")
+          ? "The analysis completed but there was an issue formatting the results. Please try again - this usually resolves on retry."
+          : errorMessage
+        
+        alert(`Analysis failed: ${friendlyMessage}\n\nIf this persists, check terminal for server logs.`)
         throw new Error(errorMessage)
       }
 
@@ -207,16 +246,15 @@ export function OnboardingWizard() {
         localStorage.setItem(STORAGE_KEY, JSON.stringify(updatedData))
       }
 
-      // Wait a bit more, then show sign-up prompt if not authenticated
+      // Wait a bit more, then show results
       await new Promise((resolve) => setTimeout(resolve, 1000))
       
-      if (!session) {
-        // Show sign-up prompt to save results
-        setShowSignUpPrompt(true)
-      } else {
-        // User is authenticated, save to database and redirect
+      // Always show results after analysis completes
+      setShowSignUpPrompt(true)
+      
+      // If authenticated, also save to database in background
+      if (session) {
         await saveToDatabase(updatedData)
-        router.push("/dashboard")
       }
     } catch (error) {
       console.error("Onboarding error:", error)

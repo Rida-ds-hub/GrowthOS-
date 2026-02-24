@@ -15,7 +15,7 @@ interface SignInModalProps {
   callbackUrl?: string
 }
 
-export function SignInModal({ isOpen, onClose, callbackUrl = "/onboarding" }: SignInModalProps) {
+export function SignInModal({ isOpen, onClose, callbackUrl = "/dashboard" }: SignInModalProps) {
   const [isLoading, setIsLoading] = useState<string | null>(null)
   const [showEmailForm, setShowEmailForm] = useState(false)
   const [isSignUp, setIsSignUp] = useState(false)

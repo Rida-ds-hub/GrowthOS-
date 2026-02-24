@@ -56,6 +56,18 @@ export const authOptions: NextAuthOptions = {
       }
       return session
     },
+    async redirect({ url, baseUrl }) {
+      // If callbackUrl is provided and is a relative URL, use it
+      if (url.startsWith("/")) {
+        return `${baseUrl}${url}`
+      }
+      // If url is on the same origin, allow it
+      if (url.startsWith(baseUrl)) {
+        return url
+      }
+      // Default: redirect to dashboard
+      return `${baseUrl}/dashboard`
+    },
   },
 }
 

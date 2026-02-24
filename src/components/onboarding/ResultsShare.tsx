@@ -4,17 +4,18 @@ import { useState } from "react"
 import { motion } from "framer-motion"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent } from "@/components/ui/card"
-import { Download, LogIn, Github, Linkedin, FileText, Globe } from "lucide-react"
+import { Download, Github, Linkedin, FileText, Globe } from "lucide-react"
+import { Logo } from "@/components/logo/Logo"
 import { SummaryCard } from "@/components/dashboard/SummaryCard"
 import { GapRadar } from "@/components/dashboard/GapRadar"
 import { GapCards } from "@/components/dashboard/GapCards"
 import { PlanTimeline } from "@/components/dashboard/PlanTimeline"
 import { PromotionNarrative } from "@/components/dashboard/PromotionNarrative"
 import { DataSources } from "@/components/dashboard/DataSources"
-import { SignInModal } from "@/components/auth/SignInModal"
 import { useSession } from "next-auth/react"
 import { useRouter } from "next/navigation"
 import { useEffect } from "react"
+import Link from "next/link"
 import { Badge } from "@/components/ui/badge"
 
 interface ResultsShareProps {
@@ -30,10 +31,25 @@ interface ResultsShareProps {
 export function ResultsShare({ analysisResult, githubData, linkedinData, resumeText, websiteUrl, onSignUp }: ResultsShareProps) {
   const { data: session } = useSession()
   const router = useRouter()
-  const [isSignInModalOpen, setIsSignInModalOpen] = useState(false)
 
   // Extract gap analysis data (handle both nested and flat structures)
   const gapAnalysis = analysisResult?.gapAnalysis || analysisResult
+
+  // Save results to sessionStorage for back button navigation
+  useEffect(() => {
+    if (gapAnalysis && typeof window !== "undefined") {
+      const resultsData = {
+        gapAnalysis,
+        githubData,
+        linkedinData,
+        resumeText,
+        websiteUrl,
+        timestamp: Date.now()
+      }
+      sessionStorage.setItem("growthos_results_cache", JSON.stringify(resultsData))
+    }
+  }, [gapAnalysis, githubData, linkedinData, resumeText, websiteUrl])
+
 
   // Save data when user signs in/up
   useEffect(() => {
@@ -45,7 +61,7 @@ export function ResultsShare({ analysisResult, githubData, linkedinData, resumeT
           const storedData = localStorage.getItem("growthos_onboarding_data")
           if (storedData) {
             const onboardingData = JSON.parse(storedData)
-            await fetch("/api/profile", {
+            const response = await fetch("/api/profile", {
               method: "POST",
               headers: { "Content-Type": "application/json" },
               body: JSON.stringify({
@@ -53,17 +69,23 @@ export function ResultsShare({ analysisResult, githubData, linkedinData, resumeT
                 targetRole: onboardingData.targetRole,
                 yearsExp: onboardingData.yearsExp,
                 timeline: onboardingData.timeline,
+                progressionIntent: onboardingData.progressionIntent,
                 websiteUrl: onboardingData.websiteUrl,
-                githubDataText: onboardingData.githubDataText,
-                linkedinDataText: onboardingData.linkedinDataText,
-                resumeText: onboardingData.resumeText,
+                githubDataText: onboardingData.githubDataText || githubData,
+                linkedinDataText: onboardingData.linkedinDataText || linkedinData,
+                resumeText: onboardingData.resumeText || resumeText,
                 gapAnalysis: onboardingData.gapAnalysis || gapAnalysis,
               }),
             })
-            // Clear localStorage after save
-            localStorage.removeItem("growthos_onboarding_data")
-            // Redirect to dashboard
-            router.push("/dashboard")
+            
+            if (response.ok) {
+              // Clear localStorage after successful save
+              localStorage.removeItem("growthos_onboarding_data")
+              // Redirect to dashboard
+              router.push("/dashboard")
+            } else {
+              console.error("Failed to save results:", await response.text())
+            }
           }
         } catch (error) {
           console.error("Failed to save results after sign in:", error)
@@ -71,7 +93,7 @@ export function ResultsShare({ analysisResult, githubData, linkedinData, resumeT
       }
       saveResults()
     }
-  }, [session, gapAnalysis, router])
+  }, [session, gapAnalysis, router, githubData, linkedinData, resumeText])
 
 
   // Debug: log the structure to help diagnose issues
@@ -94,8 +116,8 @@ export function ResultsShare({ analysisResult, githubData, linkedinData, resumeT
     }
   }
 
-  // PDF Download handler
-  const handleDownloadPDF = () => {
+  // Download Results handler
+  const handleDownloadResults = () => {
     if (!gapAnalysis) return
 
     // Create a simple text-based PDF content
@@ -181,7 +203,25 @@ ${new Date().toLocaleDateString()}
 
   return (
     <div className="min-h-screen bg-[#0a0a0a] py-8 px-4">
-      <div className="max-w-7xl mx-auto space-y-8">
+      <div className="max-w-[95vw] mx-auto px-6 space-y-8">
+        {/* Logo Header */}
+        <motion.div
+          initial={{ opacity: 0, y: -20 }}
+          animate={{ opacity: 1, y: 0 }}
+          className="mb-6 flex items-center justify-between"
+        >
+          <Link href="/">
+            <Logo variant="horizontal" size="header" />
+          </Link>
+          <Link href="/onboarding">
+            <Button
+              className="bg-emerald-500 text-black hover:bg-emerald-400 font-semibold"
+            >
+              Try Another
+            </Button>
+          </Link>
+        </motion.div>
+
         {/* Header with Actions */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}
@@ -198,28 +238,25 @@ ${new Date().toLocaleDateString()}
           </div>
           <div className="flex gap-3">
             <Button
-              onClick={handleDownloadPDF}
+              onClick={handleDownloadResults}
               variant="outline"
               className="border-zinc-700 text-zinc-300 hover:bg-zinc-800"
             >
               <Download className="w-4 h-4 mr-2" />
-              Download PDF
+              Download Results
             </Button>
-            <Button
-              onClick={() => setIsSignInModalOpen(true)}
-              variant="outline"
-              className="border-zinc-700 text-zinc-300 hover:bg-zinc-800"
-            >
-              <LogIn className="w-4 h-4 mr-2" />
-              Sign In
-            </Button>
-            {onSignUp && (
+            {!session && (
               <Button
-                onClick={onSignUp}
-                className="bg-emerald-500 text-black hover:bg-emerald-400 font-semibold"
+                disabled
+                className="bg-zinc-800 text-zinc-500 cursor-not-allowed font-semibold opacity-50"
               >
                 Sign Up to Save
               </Button>
+            )}
+            {session && (
+              <div className="text-sm text-emerald-400 flex items-center gap-2">
+                <span>✓ Results saved to your dashboard</span>
+              </div>
             )}
           </div>
         </motion.div>
@@ -316,13 +353,33 @@ ${new Date().toLocaleDateString()}
             <PromotionNarrative gapAnalysis={gapAnalysis} />
           </motion.div>
         </div>
-      </div>
 
-      <SignInModal
-        isOpen={isSignInModalOpen}
-        onClose={() => setIsSignInModalOpen(false)}
-        callbackUrl="/dashboard"
-      />
+        {/* Free Version CTA */}
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.6 }}
+          className="mt-16 pt-8 border-t border-zinc-800"
+        >
+          <div className="text-center space-y-6">
+            <Button
+              onClick={handleDownloadResults}
+              variant="outline"
+              className="border-zinc-700 text-zinc-300 hover:bg-zinc-800"
+            >
+              <Download className="w-4 h-4 mr-2" />
+              Download Results
+            </Button>
+            <p className="text-zinc-400 text-lg">
+              This is the free version. For more features and to save your results permanently,{" "}
+              <Link href="/#pricing" className="text-emerald-400 hover:text-emerald-300 underline">
+                sign up
+              </Link>
+              .
+            </p>
+          </div>
+        </motion.div>
+      </div>
     </div>
   )
 }
