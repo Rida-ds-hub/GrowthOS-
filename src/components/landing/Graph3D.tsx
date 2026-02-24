@@ -151,6 +151,8 @@ export function Graph3D({ scrollProgress }: Graph3DProps) {
     const ctx = canvasEl.getContext("2d")
     if (!ctx) return
 
+    const ctx2d = ctx
+
     function setSize() {
       canvasEl.width = window.innerWidth
       canvasEl.height = window.innerHeight
@@ -169,7 +171,7 @@ export function Graph3D({ scrollProgress }: Graph3DProps) {
 
       const W = canvasEl.width
       const H = canvasEl.height
-      ctx.clearRect(0, 0, W, H)
+      ctx2d.clearRect(0, 0, W, H)
 
       const cam = getCam(spRef.current)
       const ROY = cam.roy + autoRYRef.current
@@ -210,19 +212,19 @@ export function Graph3D({ scrollProgress }: Graph3DProps) {
           if (!a || !b) return
           const br = Math.min(a.br, b.br)
           if (br < 0.06) return
-          ctx.beginPath()
-          ctx.moveTo(a.sx, a.sy)
-          ctx.lineTo(b.sx, b.sy)
-          ctx.strokeStyle = `rgba(16,185,129,${br * 0.38})`
-          ctx.lineWidth = br > 0.7 ? 1.2 : 0.6
-          ctx.stroke()
+          ctx2d.beginPath()
+          ctx2d.moveTo(a.sx, a.sy)
+          ctx2d.lineTo(b.sx, b.sy)
+          ctx2d.strokeStyle = `rgba(16,185,129,${br * 0.38})`
+          ctx2d.lineWidth = br > 0.7 ? 1.2 : 0.6
+          ctx2d.stroke()
           if (br > 0.78) {
-            ctx.beginPath()
-            ctx.moveTo(a.sx, a.sy)
-            ctx.lineTo(b.sx, b.sy)
-            ctx.strokeStyle = `rgba(110,231,183,${(br - 0.78) * 0.6})`
-            ctx.lineWidth = 0.4
-            ctx.stroke()
+            ctx2d.beginPath()
+            ctx2d.moveTo(a.sx, a.sy)
+            ctx2d.lineTo(b.sx, b.sy)
+            ctx2d.strokeStyle = `rgba(110,231,183,${(br - 0.78) * 0.6})`
+            ctx2d.lineWidth = 0.4
+            ctx2d.stroke()
           }
         })
 
@@ -236,23 +238,23 @@ export function Graph3D({ scrollProgress }: Graph3DProps) {
           const r = Math.max(2, baseR * s * 0.9) * (0.6 + br * 0.4)
 
           if (br > 0.3) {
-            const grd = ctx.createRadialGradient(sx, sy, 0, sx, sy, r * 5)
+            const grd = ctx2d.createRadialGradient(sx, sy, 0, sx, sy, r * 5)
             grd.addColorStop(0, `rgba(16,185,129,${br * 0.18})`)
             grd.addColorStop(1, "transparent")
-            ctx.beginPath()
-            ctx.arc(sx, sy, r * 5, 0, Math.PI * 2)
-            ctx.fillStyle = grd
-            ctx.fill()
+            ctx2d.beginPath()
+            ctx2d.arc(sx, sy, r * 5, 0, Math.PI * 2)
+            ctx2d.fillStyle = grd
+            ctx2d.fill()
           }
 
-          ctx.beginPath()
-          ctx.arc(sx, sy, r, 0, Math.PI * 2)
+          ctx2d.beginPath()
+          ctx2d.arc(sx, sy, r, 0, Math.PI * 2)
           if (node.grp === "core") {
-            ctx.fillStyle = `rgba(240,240,240,${0.12 + br * 0.88})`
+            ctx2d.fillStyle = `rgba(240,240,240,${0.12 + br * 0.88})`
           } else {
-            ctx.fillStyle = `rgba(16,185,129,${0.1 + br * 0.8})`
+            ctx2d.fillStyle = `rgba(16,185,129,${0.1 + br * 0.8})`
           }
-          ctx.fill()
+          ctx2d.fill()
 
           if (
             (node.grp === "core" ||
@@ -260,11 +262,11 @@ export function Graph3D({ scrollProgress }: Graph3DProps) {
               node.grp === "signal") &&
             br > 0.3
           ) {
-            ctx.beginPath()
-            ctx.arc(sx, sy, r + 3, 0, Math.PI * 2)
-            ctx.strokeStyle = `rgba(16,185,129,${br * 0.3})`
-            ctx.lineWidth = 0.8
-            ctx.stroke()
+            ctx2d.beginPath()
+            ctx2d.arc(sx, sy, r + 3, 0, Math.PI * 2)
+            ctx2d.strokeStyle = `rgba(16,185,129,${br * 0.3})`
+            ctx2d.lineWidth = 0.8
+            ctx2d.stroke()
           }
 
           if (br > 0.5 && s > 0.35) {
@@ -272,18 +274,18 @@ export function Graph3D({ scrollProgress }: Graph3DProps) {
               Math.min(1, (br - 0.5) * 4) * Math.min(1, (s - 0.35) * 5)
             if (la > 0.05) {
               const fs = Math.max(9, Math.min(12, s * 13))
-              ctx.font = `${fs}px "IBM Plex Mono"`
+              ctx2d.font = `${fs}px "IBM Plex Mono"`
               const isLight = node.grp === "core" || node.grp === "output"
-              ctx.fillStyle = isLight
+              ctx2d.fillStyle = isLight
                 ? `rgba(240,240,240,${la})`
                 : `rgba(110,231,183,${la * 0.9})`
-              ctx.fillText(node.lbl, sx + r + 4, sy + 4)
+              ctx2d.fillText(node.lbl, sx + r + 4, sy + 4)
             }
           }
         })
 
       if (spRef.current > 0.82) {
-        const grd = ctx.createRadialGradient(
+        const grd = ctx2d.createRadialGradient(
           CX + 250,
           CY,
           0,
@@ -293,8 +295,8 @@ export function Graph3D({ scrollProgress }: Graph3DProps) {
         )
         grd.addColorStop(0, `rgba(16,185,129,${(spRef.current - 0.82) * 0.12})`)
         grd.addColorStop(1, "transparent")
-        ctx.fillStyle = grd
-        ctx.fillRect(0, 0, W, H)
+        ctx2d.fillStyle = grd
+        ctx2d.fillRect(0, 0, W, H)
       }
 
       animationFrameRef.current = requestAnimationFrame(draw)
