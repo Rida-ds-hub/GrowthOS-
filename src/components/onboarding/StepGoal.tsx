@@ -23,12 +23,10 @@ export function StepGoal({ onContinue, initialData }: StepGoalProps) {
   const [currentRole, setCurrentRole] = useState("")
   const [targetRole, setTargetRole] = useState("")
   const [yearsExp, setYearsExp] = useState<number | "">("")
-  const [timeline, setTimeline] = useState("")
+  const [timelineMonths, setTimelineMonths] = useState<number>(6) // Default to 6 months
   const [progressionIntent, setProgressionIntent] = useState<"same_company" | "new_company" | "founder" | "pivot">(
     initialData?.progressionIntent || "same_company"
   )
-
-  const timelines = ["3 months", "6 months", "9 months", "12 months"]
   const progressionOptions = [
     { value: "same_company" as const, label: "Grow in current company", desc: "Internal promotion or role expansion" },
     { value: "new_company" as const, label: "Move to a new company", desc: "External opportunity" },
@@ -40,7 +38,7 @@ export function StepGoal({ onContinue, initialData }: StepGoalProps) {
     currentRole.trim() &&
     targetRole.trim() &&
     yearsExp !== "" &&
-    timeline !== "" &&
+    timelineMonths > 0 &&
     progressionIntent !== ""
 
   const handleSubmit = (e: React.FormEvent) => {
@@ -50,7 +48,7 @@ export function StepGoal({ onContinue, initialData }: StepGoalProps) {
         currentRole: currentRole.trim(),
         targetRole: targetRole.trim(),
         yearsExp: Number(yearsExp),
-        timeline,
+        timeline: `${timelineMonths} months`,
         progressionIntent,
       })
     }
@@ -110,26 +108,24 @@ export function StepGoal({ onContinue, initialData }: StepGoalProps) {
             />
           </div>
 
-          <div className="space-y-2">
-            <Label>Timeline</Label>
-            <div className="flex flex-wrap gap-2">
-              {timelines.map((t) => (
-                <button
-                  key={t}
-                  type="button"
-                  onClick={() => setTimeline(t)}
-                  className={`
-                    px-4 py-2 rounded-lg text-sm font-medium transition-colors
-                    ${
-                      timeline === t
-                        ? "bg-emerald-500 text-black"
-                        : "bg-zinc-950 border border-zinc-700 text-zinc-300 hover:border-emerald-500/50"
-                    }
-                  `}
-                >
-                  {t}
-                </button>
-              ))}
+          <div className="space-y-3">
+            <Label>Timeline: {timelineMonths} {timelineMonths === 1 ? 'month' : 'months'}</Label>
+            <div className="space-y-2">
+              <input
+                type="range"
+                min="1"
+                max="24"
+                value={timelineMonths}
+                onChange={(e) => setTimelineMonths(Number(e.target.value))}
+                className="w-full h-2 bg-zinc-800 rounded-lg appearance-none cursor-pointer [&::-webkit-slider-thumb]:appearance-none [&::-webkit-slider-thumb]:w-4 [&::-webkit-slider-thumb]:h-4 [&::-webkit-slider-thumb]:rounded-full [&::-webkit-slider-thumb]:bg-emerald-500 [&::-webkit-slider-thumb]:border-2 [&::-webkit-slider-thumb]:border-zinc-900 [&::-webkit-slider-thumb]:shadow-md [&::-moz-range-thumb]:w-4 [&::-moz-range-thumb]:h-4 [&::-moz-range-thumb]:rounded-full [&::-moz-range-thumb]:bg-emerald-500 [&::-moz-range-thumb]:border-2 [&::-moz-range-thumb]:border-zinc-900 [&::-moz-range-thumb]:shadow-md [&::-moz-range-thumb]:cursor-pointer"
+                style={{
+                  background: `linear-gradient(to right, rgb(16, 185, 129) 0%, rgb(16, 185, 129) ${((timelineMonths - 1) / 23) * 100}%, rgb(39, 39, 42) ${((timelineMonths - 1) / 23) * 100}%, rgb(39, 39, 42) 100%)`
+                }}
+              />
+              <div className="flex justify-between text-xs text-zinc-400">
+                <span>1 month</span>
+                <span>24 months</span>
+              </div>
             </div>
           </div>
 

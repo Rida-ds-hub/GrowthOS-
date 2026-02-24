@@ -35,6 +35,7 @@ export interface GapAnalysis {
   gaps: Array<{
     domain: string;
     gap: "high" | "medium" | "low";
+    title?: string; // Succinct one-liner describing the gap
     observation: string;
     requirement: string;
     closingAction: string;
@@ -44,21 +45,39 @@ export interface GapAnalysis {
       label: string; 
       theme: string; 
       actions: string[];
-      specificTasks?: string[];
+      specificTasks?: Array<string | {
+        emoji: string;
+        title: string;
+        description: string;
+        effort: "high" | "medium" | "low";
+        timeline: string;
+      }>;
       deliverables?: string[];
     };
     phase2: { 
       label: string; 
       theme: string; 
       actions: string[];
-      specificTasks?: string[];
+      specificTasks?: Array<string | {
+        emoji: string;
+        title: string;
+        description: string;
+        effort: "high" | "medium" | "low";
+        timeline: string;
+      }>;
       deliverables?: string[];
     };
     phase3: { 
       label: string; 
       theme: string; 
       actions: string[];
-      specificTasks?: string[];
+      specificTasks?: Array<string | {
+        emoji: string;
+        title: string;
+        description: string;
+        effort: "high" | "medium" | "low";
+        timeline: string;
+      }>;
       deliverables?: string[];
     };
   };

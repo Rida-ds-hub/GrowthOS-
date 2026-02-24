@@ -47,7 +47,12 @@ Only include dataContributions for sources that were actually provided.
 Make a 3-phase execution plan (Phase 1, Phase 2, Phase 3). No specific calendar dates. Treat phases as ordered blocks: start with immediate fixes, then medium-term build, then proof/visibility. Each phase should have:
 - Clear theme
 - 3-5 specific, measurable actions (not generic advice)
-- Ordered steps for that phase (no explicit dates)
+- Ordered steps (specificTasks) for that phase - each step must include:
+  * A relevant emoji (🎙️, 🚀, 🌐, 📣, ⚙️, 🤝, 📋, 🧪, 💰, 🎤, 📊, etc.)
+  * An actionable verb title (Validate, Deploy, Launch, Publish, Architect, Network, Plan, Test, Fundraise, Pitch, Iterate, etc.)
+  * Full description of what to do
+  * Effort level: "high", "medium", or "low"
+  * Timeline: specific timeframe (e.g., "Weeks 1–4", "Month 5", "Months 10–12") - do NOT use "Ongoing"
 - Deliverables (what they'll have completed)
 
 Include suggested upskilling projects (specific projects they can build/contribute to) and a posting strategy (what to post, when, where).
@@ -88,6 +93,7 @@ Return ONLY valid JSON. No text before or after. Use this exact shape:
     {
       "domain": "string",
       "gap": "high|medium|low",
+      "title": "succinct, relevant one-liner describing the gap (e.g., 'No evidence of managing direct reports or defining strategic direction') - do NOT repeat 'Evidence Shows' or similar phrases",
       "observation": "what the evidence shows (bullet points preferred)",
       "requirement": "what the target role needs (bullet points preferred)",
       "closingAction": "single most effective action (specific and actionable)"
@@ -98,21 +104,45 @@ Return ONLY valid JSON. No text before or after. Use this exact shape:
       "label": "Phase 1", 
       "theme": "specific theme",
       "actions": ["specific action 1", "specific action 2", "specific action 3"],
-      "specificTasks": ["Step 1: Do X", "Step 2: Complete Y", "Step 3: Deliver Z"],
+      "specificTasks": [
+        {
+          "emoji": "relevant emoji (e.g., 🎙️, 🚀, 🌐, 📣, ⚙️, 🤝, 📋, 🧪, 💰, 🎤, 📊)",
+          "title": "actionable verb title (e.g., 'Validate', 'Deploy', 'Launch', 'Publish', 'Architect', 'Network', 'Plan', 'Test', 'Fundraise', 'Pitch', 'Iterate')",
+          "description": "full description of the task",
+          "effort": "high|medium|low",
+          "timeline": "specific timeline (e.g., 'Weeks 1–4', 'Month 5', 'Months 10–12')"
+        }
+      ],
       "deliverables": ["Deliverable 1", "Deliverable 2"]
     },
     "phase2": { 
       "label": "Phase 2", 
       "theme": "specific theme",
       "actions": ["specific action 1", "specific action 2", "specific action 3"],
-      "specificTasks": ["Step 1: Do X", "Step 2: Complete Y", "Step 3: Deliver Z"],
+      "specificTasks": [
+        {
+          "emoji": "relevant emoji",
+          "title": "actionable verb title",
+          "description": "full description of the task",
+          "effort": "high|medium|low",
+          "timeline": "specific timeline"
+        }
+      ],
       "deliverables": ["Deliverable 1", "Deliverable 2"]
     },
     "phase3": { 
       "label": "Phase 3", 
       "theme": "specific theme",
       "actions": ["specific action 1", "specific action 2", "specific action 3"],
-      "specificTasks": ["Step 1: Do X", "Step 2: Complete Y", "Step 3: Deliver Z"],
+      "specificTasks": [
+        {
+          "emoji": "relevant emoji",
+          "title": "actionable verb title",
+          "description": "full description of the task",
+          "effort": "high|medium|low",
+          "timeline": "specific timeline"
+        }
+      ],
       "deliverables": ["Deliverable 1", "Deliverable 2"]
     }
   },

@@ -1,11 +1,9 @@
 "use client"
 
 import { useState } from "react"
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
-import { Button } from "@/components/ui/button"
 import { GapAnalysis } from "@/lib/types"
-import { ChevronDown, ChevronUp } from "lucide-react"
+import { ChevronDown } from "lucide-react"
 
 interface GapCardsProps {
   gapAnalysis: GapAnalysis
@@ -49,12 +47,32 @@ export function GapCards({ gapAnalysis }: GapCardsProps) {
     }
   }
 
+  const getGapSeverity = (gap: string) => {
+    if (gap === "high") return "high"
+    if (gap === "medium") return "mod"
+    return "low"
+  }
+
+  const getGapScore = (domain: string) => {
+    const domainScores = gapAnalysis?.domainScores || {}
+    return (domainScores as any)[domain] || 0
+  }
+
   return (
     <div className="space-y-4">
-      <h2 className="text-2xl font-semibold text-white mb-4">Gap Details</h2>
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+      <div className="flex items-center justify-between mb-4">
+        <h2 className="font-mono text-xs md:text-sm font-semibold tracking-[0.2em] uppercase text-zinc-500 flex items-center gap-2">
+          <span className="w-4 h-px bg-zinc-500"></span>
+          Gap Details
+        </h2>
+        <span className="text-xs text-zinc-500">Click any row to expand</span>
+      </div>
+      <div className="flex flex-col gap-2">
         {gapAnalysis.gaps.map((gap, index) => {
           const isExpanded = expanded[index]
+          const severity = getGapSeverity(gap.gap)
+          const score = getGapScore(gap.domain)
+          
           // Ensure values are strings (handle arrays or other types)
           const observationText = Array.isArray(gap.observation) 
             ? gap.observation.join("\n") 
@@ -65,142 +83,91 @@ export function GapCards({ gapAnalysis }: GapCardsProps) {
           const closingActionText = Array.isArray(gap.closingAction)
             ? gap.closingAction.join("\n")
             : String(gap.closingAction || "")
-          
-          const observationBullets = parseBullets(observationText, 3)
-          const requirementBullets = parseBullets(requirementText, 3)
-          const closingBullets = parseBullets(closingActionText, 1)
 
           return (
-            <Card
+            <div
               key={index}
-              className="bg-zinc-900/50 border-zinc-800 rounded-2xl"
+              className={`
+                border border-[#1e1e1e] bg-[#111111] overflow-hidden transition-all
+                ${severity === "high" ? "hover:border-red-500/30" : severity === "mod" ? "hover:border-amber-500/30" : "hover:border-emerald-500/30"}
+              `}
             >
-              <CardHeader className="pb-3">
-                <div className="flex items-center justify-between">
-                  <CardTitle className="text-base font-semibold text-white">
-                    {gap.domain}
-                  </CardTitle>
-                  <Badge 
-                    className={
-                      gap.gap === "high" 
-                        ? "bg-red-500/10 text-red-400 border-red-500/20"
-                        : gap.gap === "medium"
-                        ? "bg-yellow-500/10 text-yellow-400 border-yellow-500/20"
-                        : "bg-emerald-500/10 text-emerald-400 border-emerald-500/20"
-                    }
-                  >
-                    {getGapLabel(gap.gap)}
-                  </Badge>
+              <div
+                className="flex items-center gap-4 px-4 md:px-5 py-4 cursor-pointer hover:bg-[#161616] transition-colors select-none"
+                onClick={() => setExpanded(prev => ({ ...prev, [index]: !prev[index] }))}
+              >
+                <div className={`w-0.5 h-8 rounded-full flex-shrink-0 ${
+                  severity === "high" ? "bg-red-500" : severity === "mod" ? "bg-amber-500" : "bg-emerald-500"
+                }`} />
+                <div className="font-mono text-sm md:text-base font-semibold text-white flex-1">
+                  {gap.domain}
                 </div>
-              </CardHeader>
-              <CardContent className="space-y-3">
-                <div>
-                  <div className="text-xs font-medium text-zinc-400 uppercase tracking-wide mb-1.5">
-                    Evidence Shows
-                  </div>
-                  <ul className="space-y-1 text-xs text-zinc-300">
-                    {observationBullets.items.map((item, idx) => (
-                      <li key={idx} className="flex items-start gap-2">
-                        <span className="text-zinc-500 mt-0.5 flex-shrink-0">•</span>
-                        <span className="leading-relaxed">{item}</span>
-                      </li>
-                    ))}
-                    {observationBullets.hasMore && !isExpanded && (
-                      <li className="text-zinc-500 text-xs">
-                        +{observationBullets.items.length > 0 
-                          ? observationText
-                              .split("\n")
-                              .map((line) => line.replace(/^[\s\-•]+/, "").trim())
-                              .filter(Boolean).length - 3
-                          : 0} more
-                      </li>
-                    )}
-                    {isExpanded &&
-                      observationText
-                        .split("\n")
-                        .map((line) => line.replace(/^[\s\-•]+/, "").trim())
-                        .filter(Boolean)
-                        .slice(3)
-                        .map((item, idx) => (
-                          <li key={`exp-${idx}`} className="flex items-start gap-2">
-                            <span className="text-zinc-500 mt-0.5 flex-shrink-0">•</span>
-                            <span className="leading-relaxed">{item}</span>
-                          </li>
-                        ))}
-                  </ul>
+                <div className="text-xs md:text-sm italic text-zinc-400 flex-2 hidden md:block">
+                  {(gap as any).title || observationText.split("\n")[0]?.substring(0, 60)}...
                 </div>
-                <div>
-                  <div className="text-xs font-medium text-zinc-400 uppercase tracking-wide mb-1.5">
-                    Role Expects
-                  </div>
-                  <ul className="space-y-1 text-xs text-zinc-300">
-                    {requirementBullets.items.map((item, idx) => (
-                      <li key={idx} className="flex items-start gap-2">
-                        <span className="text-zinc-500 mt-0.5 flex-shrink-0">•</span>
-                        <span className="leading-relaxed">{item}</span>
-                      </li>
-                    ))}
-                    {requirementBullets.hasMore && !isExpanded && (
-                      <li className="text-zinc-500 text-xs">
-                        +{requirementBullets.items.length > 0
-                          ? requirementText
-                              .split("\n")
-                              .map((line) => line.replace(/^[\s\-•]+/, "").trim())
-                              .filter(Boolean).length - 3
-                          : 0} more
-                      </li>
-                    )}
-                    {isExpanded &&
-                      requirementText
-                        .split("\n")
-                        .map((line) => line.replace(/^[\s\-•]+/, "").trim())
-                        .filter(Boolean)
-                        .slice(3)
-                        .map((item, idx) => (
-                          <li key={`exp-req-${idx}`} className="flex items-start gap-2">
-                            <span className="text-zinc-500 mt-0.5 flex-shrink-0">•</span>
-                            <span className="leading-relaxed">{item}</span>
-                          </li>
-                        ))}
-                  </ul>
+                <Badge 
+                  className={`text-[0.58rem] tracking-[0.15em] uppercase px-2 py-1 flex-shrink-0 ${
+                    severity === "high"
+                      ? "bg-red-500/10 text-red-400 border border-red-500/20"
+                      : severity === "mod"
+                      ? "bg-amber-500/10 text-amber-400 border border-amber-500/20"
+                      : "bg-emerald-500/10 text-emerald-400 border border-emerald-500/30"
+                  }`}
+                >
+                  {getGapLabel(gap.gap)}
+                </Badge>
+                <div className={`font-mono text-sm md:text-base font-semibold flex-shrink-0 min-w-[36px] text-right ${
+                  severity === "high" ? "text-red-500" : severity === "mod" ? "text-amber-500" : "text-emerald-500"
+                }`}>
+                  {score}
                 </div>
-                <div className="pt-2 border-t border-zinc-800">
-                  <div className="text-xs font-medium text-emerald-400 uppercase tracking-wide mb-1.5">
-                    Next Move
-                  </div>
-                  <div className="text-xs font-medium text-emerald-400">
-                    {closingBullets.items.length > 0 ? (
-                      <div className="flex items-start gap-2">
-                        <span className="text-emerald-500 mt-0.5 flex-shrink-0">→</span>
-                        <span className="leading-relaxed">{closingBullets.items[0]}</span>
+                <div className={`flex-shrink-0 transition-transform ${isExpanded ? "rotate-180" : ""}`}>
+                  <ChevronDown className="w-4 h-4 text-zinc-500" />
+                </div>
+              </div>
+              <div className={`overflow-hidden transition-all ${
+                isExpanded ? "max-h-[600px] pb-5" : "max-h-0"
+              }`}>
+                <div className="px-4 md:px-5 pt-0">
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4">
+                    <div>
+                      <div className="text-[0.62rem] tracking-[0.25em] uppercase text-zinc-500 mb-3 pb-2 border-b border-[#1e1e1e]">
+                        Evidence Shows
                       </div>
-                    ) : (
-                      <p className="leading-relaxed">{gap.closingAction}</p>
-                    )}
+                      <ul className="space-y-2 text-sm text-zinc-300">
+                        {observationText.split("\n").filter(Boolean).map((item, idx) => (
+                          <li key={idx} className="flex items-start gap-2">
+                            <span className="text-zinc-500 mt-1 flex-shrink-0">·</span>
+                            <span className="leading-relaxed">{item.replace(/^[\s\-•]+/, "").trim()}</span>
+                          </li>
+                        ))}
+                      </ul>
+                    </div>
+                    <div>
+                      <div className="text-[0.62rem] tracking-[0.25em] uppercase text-zinc-500 mb-3 pb-2 border-b border-[#1e1e1e]">
+                        Role Expects
+                      </div>
+                      <ul className="space-y-2 text-sm text-zinc-300">
+                        {requirementText.split("\n").filter(Boolean).map((item, idx) => (
+                          <li key={idx} className="flex items-start gap-2">
+                            <span className="text-zinc-500 mt-1 flex-shrink-0">·</span>
+                            <span className="leading-relaxed">{item.replace(/^[\s\-•]+/, "").trim()}</span>
+                          </li>
+                        ))}
+                      </ul>
+                    </div>
+                  </div>
+                  <div className="mt-4 p-4 bg-emerald-500/10 border-l-2 border-emerald-500">
+                    <div className="text-[0.6rem] tracking-[0.25em] uppercase text-emerald-500 opacity-70 mb-2">
+                      Next Move
+                    </div>
+                    <div className="text-sm text-emerald-400 leading-relaxed">
+                      {closingActionText.split("\n")[0]?.replace(/^[\s\-•→]+/, "").trim() || gap.closingAction}
+                    </div>
                   </div>
                 </div>
-                {(observationBullets.hasMore || requirementBullets.hasMore) && (
-                  <Button
-                    variant="ghost"
-                    size="sm"
-                    onClick={() => setExpanded(prev => ({ ...prev, [index]: !prev[index] }))}
-                    className="w-full text-xs text-zinc-400 hover:text-zinc-300"
-                  >
-                    {isExpanded ? (
-                      <>
-                        <ChevronUp className="w-3 h-3 mr-1" />
-                        Show less
-                      </>
-                    ) : (
-                      <>
-                        <ChevronDown className="w-3 h-3 mr-1" />
-                        Show full detail
-                      </>
-                    )}
-                  </Button>
-                )}
-              </CardContent>
-            </Card>
+              </div>
+            </div>
           )
         })}
       </div>

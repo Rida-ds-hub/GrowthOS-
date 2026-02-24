@@ -1,147 +1,209 @@
 "use client"
 
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
+import { useState } from "react"
 import { GapAnalysis } from "@/lib/types"
-import { cn } from "@/lib/utils"
 
 interface PlanTimelineProps {
   gapAnalysis: GapAnalysis
 }
 
 export function PlanTimeline({ gapAnalysis }: PlanTimelineProps) {
+  const [activePhase, setActivePhase] = useState(0)
+
   if (!gapAnalysis || !gapAnalysis.plan) {
     return (
       <div className="space-y-4">
-        <h2 className="text-2xl font-semibold text-white mb-4">3-Phase Plan</h2>
+        <div className="flex items-center justify-between mb-4">
+          <h2 className="font-mono text-xs md:text-sm font-semibold tracking-[0.2em] uppercase text-zinc-500 flex items-center gap-2">
+            <span className="w-4 h-px bg-zinc-500"></span>
+            Your 3-Phase Plan
+          </h2>
+        </div>
         <p className="text-zinc-400">No plan data available</p>
       </div>
     )
   }
 
   const phases = [
-    { ...(gapAnalysis.plan.phase1 || { theme: "", actions: [] }), label: gapAnalysis.plan.phase1?.label || "Phase 1" },
-    { ...(gapAnalysis.plan.phase2 || { theme: "", actions: [] }), label: gapAnalysis.plan.phase2?.label || "Phase 2" },
-    { ...(gapAnalysis.plan.phase3 || { theme: "", actions: [] }), label: gapAnalysis.plan.phase3?.label || "Phase 3" },
+    { 
+      ...(gapAnalysis.plan.phase1 || { theme: "", actions: [], deliverables: [] }), 
+      months: "Months 1–3",
+      num: 1
+    },
+    { 
+      ...(gapAnalysis.plan.phase2 || { theme: "", actions: [], deliverables: [] }), 
+      months: "Months 4–8",
+      num: 2
+    },
+    { 
+      ...(gapAnalysis.plan.phase3 || { theme: "", actions: [], deliverables: [] }), 
+      months: "Months 9–12",
+      num: 3
+    },
   ]
 
-  // Determine current phase (simplified - would calculate from actual dates)
-  const currentPhaseIndex = 0 // This would be calculated based on when onboarding was completed
+  const getPhaseMonths = (index: number) => {
+    if (index === 0) return "Months 1–3"
+    if (index === 1) return "Months 4–8"
+    return "Months 9–12"
+  }
 
   return (
     <div className="space-y-4">
-      <h2 className="text-2xl font-semibold text-white mb-4">3-Phase Plan</h2>
-      
-      {/* Flow Diagram */}
-      <div className="flex items-center justify-center gap-6 md:gap-12 lg:gap-16 mb-8 py-6 overflow-x-auto">
+      <div className="flex items-center justify-between mb-4">
+        <h2 className="font-mono text-xs md:text-sm font-semibold tracking-[0.2em] uppercase text-zinc-500 flex items-center gap-2">
+          <span className="w-4 h-px bg-zinc-500"></span>
+          Your 3-Phase Plan
+        </h2>
+        <span className="text-xs text-emerald-500">12 months · 3 phases</span>
+      </div>
+
+      {/* Tab Switcher */}
+      <div className="grid grid-cols-3 gap-px bg-[#1e1e1e] border border-[#1e1e1e] border-b-0">
         {phases.map((phase, index) => (
-          <div key={index} className="flex items-center gap-6 md:gap-12 lg:gap-16 flex-shrink-0">
-            <div className="flex flex-col items-center">
+          <button
+            key={index}
+            onClick={() => setActivePhase(index)}
+            className={`
+              bg-[#111111] px-4 md:px-6 py-4 md:py-5 text-left transition-colors relative
+              ${activePhase === index ? "bg-[#161616]" : "hover:bg-[#161616]"}
+            `}
+          >
+            {activePhase === index && (
+              <div className="absolute bottom-0 left-0 right-0 h-0.5 bg-emerald-500 z-10" />
+            )}
+            <div className="flex items-center gap-2 md:gap-3 mb-2">
               <div className={`
-                w-16 h-16 md:w-20 md:h-20 lg:w-24 lg:h-24 rounded-full flex items-center justify-center text-base md:text-lg lg:text-xl font-semibold
-                ${index === 0 ? "bg-emerald-500 text-black" : "bg-zinc-800 text-zinc-300"}
+                w-7 h-7 rounded-full flex items-center justify-center font-mono text-xs md:text-sm font-semibold transition-all
+                ${activePhase === index 
+                  ? "bg-emerald-500 text-black" 
+                  : "bg-[#27272a] text-zinc-500 border border-[#2a2a2a]"
+                }
               `}>
-                {index + 1}
+                {phase.num}
               </div>
-              <div className="text-xs md:text-sm lg:text-base text-zinc-400 mt-2 md:mt-3 text-center max-w-[120px] md:max-w-[160px] lg:max-w-[200px] leading-tight">
-                {phase.theme || `Phase ${index + 1}`}
+              <div className="text-[0.62rem] tracking-[0.2em] uppercase text-zinc-500">
+                {getPhaseMonths(index)}
               </div>
             </div>
-            {index < phases.length - 1 && (
-              <div className="flex items-center">
-                <div className="w-12 md:w-20 lg:w-24 h-0.5 bg-emerald-500/50" />
-                <div className="w-0 h-0 border-l-[8px] md:border-l-[12px] lg:border-l-[16px] border-l-emerald-500/50 border-t-[4px] md:border-t-[6px] lg:border-t-[8px] border-t-transparent border-b-[4px] md:border-b-[6px] lg:border-b-[8px] border-b-transparent" />
-              </div>
-            )}
-          </div>
+            <div className={`font-mono text-xs md:text-sm font-semibold leading-snug transition-opacity ${
+              activePhase === index ? "opacity-100 text-white" : "opacity-50 text-white"
+            }`}>
+              {phase.theme || `Phase ${index + 1}`}
+            </div>
+          </button>
         ))}
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6 md:gap-8 overflow-x-auto md:overflow-visible">
-        {phases.map((phase, index) => {
-          const isCurrentPhase = index === currentPhaseIndex
-          return (
-            <Card
-              key={index}
-              className={cn(
-                "bg-zinc-900/50 border-zinc-800 rounded-2xl",
-                isCurrentPhase && "border-emerald-500 border-2"
-              )}
-            >
-              <CardHeader className="pb-3">
-                <div className="flex items-center justify-between mb-2">
-                  <CardTitle className="text-sm font-medium text-zinc-400 uppercase tracking-wide">
-                    {phase.label}
-                  </CardTitle>
-                  {isCurrentPhase && (
-                    <span className="text-xs font-medium text-emerald-500">
-                      Start here
-                    </span>
-                  )}
-                </div>
-                <h3 className="text-base font-semibold text-white leading-tight">
-                  {phase.theme}
-                </h3>
-              </CardHeader>
-              <CardContent className="space-y-3">
-                {phase.specificTasks && phase.specificTasks.length > 0 ? (
-                  <div>
-                    <div className="text-xs font-medium text-emerald-400 uppercase tracking-wide mb-2">
-                      Moves You'll Make
-                    </div>
-                    <ul className="space-y-1.5">
-                      {phase.specificTasks.slice(0, 4).map((task, taskIndex) => (
-                        <li
-                          key={taskIndex}
-                          className="text-xs text-zinc-300 flex items-start gap-2 leading-relaxed"
-                        >
-                          <span className="text-emerald-500 mt-0.5 flex-shrink-0">→</span>
-                          <span>{task.replace(/^Task:\s*/i, '')}</span>
-                        </li>
-                      ))}
-                    </ul>
-                  </div>
-                ) : phase.actions && phase.actions.length > 0 ? (
-                  <div>
-                    <div className="text-xs font-medium text-emerald-400 uppercase tracking-wide mb-2">
-                      Moves You'll Make
-                    </div>
-                    <ul className="space-y-1.5">
-                      {phase.actions.slice(0, 4).map((action, actionIndex) => (
-                        <li
-                          key={actionIndex}
-                          className="text-xs text-zinc-300 flex items-start gap-2 leading-relaxed"
-                        >
-                          <span className="text-emerald-500 mt-0.5 flex-shrink-0">→</span>
-                          <span>{action}</span>
-                        </li>
-                      ))}
-                    </ul>
-                  </div>
-                ) : null}
+      {/* Phase Panel */}
+      {phases.map((phase, index) => (
+        <div
+          key={index}
+          className={`
+            bg-[#161616] border border-[#1e1e1e] p-6 md:p-8 mb-6
+            ${activePhase === index ? "block" : "hidden"}
+          `}
+        >
+          <div className="flex items-start justify-between mb-6 md:mb-7 gap-4">
+            <div>
+              <div className="text-[0.6rem] tracking-[0.3em] uppercase text-emerald-500 mb-2 flex items-center gap-2">
+                <span className="w-3.5 h-px bg-emerald-500"></span>
+                Phase {phase.num} · {getPhaseMonths(index)}
+              </div>
+              <div className="font-mono text-lg md:text-xl font-semibold text-white leading-tight">
+                {phase.theme || `Phase ${phase.num}`}
+              </div>
+            </div>
+            {index === 0 && (
+              <div className="text-[0.62rem] tracking-[0.15em] uppercase bg-emerald-500/10 text-emerald-400 border border-emerald-500/30 px-3 py-1.5 flex-shrink-0">
+                Start here
+              </div>
+            )}
+          </div>
 
-                {phase.deliverables && phase.deliverables.length > 0 && (
-                  <div className="pt-2 border-t border-zinc-800">
-                    <div className="text-xs font-medium text-blue-400 uppercase tracking-wide mb-2">
-                      This Phase's Deliverables
-                    </div>
-                    <ul className="space-y-1">
-                      {phase.deliverables.slice(0, 5).map((deliverable, delIndex) => (
-                        <li
-                          key={delIndex}
-                          className="text-xs text-zinc-300 flex items-start gap-2 leading-relaxed"
-                        >
-                          <span className="text-blue-400 mt-0.5 flex-shrink-0">✓</span>
-                          <span>{deliverable}</span>
-                        </li>
-                      ))}
-                    </ul>
+          {/* Move Cards Grid */}
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-3 mb-6 md:mb-7">
+            {(phase.specificTasks || phase.actions || []).slice(0, 4).map((task: any, taskIndex: number) => {
+              // Handle both new structured format and legacy string format
+              let emoji = "→"
+              let title = "Action"
+              let description = ""
+              let effort = "medium"
+              let timeline = ""
+              
+              if (typeof task === "object" && task !== null) {
+                emoji = task.emoji || "→"
+                title = task.title || "Action"
+                description = task.description || ""
+                effort = task.effort || "medium"
+                timeline = task.timeline || ""
+              } else {
+                // Legacy string format - parse it
+                const actionText = String(task).replace(/^Task:\s*/i, '').replace(/^Action:\s*/i, '')
+                const verbMatch = actionText.match(/^(\w+)/)
+                title = verbMatch ? verbMatch[1] : "Action"
+                description = verbMatch ? actionText.substring(verbMatch[0].length).trim() : actionText
+                // Try to infer emoji from verb
+                emoji = title === "Validate" ? "🎙️" : title === "Build" || title === "Deploy" ? "🚀" : title === "Launch" ? "🌐" : title === "Publish" ? "📣" : title === "Architect" ? "⚙️" : title === "Network" ? "🤝" : title === "Plan" ? "📋" : title === "Test" ? "🧪" : title === "Fundraise" ? "💰" : title === "Pitch" ? "🎤" : title === "Iterate" ? "📊" : "→"
+              }
+              
+              const effortColor = effort === "high" ? "bg-red-500" : effort === "low" ? "bg-emerald-500" : "bg-amber-500"
+              const effortLabel = effort === "high" ? "High" : effort === "low" ? "Low" : "Medium"
+              
+              return (
+                <div
+                  key={taskIndex}
+                  className="bg-[#111111] border border-[#1e1e1e] p-4 md:p-5 flex gap-3 md:gap-4 items-start transition-all hover:border-[#2a2a2a] hover:bg-[#161616] relative overflow-hidden group"
+                >
+                  <div className="absolute top-0 left-0 bottom-0 w-0.5 bg-emerald-500 transform scale-y-0 group-hover:scale-y-100 transition-transform origin-top" />
+                  <div className="w-8 h-8 flex-shrink-0 bg-emerald-500/10 border border-emerald-500/30 flex items-center justify-center text-base">
+                    {emoji}
                   </div>
-                )}
-              </CardContent>
-            </Card>
-          )
-        })}
-      </div>
+                  <div className="flex-1 min-w-0">
+                    <div className="font-mono text-xs md:text-sm font-semibold text-emerald-500 tracking-[0.1em] uppercase mb-1">
+                      {title}
+                    </div>
+                    <div className="text-sm text-zinc-300 leading-relaxed">
+                      {description || (typeof task === "string" ? task.replace(/^Task:\s*/i, '').replace(/^Action:\s*/i, '') : "")}
+                    </div>
+                    <div className="text-[0.62rem] text-zinc-500 mt-2 flex items-center gap-2">
+                      <span className={`w-1.5 h-1.5 rounded-full ${effortColor}`}></span>
+                      {effortLabel} effort{timeline ? ` · ${timeline}` : ""}
+                    </div>
+                  </div>
+                </div>
+              )
+            })}
+          </div>
+
+          {/* Deliverables */}
+          {phase.deliverables && phase.deliverables.length > 0 && (
+            <div className="border-t border-[#1e1e1e] pt-5 md:pt-6">
+              <div className="flex items-center justify-between mb-4">
+                <div className="text-[0.62rem] tracking-[0.3em] uppercase text-zinc-500">
+                  Phase deliverables
+                </div>
+                <div className="text-[0.62rem] text-zinc-500 bg-[#111111] border border-[#1e1e1e] px-2 py-1">
+                  {phase.deliverables.length} outputs
+                </div>
+              </div>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
+                {phase.deliverables.map((deliverable: string, delIndex: number) => (
+                  <div
+                    key={delIndex}
+                    className="flex items-start gap-2 md:gap-3 p-3 md:p-4 bg-[#111111] border border-[#1e1e1e] text-sm text-zinc-300 leading-relaxed"
+                  >
+                    <div className="w-4 h-4 flex-shrink-0 border border-emerald-500/30 flex items-center justify-center text-xs text-emerald-500 mt-0.5">
+                      ✓
+                    </div>
+                    <span>{deliverable}</span>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
+        </div>
+      ))}
     </div>
   )
 }

@@ -246,11 +246,40 @@ export function OnboardingWizard() {
         localStorage.setItem(STORAGE_KEY, JSON.stringify(updatedData))
       }
 
-      // Wait a bit more, then show results
+      // Wait a bit more, then redirect to results page
       await new Promise((resolve) => setTimeout(resolve, 1000))
       
-      // Always show results after analysis completes
-      setShowSignUpPrompt(true)
+      // Store complete results data for the results page
+      if (typeof window !== "undefined") {
+        const resultsData = {
+          gapAnalysis: gapAnalysisData,
+          targetRole: updatedData.targetRole,
+          timeline: updatedData.timeline,
+          currentRole: updatedData.currentRole,
+          yearsExp: updatedData.yearsExp,
+          progressionIntent: updatedData.progressionIntent,
+          generatedAt: new Date().toISOString(),
+        }
+        sessionStorage.setItem("growthos_view_results", JSON.stringify(resultsData))
+        
+        // Also keep the cache for backward compatibility
+        const cacheData = {
+          gapAnalysis: gapAnalysisData,
+          githubData: githubData || undefined,
+          linkedinData: linkedinText || undefined,
+          resumeText: updatedData.resumeText || undefined,
+          websiteUrl: updatedData.websiteUrl || undefined,
+          timestamp: Date.now(),
+        }
+        sessionStorage.setItem("growthos_results_cache", JSON.stringify(cacheData))
+      }
+      
+      // Stop analyzing and redirect to results page
+      setIsAnalyzing(false)
+      // Small delay to ensure state updates before redirect
+      setTimeout(() => {
+        router.push("/results/view")
+      }, 100)
       
       // If authenticated, also save to database in background
       if (session) {
@@ -318,31 +347,24 @@ export function OnboardingWizard() {
     )
   }
 
-  if (showSignUpPrompt) {
-    // Debug: log what we're passing to ResultsShare
-    console.log("OnboardingWizard - Passing to ResultsShare:", {
-      dataGapAnalysis: data.gapAnalysis,
-      fullData: data,
-      hasGapAnalysis: !!data.gapAnalysis,
-    })
-    
-    return (
-      <>
-        <ResultsShare
-          analysisResult={data.gapAnalysis || data}
-          githubData={data.githubDataText || undefined}
-          linkedinData={data.linkedinDataText || data.linkedinManualData || undefined}
-          resumeText={data.resumeText || undefined}
-          websiteUrl={data.websiteUrl || undefined}
-          onSignUp={() => setIsSignUpModalOpen(true)}
-        />
-        <SignUpModal
-          isOpen={isSignUpModalOpen}
-          onClose={() => setIsSignUpModalOpen(false)}
-          callbackUrl="/dashboard"
-        />
-      </>
-    )
+  // Note: Results are now shown on /results/view page, not here
+  // This check is kept for backward compatibility with cached results
+  if (showSignUpPrompt && data.gapAnalysis) {
+    // If we have cached results and user navigated back, redirect to results page
+    if (typeof window !== "undefined") {
+      const resultsData = {
+        gapAnalysis: data.gapAnalysis,
+        targetRole: data.targetRole,
+        timeline: data.timeline,
+        currentRole: data.currentRole,
+        yearsExp: data.yearsExp,
+        progressionIntent: data.progressionIntent,
+        generatedAt: new Date().toISOString(),
+      }
+      sessionStorage.setItem("growthos_view_results", JSON.stringify(resultsData))
+      router.push("/results/view")
+      return null
+    }
   }
 
   return (

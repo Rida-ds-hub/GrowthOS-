@@ -18,9 +18,9 @@ export function ReadinessScore({ score, className }: ReadinessScoreProps) {
   const offset = circumference - (score / 100) * circumference
 
   return (
-    <div className={cn("flex items-center gap-3", className)}>
-      <div className="relative w-12 h-12">
-        <svg className="w-12 h-12 transform -rotate-90" viewBox="0 0 40 40">
+    <div className={cn("flex items-center justify-center", className)}>
+      <div className="relative w-24 h-24">
+        <svg className="w-24 h-24 transform -rotate-90" viewBox="0 0 40 40">
           <circle
             cx="20"
             cy="20"
@@ -47,7 +47,7 @@ export function ReadinessScore({ score, className }: ReadinessScoreProps) {
           />
         </svg>
         <div className="absolute inset-0 flex items-center justify-center">
-          <span className={cn("text-sm font-semibold", getColor())}>
+          <span className={cn("text-lg font-semibold", getColor())}>
             {score}%
           </span>
         </div>
