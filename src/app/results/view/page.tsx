@@ -2,7 +2,7 @@
 
 import { useSearchParams, useRouter } from "next/navigation"
 import Link from "next/link"
-import { useEffect, useState } from "react"
+import { Suspense, useEffect, useState } from "react"
 import { motion } from "framer-motion"
 import { Button } from "@/components/ui/button"
 import { SignUpModal } from "@/components/auth/SignUpModal"
@@ -15,6 +15,20 @@ import { Logo } from "@/components/logo/Logo"
 import { ResultsReport } from "@/components/results/ResultsReport"
 
 export default function ViewResultsPage() {
+  return (
+    <Suspense
+      fallback={
+        <div className="min-h-screen bg-[#0a0a0a] flex items-center justify-center">
+          <div className="w-16 h-16 border-4 border-emerald-500 border-t-transparent rounded-full animate-spin" />
+        </div>
+      }
+    >
+      <ViewResultsContent />
+    </Suspense>
+  )
+}
+
+function ViewResultsContent() {
   const searchParams = useSearchParams()
   const router = useRouter()
   const [analysisData, setAnalysisData] = useState<any>(null)
