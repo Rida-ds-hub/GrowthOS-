@@ -162,7 +162,8 @@ export function Graph3D({ scrollProgress }: Graph3DProps) {
       lastTRef.current = now
 
       spRef.current += (scrollProgress - spRef.current) * 0.055
-      autoRYRef.current += dt * 0.04
+      // Increase automatic rotation for a more dynamic hero animation
+      autoRYRef.current += dt * 0.12
 
       const W = canvas.width
       const H = canvas.height
@@ -172,7 +173,8 @@ export function Graph3D({ scrollProgress }: Graph3DProps) {
       const ROY = cam.roy + autoRYRef.current
       const ROX = cam.rox + Math.sin(now * 0.00022) * 0.025
 
-      const FOV = 700
+      // Larger apparent graph size in the hero section
+      const FOV = 1050
       const CX = W * 0.68
       const CY = H * 0.47
 

@@ -12,6 +12,7 @@ export function LandingPage() {
   const driverRef = useRef<HTMLDivElement>(null)
   const [scrollProgress, setScrollProgress] = useState(0)
   const [activePanel, setActivePanel] = useState(0)
+  const [activeHowStep, setActiveHowStep] = useState(1)
 
   // Cursor effect
   useEffect(() => {
@@ -243,10 +244,19 @@ export function LandingPage() {
       </div>
 
       <div className="stats-bar">
-        <div><div className="stat-n">3</div><div className="stat-l">Domains tracked daily</div></div>
-        <div><div className="stat-n">15m</div><div className="stat-l">Daily commitment</div></div>
-        <div><div className="stat-n">90d</div><div className="stat-l">Average to next jump</div></div>
-        <div><div className="stat-n">0</div><div className="stat-l">Guesswork required</div></div>
+        <div className="stats-items">
+          <div><div className="stat-n">3</div><div className="stat-l">Domains: skills, brand, signal</div></div>
+          <div><div className="stat-n">15m</div><div className="stat-l">Minutes of focused progress</div></div>
+          <div><div className="stat-n">90d</div><div className="stat-l">Days to your next move</div></div>
+          <div><div className="stat-n">0</div><div className="stat-l">Unstructured guesswork</div></div>
+        </div>
+        <div className="stats-note">
+          <div className="stats-note-label">// Powered by your real work</div>
+          <p>
+            Growth OS pulls from your GitHub, LinkedIn, calendar, and resume to keep
+            these numbers live and grounded in actual evidence.
+          </p>
+        </div>
       </div>
 
       <div className="sec" id="system">
@@ -265,13 +275,443 @@ export function LandingPage() {
 
       <div className="sec alt" id="how">
         <div className="sec-tag">How It Works</div>
-        <h2 className="sec-h">Day one to<br /><span className="g">your next jump.</span></h2>
-        <div className="steps">
-          <div className="step"><div className="step-n">01</div><div className="step-body"><div className="step-label">Connect</div><div className="step-h">Link your professional surface area</div><p className="step-p">GitHub, LinkedIn, resume, portfolio. Takes minutes. Growth OS immediately begins building your career graph and identifying the gaps you have been guessing at.</p></div></div>
-          <div className="step"><div className="step-n">02</div><div className="step-body"><div className="step-label">Analyze</div><div className="step-h">Get your gap analysis</div><p className="step-p">A precise breakdown of skill gaps, brand gaps, and trajectory gaps mapped against your actual target. Not what a coach assumes you want. What the data shows you need.</p></div></div>
-          <div className="step"><div className="step-n">03</div><div className="step-body"><div className="step-label">Plan</div><div className="step-h">Receive your 90-day roadmap</div><p className="step-p">A 30-60-90 day plan across upskilling, branding, and positioning. Built from your specific gaps. Adapts as you make progress. Never stale, never generic.</p></div></div>
-          <div className="step"><div className="step-n">04</div><div className="step-body"><div className="step-label">Execute</div><div className="step-h">15 minutes a day. Watch it compound.</div><p className="step-p">Daily micro-learning, code tasks, and reflections. The system logs your meetings, updates your resume, drafts your LinkedIn posts. You just do the work. Growth OS handles the rest.</p></div></div>
-          <div className="step"><div className="step-n">05</div><div className="step-body"><div className="step-label">Move</div><div className="step-h">Make your jump when the signal fires</div><p className="step-p">When your readiness score hits the threshold, Growth OS tells you. Promotion ask, job search, pivot, or starting something of your own. You will know. And you will be ready.</p></div></div>
+        <h2 className="sec-h">
+          Day one to
+          <br />
+          <span className="g">your next jump.</span>
+        </h2>
+
+        <div className="how-grid">
+          {/* LEFT: STEPS */}
+          <div className="steps">
+            <div
+              className={`step how-step ${activeHowStep === 1 ? "active-step" : ""}`}
+              onMouseEnter={() => setActiveHowStep(1)}
+            >
+              <div className="step-n">01</div>
+              <div className="step-body">
+                <div className="step-label">Connect</div>
+                <div className="step-h">Link your professional surface area</div>
+                <p className="step-p">
+                  GitHub, LinkedIn, resume, portfolio. Takes minutes. Growth OS immediately begins
+                  building your career graph and identifying the gaps you have been guessing at.
+                </p>
+              </div>
+            </div>
+
+            <div
+              className={`step how-step ${activeHowStep === 2 ? "active-step" : ""}`}
+              onMouseEnter={() => setActiveHowStep(2)}
+            >
+              <div className="step-n">02</div>
+              <div className="step-body">
+                <div className="step-label">Analyze</div>
+                <div className="step-h">Get your gap analysis</div>
+                <p className="step-p">
+                  A precise breakdown of skill gaps, brand gaps, and trajectory gaps mapped against
+                  your actual target. Not what a coach assumes you want. What the data shows you
+                  need.
+                </p>
+              </div>
+            </div>
+
+            <div
+              className={`step how-step ${activeHowStep === 3 ? "active-step" : ""}`}
+              onMouseEnter={() => setActiveHowStep(3)}
+            >
+              <div className="step-n">03</div>
+              <div className="step-body">
+                <div className="step-label">Plan</div>
+                <div className="step-h">Receive your 90-day roadmap</div>
+                <p className="step-p">
+                  A 30-60-90 day plan across upskilling, branding, and positioning. Built from your
+                  specific gaps. Adapts as you make progress. Never stale, never generic.
+                </p>
+              </div>
+            </div>
+
+            <div
+              className={`step how-step ${activeHowStep === 4 ? "active-step" : ""}`}
+              onMouseEnter={() => setActiveHowStep(4)}
+            >
+              <div className="step-n">04</div>
+              <div className="step-body">
+                <div className="step-label">Execute</div>
+                <div className="step-h">15 minutes a day. Watch it compound.</div>
+                <p className="step-p">
+                  Daily micro-learning, code tasks, and reflections. The system logs your meetings,
+                  updates your resume, drafts your LinkedIn posts. You just do the work. Growth OS
+                  handles the rest.
+                </p>
+              </div>
+            </div>
+
+            <div
+              className={`step how-step ${activeHowStep === 5 ? "active-step" : ""}`}
+              onMouseEnter={() => setActiveHowStep(5)}
+            >
+              <div className="step-n">05</div>
+              <div className="step-body">
+                <div className="step-label">Move</div>
+                <div className="step-h">Make your jump when the signal fires</div>
+                <p className="step-p">
+                  When your readiness score hits the threshold, Growth OS tells you. Promotion ask,
+                  job search, pivot, or starting something of your own. You will know. And you will
+                  be ready.
+                </p>
+              </div>
+            </div>
+          </div>
+
+          {/* RIGHT: VISUAL PANEL */}
+          <div className="how-visual-wrap">
+            {/* STEP 1: Connect */}
+            <div className={`how-visual ${activeHowStep === 1 ? "active" : ""}`} id="hv-1">
+              <div className="hv-eyebrow">Connecting your data</div>
+              <div className="hv-chrome">
+                <div className="hv-topbar">
+                  <div className="hv-dots">
+                    <div className="hv-dot" style={{ background: "#ff5f57" }} />
+                    <div className="hv-dot" style={{ background: "#febc2e" }} />
+                    <div className="hv-dot" style={{ background: "#10b981" }} />
+                  </div>
+                  <div className="hv-topbar-title">growth_os // connect</div>
+                  <div />
+                </div>
+                <div className="hv-body">
+                  <div className="hv-src-grid">
+                    <div className="hv-src s1">
+                      <span className="hv-src-ico">⌥</span>
+                      <div>
+                        <div className="hv-src-name">GitHub</div>
+                        <div className="hv-src-detail">9 repos · 2 languages</div>
+                      </div>
+                      <span className="hv-src-badge">✓ linked</span>
+                    </div>
+                    <div className="hv-src s2">
+                      <span className="hv-src-ico">in</span>
+                      <div>
+                        <div className="hv-src-name">LinkedIn</div>
+                        <div className="hv-src-detail">Profile connected</div>
+                      </div>
+                      <span className="hv-src-badge">✓ linked</span>
+                    </div>
+                    <div className="hv-src s3">
+                      <span className="hv-src-ico">≡</span>
+                      <div>
+                        <div className="hv-src-name">Resume</div>
+                        <div className="hv-src-detail">3,555 chars extracted</div>
+                      </div>
+                      <span className="hv-src-badge">✓ linked</span>
+                    </div>
+                    <div className="hv-src s4">
+                      <span className="hv-src-ico">⊕</span>
+                      <div>
+                        <div className="hv-src-name">Portfolio</div>
+                        <div className="hv-src-detail">Site indexed</div>
+                      </div>
+                      <span className="hv-src-badge">✓ linked</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* STEP 2: Analyze */}
+            <div className={`how-visual ${activeHowStep === 2 ? "active" : ""}`} id="hv-2">
+              <div className="hv-eyebrow">Gap analysis results</div>
+              <div className="hv-chrome">
+                <div className="hv-topbar">
+                  <div className="hv-dots">
+                    <div className="hv-dot" style={{ background: "#ff5f57" }} />
+                    <div className="hv-dot" style={{ background: "#febc2e" }} />
+                    <div className="hv-dot" style={{ background: "#10b981" }} />
+                  </div>
+                  <div className="hv-topbar-title">growth_os // analysis</div>
+                  <div />
+                </div>
+                <div className="hv-body">
+                  <div className="hv-gap-list">
+                    <div className="hv-gap-item">
+                      <div className="hv-gap-top">
+                        <span className="hv-gap-name">Technical Depth</span>
+                        <span className="hv-gap-val" style={{ color: "var(--em)" }}>
+                          80%
+                        </span>
+                      </div>
+                      <div className="hv-gap-track">
+                        <div
+                          className="hv-gap-bar"
+                          style={{ width: "80%", background: "var(--em)" }}
+                        />
+                      </div>
+                    </div>
+                    <div className="hv-gap-item">
+                      <div className="hv-gap-top">
+                        <span className="hv-gap-name">Execution Scope</span>
+                        <span className="hv-gap-val" style={{ color: "var(--em)" }}>
+                          75%
+                        </span>
+                      </div>
+                      <div className="hv-gap-track">
+                        <div
+                          className="hv-gap-bar"
+                          style={{ width: "75%", background: "var(--em)" }}
+                        />
+                      </div>
+                    </div>
+                    <div className="hv-gap-item">
+                      <div className="hv-gap-top">
+                        <span className="hv-gap-name">System Design</span>
+                        <span className="hv-gap-val" style={{ color: "#f59e0b" }}>
+                          55%
+                        </span>
+                      </div>
+                      <div className="hv-gap-track">
+                        <div
+                          className="hv-gap-bar"
+                          style={{ width: "55%", background: "#f59e0b" }}
+                        />
+                      </div>
+                    </div>
+                    <div className="hv-gap-item">
+                      <div className="hv-gap-top">
+                        <span className="hv-gap-name">Brand Presence</span>
+                        <span className="hv-gap-val" style={{ color: "#ef4444" }}>
+                          22%
+                        </span>
+                      </div>
+                      <div className="hv-gap-track">
+                        <div
+                          className="hv-gap-bar"
+                          style={{ width: "22%", background: "#ef4444" }}
+                        />
+                      </div>
+                    </div>
+                    <div className="hv-gap-item">
+                      <div className="hv-gap-top">
+                        <span className="hv-gap-name">Leadership</span>
+                        <span className="hv-gap-val" style={{ color: "#ef4444" }}>
+                          35%
+                        </span>
+                      </div>
+                      <div className="hv-gap-track">
+                        <div
+                          className="hv-gap-bar"
+                          style={{ width: "35%", background: "#ef4444" }}
+                        />
+                      </div>
+                    </div>
+                  </div>
+                  <div className="hv-gap-footer">
+                    <span className="hv-gap-footer-label">Overall readiness</span>
+                    <span className="hv-overall">
+                      60
+                      <span
+                        style={{
+                          fontSize: ".8rem",
+                          color: "var(--muted)",
+                          fontWeight: 400,
+                        }}
+                      >
+                        /100
+                      </span>
+                    </span>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* STEP 3: Plan */}
+            <div className={`how-visual ${activeHowStep === 3 ? "active" : ""}`} id="hv-3">
+              <div className="hv-eyebrow">Your 90-day roadmap</div>
+              <div className="hv-chrome">
+                <div className="hv-topbar">
+                  <div className="hv-dots">
+                    <div className="hv-dot" style={{ background: "#ff5f57" }} />
+                    <div className="hv-dot" style={{ background: "#febc2e" }} />
+                    <div className="hv-dot" style={{ background: "#10b981" }} />
+                  </div>
+                  <div className="hv-topbar-title">growth_os // roadmap</div>
+                  <div />
+                </div>
+                <div className="hv-body">
+                  <div className="hv-phases">
+                    <div className="hv-ph lit">
+                      <div className="hv-ph-track">
+                        <div className="hv-ph-node" />
+                        <div className="hv-ph-line" />
+                      </div>
+                      <div className="hv-ph-content">
+                        <div className="hv-ph-label">Phase 1 · Days 1–30</div>
+                        <div className="hv-ph-name">Validate &amp; Build Foundation</div>
+                        <div className="hv-ph-items">
+                          <div className="hv-ph-item">20+ customer interviews</div>
+                          <div className="hv-ph-item">Deploy full-stack app on AWS</div>
+                          <div className="hv-ph-item">Optimize LinkedIn presence</div>
+                        </div>
+                      </div>
+                    </div>
+                    <div className="hv-ph dim">
+                      <div className="hv-ph-track">
+                        <div className="hv-ph-node" />
+                        <div className="hv-ph-line" />
+                      </div>
+                      <div className="hv-ph-content">
+                        <div className="hv-ph-label">Phase 2 · Days 31–60</div>
+                        <div className="hv-ph-name">MVP &amp; Team Building</div>
+                        <div className="hv-ph-items">
+                          <div className="hv-ph-item">Build core MVP features</div>
+                          <div className="hv-ph-item">Identify co-founders</div>
+                        </div>
+                      </div>
+                    </div>
+                    <div className="hv-ph dim">
+                      <div className="hv-ph-track">
+                        <div className="hv-ph-node" />
+                      </div>
+                      <div className="hv-ph-content">
+                        <div className="hv-ph-label">Phase 3 · Days 61–90</div>
+                        <div className="hv-ph-name">Launch &amp; Traction</div>
+                        <div className="hv-ph-items">
+                          <div className="hv-ph-item">
+                            Public launch · Pitch investors
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* STEP 4: Execute */}
+            <div className={`how-visual ${activeHowStep === 4 ? "active" : ""}`} id="hv-4">
+              <div className="hv-eyebrow">Today's activity</div>
+              <div className="hv-chrome">
+                <div className="hv-topbar">
+                  <div className="hv-dots">
+                    <div className="hv-dot" style={{ background: "#ff5f57" }} />
+                    <div className="hv-dot" style={{ background: "#febc2e" }} />
+                    <div className="hv-dot" style={{ background: "#10b981" }} />
+                  </div>
+                  <div className="hv-topbar-title">growth_os // day 47</div>
+                  <div />
+                </div>
+                <div className="hv-body">
+                  <div className="hv-feed">
+                    <div className="hv-feed-item hv-fi1">
+                      <div className="hv-feed-ico">📚</div>
+                      <div className="hv-feed-title">System design micro-lesson</div>
+                      <div className="hv-feed-ok">✓ done</div>
+                    </div>
+                    <div className="hv-feed-item hv-fi2">
+                      <div className="hv-feed-ico">⌥</div>
+                      <div className="hv-feed-title">
+                        PR #482 merged → resume updated
+                      </div>
+                      <div className="hv-feed-ok">✓ done</div>
+                    </div>
+                    <div className="hv-feed-item hv-fi3">
+                      <div className="hv-feed-ico">🗒</div>
+                      <div className="hv-feed-title">
+                        1:1 with Priya → promo case logged
+                      </div>
+                      <div className="hv-feed-ok">✓ done</div>
+                    </div>
+                    <div className="hv-feed-item hv-fi4">
+                      <div className="hv-feed-ico">in</div>
+                      <div className="hv-feed-title">
+                        LinkedIn draft ready for review
+                      </div>
+                      <div className="hv-feed-ok">✓ done</div>
+                    </div>
+                  </div>
+                  <div className="hv-streak-bar" style={{ marginTop: ".6rem" }}>
+                    <span className="hv-streak-left">Current streak</span>
+                    <div
+                      style={{
+                        display: "flex",
+                        alignItems: "baseline",
+                        gap: ".3rem",
+                      }}
+                    >
+                      <span className="hv-streak-num">47</span>
+                      <span style={{ fontSize: ".65rem", color: "var(--muted)" }}>
+                        days
+                      </span>
+                    </div>
+                    <span style={{ fontSize: ".68rem", color: "var(--em)" }}>
+                      Readiness +3 today
+                    </span>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* STEP 5: Move */}
+            <div className={`how-visual ${activeHowStep === 5 ? "active" : ""}`} id="hv-5">
+              <div className="hv-eyebrow">Your jump signal</div>
+              <div className="hv-chrome">
+                <div className="hv-topbar">
+                  <div className="hv-dots">
+                    <div className="hv-dot" style={{ background: "#ff5f57" }} />
+                    <div className="hv-dot" style={{ background: "#febc2e" }} />
+                    <div className="hv-dot" style={{ background: "#10b981" }} />
+                  </div>
+                  <div className="hv-topbar-title">growth_os // signal · day 90</div>
+                  <div />
+                </div>
+                <div className="hv-body">
+                  <div className="hv-ready-top">
+                    <div className="hv-ring-wrap">
+                      <svg viewBox="0 0 90 90" width="90" height="90">
+                        <circle
+                          cx="45"
+                          cy="45"
+                          r="38"
+                          fill="none"
+                          stroke="var(--border)"
+                          strokeWidth="5"
+                        />
+                        <circle
+                          cx="45"
+                          cy="45"
+                          r="38"
+                          fill="none"
+                          stroke="var(--em)"
+                          strokeWidth="5"
+                          strokeDasharray="239"
+                          strokeDashoffset="36"
+                          strokeLinecap="round"
+                          transform="rotate(-90 45 45)"
+                          style={{ animation: "ringDraw 1.2s ease-out forwards" }}
+                        />
+                      </svg>
+                      <div className="hv-ring-pct">85%</div>
+                    </div>
+                    <div className="hv-ready-scores">
+                      <div className="hv-rs-row">
+                        <span>Skill readiness</span>
+                        <span className="hv-rs-val">84%</span>
+                      </div>
+                      <div className="hv-rs-row">
+                        <span>Brand signal</span>
+                        <span className="hv-rs-val">73%</span>
+                      </div>
+                      <div className="hv-rs-row">
+                        <span>Evidence portfolio</span>
+                        <span className="hv-rs-val">91%</span>
+                      </div>
+                    </div>
+                  </div>
+                  <div className="hv-ready-signal">
+                    READY<span className="hv-blink">_</span>&nbsp;Make your move.
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
         </div>
       </div>
 
