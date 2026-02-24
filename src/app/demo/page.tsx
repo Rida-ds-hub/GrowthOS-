@@ -31,41 +31,31 @@ const demoGapAnalysis: GapAnalysis = {
     "System Design Maturity": {
       score: 65,
       range: "moderate",
-      explanation: "Strong foundation in microservices architecture, but limited experience with distributed systems at scale.",
-      evidence: ["Built microservices for internal tools", "Designed API architecture for team project"],
+      explanation:
+        "Strong foundation in microservices architecture, but limited experience with distributed systems at scale.",
+      evidence: [
+        "Built microservices for internal tools",
+        "Designed API architecture for team project",
+      ],
       dataContributions: [
         {
           source: "github",
-          contribution: "Shows experience with microservices but no large-scale distributed systems",
-          impact: "medium"
+          contribution:
+            "Shows experience with microservices but no large-scale distributed systems",
+          impact: "medium",
         },
         {
           source: "resume",
-          contribution: "Mentions system design but lacks specific examples of distributed systems",
-          impact: "low"
-        }
-      ],
-      nextSteps: ["Design a distributed caching system", "Write technical blog post on system design"]
-    },
-    "Brand Presence": {
-      score: 45,
-      range: "needs-improvement",
-      explanation: "Minimal public presence. Only 3 LinkedIn posts in the last year, no technical blog posts.",
-      evidence: ["3 LinkedIn posts in past year", "No technical blog"],
-      dataContributions: [
-        {
-          source: "linkedin",
-          contribution: "Minimal posting activity, no technical content",
-          impact: "high"
+          contribution:
+            "Mentions system design but lacks specific examples of distributed systems",
+          impact: "low",
         },
-        {
-          source: "github",
-          contribution: "Active but no public documentation or blog posts",
-          impact: "medium"
-        }
       ],
-      nextSteps: ["Post 2 LinkedIn posts per month", "Start technical blog"]
-    }
+      nextSteps: [
+        "Design a distributed caching system",
+        "Write technical blog post on system design",
+      ],
+    },
   },
   gaps: [
     {
