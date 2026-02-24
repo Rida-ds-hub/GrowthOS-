@@ -46,6 +46,7 @@ CRITICAL: For each domain, you MUST include "dataContributions" showing how each
 - If GitHub data was provided, explain how it influenced the score (e.g., "GitHub shows 12 repositories with distributed systems patterns, contributing to System Design Maturity")
 - If LinkedIn data was provided, explain how professional experience contributed (e.g., "LinkedIn shows 5 years of team leadership, contributing to Leadership & Influence")
 - If Resume was provided, explain how it contributed (e.g., "Resume demonstrates project execution across 3 companies, contributing to Execution Scope")
+- If Personal Website / Newsletter was provided (e.g., personal site, Medium, Substack), explain how public writing, projects, or case studies contributed (e.g., "Personal blog on Medium shows 10 in-depth posts on system design tradeoffs, strengthening Technical Depth and Communication & Visibility")
 Only include dataContributions for sources that were actually provided.
 
 Make a 3-phase execution plan (Phase 1, Phase 2, Phase 3). No specific calendar dates. Treat phases as ordered blocks **within the overall timeline above** (Timeline: ${data.timeline}): Phase 1 = first 30–40% of the timeline, Phase 2 = middle 30–40%, Phase 3 = final 20–30% (proof/visibility). Each phase should have:

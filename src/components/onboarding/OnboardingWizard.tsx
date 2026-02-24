@@ -306,10 +306,18 @@ export function OnboardingWizard() {
         // Also keep the cache for backward compatibility
         const cacheData = {
           gapAnalysis: gapAnalysisData,
+          // core profile meta for fallback display
+          targetRole: updatedData.targetRole,
+          timeline: updatedData.timeline,
+          currentRole: updatedData.currentRole,
+          yearsExp: updatedData.yearsExp,
+          progressionIntent: updatedData.progressionIntent,
+          // data sources
           githubData: githubData || undefined,
           linkedinData: linkedinText || undefined,
           resumeText: updatedData.resumeText || undefined,
           websiteUrl: updatedData.websiteUrl || undefined,
+          // timestamp for staleness check
           timestamp: Date.now(),
         }
         sessionStorage.setItem("growthos_results_cache", JSON.stringify(cacheData))
@@ -393,20 +401,6 @@ export function OnboardingWizard() {
   if (showSignUpPrompt && data.gapAnalysis) {
     // If we have cached results and user navigated back, redirect to results page
     if (typeof window !== "undefined") {
-      const resultsData = {
-        gapAnalysis: data.gapAnalysis,
-        targetRole: data.targetRole,
-        timeline: data.timeline,
-        currentRole: data.currentRole,
-        yearsExp: data.yearsExp,
-        progressionIntent: data.progressionIntent,
-        githubData: undefined,
-        linkedinData: undefined,
-        resumeText: data.resumeText || undefined,
-        websiteUrl: data.websiteUrl || undefined,
-        generatedAt: new Date().toISOString(),
-      }
-      sessionStorage.setItem("growthos_view_results", JSON.stringify(resultsData))
       router.push("/results/view")
       return null
     }

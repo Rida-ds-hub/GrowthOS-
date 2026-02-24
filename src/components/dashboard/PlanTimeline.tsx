@@ -6,9 +6,10 @@ import { GapAnalysis } from "@/lib/types"
 interface PlanTimelineProps {
   gapAnalysis: GapAnalysis
   timeline?: string
+  forceExpanded?: boolean
 }
 
-export function PlanTimeline({ gapAnalysis, timeline }: PlanTimelineProps) {
+export function PlanTimeline({ gapAnalysis, timeline, forceExpanded = false }: PlanTimelineProps) {
   const [activePhase, setActivePhase] = useState(0)
 
   const parseMonthsFromTimeline = (value?: string): number => {
@@ -84,51 +85,56 @@ export function PlanTimeline({ gapAnalysis, timeline }: PlanTimelineProps) {
         </span>
       </div>
 
-      {/* Tab Switcher */}
-      <div className="grid grid-cols-3 gap-px bg-[#1e1e1e] border border-[#1e1e1e] border-b-0">
-        {phases.map((phase, index) => (
-          <button
-            key={index}
-            onClick={() => setActivePhase(index)}
-            className={`
-              bg-[#111111] px-4 md:px-6 py-4 md:py-5 text-left transition-colors relative
-              ${activePhase === index ? "bg-[#161616]" : "hover:bg-[#161616]"}
-            `}
-          >
-            {activePhase === index && (
-              <div className="absolute bottom-0 left-0 right-0 h-0.5 bg-emerald-500 z-10" />
-            )}
-            <div className="flex items-center gap-2 md:gap-3 mb-2">
-              <div className={`
-                w-7 h-7 rounded-full flex items-center justify-center font-mono text-xs md:text-sm font-semibold transition-all
-                ${activePhase === index 
-                  ? "bg-emerald-500 text-black" 
-                  : "bg-[#27272a] text-zinc-500 border border-[#2a2a2a]"
-                }
-              `}>
-                {phase.num}
+      {/* Tab Switcher (hidden in export mode) */}
+      {!forceExpanded && (
+        <div className="grid grid-cols-3 gap-px bg-[#1e1e1e] border border-[#1e1e1e] border-b-0">
+          {phases.map((phase, index) => (
+            <button
+              key={index}
+              onClick={() => setActivePhase(index)}
+              className={`
+                bg-[#111111] px-4 md:px-6 py-4 md:py-5 text-left transition-colors relative
+                ${activePhase === index ? "bg-[#161616]" : "hover:bg-[#161616]"}
+              `}
+            >
+              {activePhase === index && (
+                <div className="absolute bottom-0 left-0 right-0 h-0.5 bg-emerald-500 z-10" />
+              )}
+              <div className="flex items-center gap-2 md:gap-3 mb-2">
+                <div className={`
+                  w-7 h-7 rounded-full flex items-center justify-center font-mono text-xs md:text-sm font-semibold transition-all
+                  ${activePhase === index 
+                    ? "bg-emerald-500 text-black" 
+                    : "bg-[#27272a] text-zinc-500 border border-[#2a2a2a]"
+                  }
+                `}>
+                  {phase.num}
+                </div>
+                <div className="text-[0.62rem] tracking-[0.2em] uppercase text-zinc-500">
+                  {phase.months}
+                </div>
               </div>
-              <div className="text-[0.62rem] tracking-[0.2em] uppercase text-zinc-500">
-                {phase.months}
+              <div className={`font-mono text-xs md:text-sm font-semibold leading-snug transition-opacity ${
+                activePhase === index ? "opacity-100 text-white" : "opacity-50 text-white"
+              }`}>
+                {phase.theme || `Phase ${index + 1}`}
               </div>
-            </div>
-            <div className={`font-mono text-xs md:text-sm font-semibold leading-snug transition-opacity ${
-              activePhase === index ? "opacity-100 text-white" : "opacity-50 text-white"
-            }`}>
-              {phase.theme || `Phase ${index + 1}`}
-            </div>
-          </button>
-        ))}
-      </div>
+            </button>
+          ))}
+        </div>
+      )}
 
-      {/* Phase Panel */}
-      {phases.map((phase, index) => (
+      {/* Phase Panel(s) */}
+      {phases.map((phase, index) => {
+        const visible = forceExpanded || activePhase === index
+        if (!visible) return null
+
+        return (
         <div
           key={index}
-          className={`
+          className="
             bg-[#161616] border border-[#1e1e1e] p-6 md:p-8 mb-6
-            ${activePhase === index ? "block" : "hidden"}
-          `}
+          "
         >
           <div className="flex items-start justify-between mb-6 md:mb-7 gap-4">
             <div>
@@ -229,7 +235,7 @@ export function PlanTimeline({ gapAnalysis, timeline }: PlanTimelineProps) {
             </div>
           )}
         </div>
-      ))}
+      )})}
     </div>
   )
 }

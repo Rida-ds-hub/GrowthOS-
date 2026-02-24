@@ -7,9 +7,10 @@ import { ChevronDown } from "lucide-react"
 
 interface GapCardsProps {
   gapAnalysis: GapAnalysis
+  forceExpanded?: boolean
 }
 
-export function GapCards({ gapAnalysis }: GapCardsProps) {
+export function GapCards({ gapAnalysis, forceExpanded = false }: GapCardsProps) {
   const [expanded, setExpanded] = useState<Record<number, boolean>>({})
 
   if (!gapAnalysis || !gapAnalysis.domainScores) {
@@ -74,11 +75,13 @@ export function GapCards({ gapAnalysis }: GapCardsProps) {
           <span className="w-4 h-px bg-zinc-500"></span>
           Gap Details
         </h2>
-        <span className="text-xs text-zinc-500">Click any row to expand</span>
+        {!forceExpanded && (
+          <span className="text-xs text-zinc-500">Click any row to expand</span>
+        )}
       </div>
       <div className="flex flex-col gap-2">
         {allGaps.map((gap, index) => {
-          const isExpanded = expanded[index]
+          const isExpanded = forceExpanded || expanded[index]
           const badge = gap.badge
           
           // Ensure values are strings (handle arrays or other types)
@@ -101,8 +104,14 @@ export function GapCards({ gapAnalysis }: GapCardsProps) {
               `}
             >
               <div
-                className="flex items-center gap-4 px-4 md:px-5 py-4 cursor-pointer hover:bg-[#161616] transition-colors select-none"
-                onClick={() => setExpanded(prev => ({ ...prev, [index]: !prev[index] }))}
+                className={`flex items-center gap-4 px-4 md:px-5 py-4 transition-colors select-none ${
+                  forceExpanded ? "" : "cursor-pointer hover:bg-[#161616]"
+                }`}
+                onClick={
+                  forceExpanded
+                    ? undefined
+                    : () => setExpanded((prev) => ({ ...prev, [index]: !prev[index] }))
+                }
               >
                 <div 
                   className="w-0.5 h-8 rounded-full flex-shrink-0"
@@ -125,9 +134,11 @@ export function GapCards({ gapAnalysis }: GapCardsProps) {
                 >
                   {gap.score}
                 </div>
-                <div className={`flex-shrink-0 transition-transform ${isExpanded ? "rotate-180" : ""}`}>
-                  <ChevronDown className="w-4 h-4 text-zinc-500" />
-                </div>
+                {!forceExpanded && (
+                  <div className={`flex-shrink-0 transition-transform ${isExpanded ? "rotate-180" : ""}`}>
+                    <ChevronDown className="w-4 h-4 text-zinc-500" />
+                  </div>
+                )}
               </div>
               <div className={`overflow-hidden transition-all ${
                 isExpanded ? "max-h-[600px] pb-5" : "max-h-0"
