@@ -2,83 +2,76 @@
 
 **Build the evidence. Earn the promotion.**
 
-Growth OS is a structured career progression engine for tech professionals. It maps where you are, where you need to be, identifies gaps, trains decision-making maturity daily, captures real impact continuously, and compiles promotion-ready evidence over time.
+An AI-powered career progression engine that analyzes your GitHub, resume, and portfolio to generate a personalized gap analysis and 90-day action plan — free, no sign-up required.
 
-## Core Loop
+**Live app:** [https://growth-os-lake.vercel.app](https://growth-os-lake.vercel.app)
 
-**Progression → Capability → Evidence → Narrative**
+---
 
-## Tech Stack
+## What it does
+
+Growth OS ingests real professional data (GitHub repos, resume PDF, portfolio URL, optional LinkedIn paste) and runs an AI-powered gap analysis across five career domains: **System Design Maturity**, **Execution Scope**, **Communication & Visibility**, **Technical Depth**, and **Leadership & Influence**. It returns a readiness score, domain breakdowns, identified gaps, a 90-day roadmap, upskilling project ideas, a posting strategy, and a promotion narrative — all downloadable as a report.
+
+---
+
+## Repo structure
+
+The runnable app and submission live in **`growth-os-vibes/`**:
+
+```
+GrowthOS-/
+├── growth-os-vibes/     ← Next.js app (clone, install, run from here)
+│   ├── src/
+│   ├── public/
+│   ├── README.md        ← Full setup, deploy, and submission details
+│   ├── ROUTES.txt       ← Routes index
+│   ├── routes.md
+│   ├── schema.sql
+│   └── explainer_rida.md
+├── src/                 ← Legacy/other app code (if any)
+└── README.md            ← This file
+```
+
+---
+
+## Quick start
+
+```bash
+git clone https://github.com/Rida-ds-hub/GrowthOS-.git
+cd GrowthOS-/growth-os-vibes
+cp .env.example .env.local
+# Edit .env.local: add GEMINI_API_KEY (get one at https://aistudio.google.com/app/apikey)
+npm install
+npm run dev
+```
+
+Open [http://localhost:3000](http://localhost:3000) and go to **Onboarding** to run a full analysis.
+
+For full setup, env vars, deployment, and submission deliverables, see **[growth-os-vibes/README.md](./growth-os-vibes/README.md)**.
+
+---
+
+## Tech stack
 
 - **Framework:** Next.js 14 (App Router, TypeScript)
-- **Styling:** Tailwind CSS + Shadcn/ui
+- **Styling:** Tailwind CSS
 - **Animation:** Framer Motion
-- **Auth:** NextAuth.js (GitHub + LinkedIn OAuth)
-- **Database:** Supabase (PostgreSQL + JSONB)
 - **AI:** Google Gemini API (gemini-2.5-flash)
+- **Database:** Supabase (optional; waitlist only)
 - **Charts:** Recharts
 - **Deployment:** Vercel
 
-## Quick Start
+No auth required — the analysis flow works without sign-up.
 
-1. **Install dependencies:**
-   ```bash
-   npm install
-   ```
+---
 
-2. **Set up environment variables:**
-   ```bash
-   cp .env.local.example .env.local
-   # Edit .env.local with your credentials
-   ```
+## Links
 
-3. **Set up Supabase:**
-   - Create a project at https://supabase.com
-   - Run the SQL schema from `spec.md` Section 7
-   - Add credentials to `.env.local`
+- **Live deployment:** [https://growth-os-lake.vercel.app](https://growth-os-lake.vercel.app)
+- **Demo (Loom):** [https://www.loom.com/share/039b51eabcf64888bbb1fec44b5d76fd](https://www.loom.com/share/039b51eabcf64888bbb1fec44b5d76fd)
 
-4. **Run development server:**
-   ```bash
-   npm run dev
-   ```
-
-5. **Open:** [http://localhost:3000](http://localhost:3000)
-
-## Documentation
-
-- **Full Specification:** [`spec.md`](./spec.md) - Complete product spec
-- **Implementation Plan:** [`IMPLEMENTATION_PLAN.md`](./IMPLEMENTATION_PLAN.md) - Build phases
-- **Setup Guide:** [`SETUP.md`](./SETUP.md) - Detailed setup instructions
-- **Credentials:** [`CREDENTIALS_NEEDED.md`](./CREDENTIALS_NEEDED.md) - Where to get API keys
-
-## Project Status
-
-### ✅ Completed
-- Project structure and configuration
-- TypeScript types and utilities
-- NextAuth setup
-- Supabase clients
-- Groq AI client
-- Landing page components
-- Basic UI components
-
-### 🚧 In Progress
-- Onboarding flow
-- Dashboard components
-- API routes
-
-### 📋 Planned
-- Gap analysis API
-- GitHub integration
-- Resume parsing
-- Feedback system
-
-## Principles
-
-1. **Plan or Fail** - You cannot progress without a map
-2. **Human Thinks. AI Executes.** - Train thinking, AI handles execution
-3. **Visibility Is Not Optional** - Build the signal systematically
+---
 
 ## License
 
-Private - Hackathon Build
+Private — Hackathon build.
