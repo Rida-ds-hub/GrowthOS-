@@ -15,3 +15,4 @@ POST /api/waitlist          Collect waitlist email (Supabase upsert)
 
 # Env: GEMINI_API_KEY (required for analysis), NEXT_PUBLIC_SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY (optional).
 # See routes.md for full route map; schema.sql for Supabase table.
+# All API handlers: src/app/api/<name>/route.ts or .../scrape/route.ts — runtime = nodejs. Full tree: STRUCTURE.txt.

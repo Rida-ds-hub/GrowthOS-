@@ -23,12 +23,11 @@ GrowthOS-/
 ├── growth-os-vibes/     ← Next.js app (clone, install, run from here)
 │   ├── src/
 │   ├── public/
-│   ├── README.md        ← Full setup, deploy, and submission details
 │   ├── ROUTES.txt       ← Routes index
 │   ├── routes.md
 │   ├── schema.sql
-│   └── explainer_rida.md
-├── src/                 ← Legacy/other app code (if any)
+│   └── explainer_rida.md  ← Full setup, deploy, and submission details
+├── src/                 ← Your app code (run/deploy from repo root)
 └── README.md            ← This file
 ```
 
@@ -47,7 +46,7 @@ npm run dev
 
 Open [http://localhost:3000](http://localhost:3000) and go to **Onboarding** to run a full analysis.
 
-For full setup, env vars, deployment, and submission deliverables, see **[growth-os-vibes/README.md](./growth-os-vibes/README.md)**.
+For full setup, env vars, deployment, and submission deliverables, see **[growth-os-vibes/explainer_rida.md](./growth-os-vibes/explainer_rida.md)**.
 
 ---
 

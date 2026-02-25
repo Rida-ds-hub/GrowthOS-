@@ -1,0 +1,49 @@
+{
+  "gapAnalysis": {
+    "summary": "Sample summary: Strong technical depth and execution; opportunities in system design visibility and leadership narrative. A 90-day focus on cross-team ownership and written artifacts would close the main gaps.",
+    "readinessScore": 62,
+    "domainScores": {
+      "System Design Maturity": 55,
+      "Execution Scope": 72,
+      "Communication & Visibility": 48,
+      "Technical Depth": 78,
+      "Leadership & Influence": 52
+    },
+    "gaps": [
+      {
+        "domain": "Communication & Visibility",
+        "gap": "high",
+        "title": "Limited visible artifacts",
+        "observation": "Few design docs or post-mortems in the sample data.",
+        "requirement": "Produce at least one high-signal artifact per quarter.",
+        "closingAction": "Draft a one-pager for the next project and share in a team channel."
+      },
+      {
+        "domain": "Leadership & Influence",
+        "gap": "medium",
+        "title": "Cross-team ownership",
+        "observation": "Experience is mostly within a single team.",
+        "requirement": "Demonstrate impact across teams or stakeholders.",
+        "closingAction": "Volunteer for one cross-team initiative and document outcomes."
+      }
+    ],
+    "plan": {
+      "phase1": {
+        "label": "Phase 1",
+        "theme": "Foundation",
+        "actions": ["Create one design doc or RFC", "Ship one visible deliverable", "Document one post-mortem"]
+      },
+      "phase2": {
+        "label": "Phase 2",
+        "theme": "Expand",
+        "actions": ["Lead a small cross-team effort", "Present at team sync", "Contribute to roadmap discussion"]
+      },
+      "phase3": {
+        "label": "Phase 3",
+        "theme": "Signal",
+        "actions": ["Summarize impact for review", "Update narrative for next level", "Align with manager on evidence"]
+      }
+    },
+    "promotionNarrative": "I drove [X] to completion, improved [Y] by [Z], and created visible artifacts (design doc, post-mortem) that aligned the team. I am ready for [next level] because I have demonstrated [evidence]."
+  }
+}

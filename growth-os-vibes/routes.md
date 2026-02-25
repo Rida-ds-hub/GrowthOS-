@@ -1,5 +1,18 @@
 # Growth OS — Route Map
 
+## Route handler runtime
+
+All API route handlers use **Node.js** (not Edge). Each route file exports `export const runtime = "nodejs"`:
+
+- `src/app/api/gap-analysis/route.ts`
+- `src/app/api/github/public/route.ts`
+- `src/app/api/parse-resume/route.ts`
+- `src/app/api/website/scrape/route.ts`
+
+See `STRUCTURE.txt` for the full `src/app` directory tree.
+
+---
+
 ## Pages (Frontend)
 
 | Path | Description |

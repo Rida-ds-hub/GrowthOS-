@@ -88,9 +88,13 @@ export async function POST(request: NextRequest) {
 
       return NextResponse.json({ data: cappedData })
     } catch (formatError: any) {
-      console.error("[GitHub Public API] Error formatting data:", formatError)
-      console.error("[GitHub Public API] Profile data:", JSON.stringify(profile, null, 2))
-      console.error("[GitHub Public API] Repos data:", JSON.stringify(repos, null, 2))
+      console.error("[GitHub Public API] Error formatting data:", formatError?.message)
+      if (process.env.NODE_ENV !== "production") {
+        console.error("[GitHub Public API] Profile data:", JSON.stringify(profile, null, 2))
+        console.error("[GitHub Public API] Repos data:", JSON.stringify(repos, null, 2))
+      } else {
+        console.error("[GitHub Public API] Profile keys:", profile ? Object.keys(profile) : "none", "reposCount:", Array.isArray(repos) ? repos.length : 0)
+      }
       throw formatError
     }
   } catch (error: unknown) {

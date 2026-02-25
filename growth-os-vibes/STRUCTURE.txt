@@ -1,0 +1,21 @@
+# Growth OS — src/app directory tree (for reviewers)
+# Full paths so route handlers can be traced. All API route.ts use runtime = "nodejs".
+
+src/app/
+src/app/api/
+src/app/api/gap-analysis/route.ts
+src/app/api/github/
+src/app/api/github/public/route.ts
+src/app/api/parse-resume/route.ts
+src/app/api/waitlist/route.ts
+src/app/api/website/
+src/app/api/website/scrape/route.ts
+src/app/globals.css
+src/app/icon.svg
+src/app/layout.tsx
+src/app/page.tsx
+src/app/onboarding/
+src/app/onboarding/page.tsx
+src/app/results/
+src/app/results/view/
+src/app/results/view/page.tsx

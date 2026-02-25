@@ -85,7 +85,7 @@ export async function POST(request: NextRequest) {
         result = await model.generateContent(prompt)
         console.log("API: Gemini API retry successful")
       } catch (retryError: any) {
-        console.error("API: Gemini API retry also failed:", retryError)
+      console.error("API: Gemini API retry also failed:", retryError?.message)
         return NextResponse.json(
           { error: `Gemini API error: ${retryError?.message || "Unknown error"}` },
           { status: 500 }
@@ -95,8 +95,10 @@ export async function POST(request: NextRequest) {
 
     const rawResponse = result.response.text() || "{}"
     console.log("API: Raw response length:", rawResponse.length)
-    console.log("API: Raw response preview:", rawResponse.substring(0, 200))
-    
+    if (process.env.NODE_ENV !== "production") {
+      console.log("API: Raw response preview:", rawResponse.substring(0, 200))
+    }
+
     if (!rawResponse || rawResponse === "{}") {
       console.error("API: Empty response from Gemini")
       return NextResponse.json(
@@ -175,11 +177,9 @@ export async function POST(request: NextRequest) {
       console.log("API: Has domainScores?", !!gapAnalysis.domainScores)
       console.log("API: DomainScores keys:", gapAnalysis.domainScores ? Object.keys(gapAnalysis.domainScores) : "none")
     } catch (parseError: any) {
-      console.error("API: Failed to parse AI response:", parseError)
-      console.error("API: Parse error at position:", parseError.message)
-      console.error("API: Cleaned response (first 500 chars):", cleanedResponse.slice(0, 500))
-      console.error("API: Cleaned response (last 500 chars):", cleanedResponse.slice(-500))
-      
+      console.error("API: Failed to parse AI response:", parseError?.message)
+      console.error("API: Parse failed, responseLength:", cleanedResponse.length)
+
       // Retry: try to strip any remaining non-JSON and re-extract
       try {
         // Remove any remaining control chars including \t and \r that might be in strings
@@ -195,8 +195,9 @@ export async function POST(request: NextRequest) {
         
         gapAnalysis = JSON.parse(repairedJson)
         console.log("API: Successfully parsed after repair pass")
-      } catch (secondAttemptError) {
-        console.error("API: Second parse attempt also failed:", secondAttemptError)
+      } catch (secondAttemptError: unknown) {
+        const err = secondAttemptError instanceof Error ? secondAttemptError.message : String(secondAttemptError)
+        console.error("API: Second parse attempt also failed:", err)
         return NextResponse.json(
           { 
             error: "Failed to parse analysis response. The AI may have returned malformed JSON. Please try again.",
@@ -263,6 +264,7 @@ export async function POST(request: NextRequest) {
       promotionNarrative: typeof gapAnalysis.promotionNarrative === "string" ? gapAnalysis.promotionNarrative : "",
     }
 
+    console.log("API: Gap analysis success, responseLength:", rawResponse.length, "domainsPresent:", Object.keys(gapAnalysis.domainScores || {}).length)
     console.log("API: Returning gapAnalysis response")
     return NextResponse.json({ gapAnalysis: normalized })
   } catch (error) {

@@ -273,15 +273,6 @@ export function LandingPage() {
           <div><div className="stat-n">1</div><div className="stat-l">Analysis to know your gaps</div></div>
           <div><div className="stat-n">$0</div><div className="stat-l">To get your full report</div></div>
         </div>
-        <div className="stats-note">
-          <div className="stats-note-label">
-            {"// Built on evidence, not assumptions"}
-          </div>
-          <p>
-            Growth OS ingests your GitHub, resume, and portfolio to generate
-            a gap analysis grounded in what you have actually built and shipped.
-          </p>
-        </div>
       </div>
 
       <div className="sec" id="system">
