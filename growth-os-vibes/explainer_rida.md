@@ -15,7 +15,7 @@
 
 | Deliverable | File / link |
 |------------|-------------|
-| Landing page screenshot | `landing_page_rida.png` |
+| Landing page screenshot | `landing_page_rida.png` (full-page, min width 1280px, PNG/JPG; must show product name, tagline, value prop, and a visible CTA) |
 | Routes map | `ROUTES.txt` (short index) + `routes.md` (full map) + `STRUCTURE.txt` (src/app tree) |
 | Supabase schema | `schema.sql` (waitlist table only; no profiles/feedback in this build) |
 | Explainer | This file (`explainer_rida.md`) |
@@ -25,6 +25,12 @@
 | Source | `src/` |
 
 **For judges — live flow:** Set `GEMINI_API_KEY` in Vercel (Project → Settings → Environment Variables). Then open the [live app onboarding](https://growth-os-lake.vercel.app/onboarding), use test GitHub username **`rida-ds-hub`**, and optionally upload a small PDF resume (&lt; 5 MB) or skip. A successful run shows the results page with readiness score and 90-day plan; use **Download Results** to export. The [Loom demo](https://www.loom.com/share/039b51eabcf64888bbb1fec44b5d76fd) (30–60s) shows onboarding → loader → results → download. For offline verification of the `/api/gap-analysis` response shape, see **`sample-gap-analysis-output.json`** (sanitized, no PII). If the key is missing, `/api/gap-analysis` returns a clear 500 with instructions to set the key.
+
+---
+
+## Problem solved
+
+Most tech professionals have ambition but no clear system for career growth. They guess at which skills to build, when to push for a promotion, and how to make their work visible — and they guess wrong. Growth OS fixes that by turning real evidence (GitHub, resume, portfolio) into a structured gap analysis and a 90-day plan so they know exactly where they stand and what to do next.
 
 ---
 
@@ -96,7 +102,7 @@ growth-os-vibes/
 │   │   └── results/view/      # Results page
 │   ├── components/            # UI, landing, onboarding, dashboard
 │   └── lib/                   # Gemini, GitHub, Supabase, types, API schemas
-├── public/                    # Static assets (e.g. og.png)
+├── public/                    # Static assets; includes og.png for social/link previews (Open Graph)
 ├── .env.example               # Env template
 ├── ROUTES.txt                 # Routes index
 ├── routes.md                  # Full route map + runtime
@@ -107,6 +113,8 @@ growth-os-vibes/
 ```
 
 `@/lib/*` → `src/lib/*`. API routes under `src/app/api/*/route.ts` use `export const runtime = "nodejs"` where they rely on Node-only APIs (pdf-parse, fetch + HTML parsing).
+
+**Included for reviewers:** `public/og.png` is provided for Open Graph / Twitter card previews when the app URL is shared; the root layout references it for `metadataBase`, `openGraph.images`, and `twitter.images`.
 
 ---
 
@@ -227,3 +235,32 @@ Single table: **waitlist** (`id`, `email`, `created_at`). Run `schema.sql` in th
 - [x] Live deployment (set `GEMINI_API_KEY` in Vercel for analysis)
 - [x] Public GitHub repository
 - [x] Full source in `src/`
+
+---
+
+## Creating the submission zip
+
+Zip the **`growth-os-vibes`** folder so the archive stays small and contains everything required.
+
+**Include:**
+- `landing_page_rida.png` — full-page landing screenshot (PNG or JPG, **min width 1280px**); must show product name, tagline, value proposition, and a visible CTA (e.g. “Track My Readiness”, “Start Free”).
+- `explainer_rida.md` — this file (product name, one-line description, team, live URL, GitHub URL, problem description).
+- **Next.js routes export:** `ROUTES.txt`, `routes.md`, `STRUCTURE.txt` (route index, full map, and `src/app` tree).
+- `schema.sql` — Supabase waitlist table.
+- `src/` — all Next.js app and component source (pages, API routes, components, lib).
+- `public/` — static assets (e.g. `og.png`).
+- `package.json`, `.env.example`, `sample-gap-analysis-output.json`, and config files (`next.config.js`, `tsconfig.json`, etc.).
+
+**Exclude (to keep the zip small):**
+- `node_modules/`
+- `.next/`
+- `.git/`
+- `*.zip`, `.env.local`, and other large or secret files
+
+**Example (from repo root):**
+```bash
+cd /path/to/GrowthOS-
+zip -r growth-os-submission.zip growth-os-vibes -x "growth-os-vibes/node_modules/*" -x "growth-os-vibes/.next/*" -x "growth-os-vibes/.git/*" -x "*.zip"
+```
+
+Ensure `landing_page_rida.png` is inside `growth-os-vibes/` before zipping (e.g. copy it there if it lives elsewhere).
