@@ -1,5 +1,15 @@
 // GitHub REST API helpers
 
+export class GitHubRateLimitError extends Error {
+  constructor(
+    message: string,
+    public readonly retryAfterSeconds: number
+  ) {
+    super(message)
+    this.name = "GitHubRateLimitError"
+  }
+}
+
 export interface GitHubProfile {
   login: string;
   name: string;
@@ -106,6 +116,25 @@ export async function fetchGitHubProfileByUsername(username: string): Promise<Gi
     },
   })
 
+  if (response.status === 403) {
+    const reset = response.headers.get("X-RateLimit-Reset")
+    const retryAfter = response.headers.get("Retry-After")
+    let retryAfterSeconds = 60
+    if (retryAfter) {
+      const parsed = parseInt(retryAfter, 10)
+      if (!isNaN(parsed)) retryAfterSeconds = parsed
+    } else if (reset) {
+      const resetTime = parseInt(reset, 10)
+      if (!isNaN(resetTime)) {
+        retryAfterSeconds = Math.max(1, resetTime - Math.floor(Date.now() / 1000))
+      }
+    }
+    throw new GitHubRateLimitError(
+      `GitHub rate limit exceeded. Please try again in ${Math.ceil(retryAfterSeconds / 60)} minutes.`,
+      retryAfterSeconds
+    )
+  }
+
   if (!response.ok) {
     throw new Error(`Failed to fetch GitHub profile for ${username}`)
   }
@@ -120,6 +149,25 @@ export async function fetchGitHubReposByUsername(username: string): Promise<GitH
       Accept: 'application/vnd.github.v3+json',
     },
   })
+
+  if (response.status === 403) {
+    const reset = response.headers.get("X-RateLimit-Reset")
+    const retryAfter = response.headers.get("Retry-After")
+    let retryAfterSeconds = 60
+    if (retryAfter) {
+      const parsed = parseInt(retryAfter, 10)
+      if (!isNaN(parsed)) retryAfterSeconds = parsed
+    } else if (reset) {
+      const resetTime = parseInt(reset, 10)
+      if (!isNaN(resetTime)) {
+        retryAfterSeconds = Math.max(1, resetTime - Math.floor(Date.now() / 1000))
+      }
+    }
+    throw new GitHubRateLimitError(
+      `GitHub rate limit exceeded. Please try again in ${Math.ceil(retryAfterSeconds / 60)} minutes.`,
+      retryAfterSeconds
+    )
+  }
 
   if (!response.ok) {
     throw new Error(`Failed to fetch GitHub repos for ${username}`)
