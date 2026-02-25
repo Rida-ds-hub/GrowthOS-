@@ -38,7 +38,7 @@ body {
 
 /* Restore pointer on all interactive elements for accessibility */
 a, button, input, textarea, select, [role="button"], label, summary,
-.bp, .bs, .plan-cta, .em-sub, .nav-links a, .footer-col a, .footer-socials a {
+.bp, .bs, .plan-cta, .em-sub, .nav-links a, .footer-col a {
   cursor: pointer !important;
 }
 
@@ -427,6 +427,36 @@ nav {
 .bs:hover {
   color: var(--em);
   border-color: var(--em-mid);
+}
+
+.waitlist-btn {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: .72rem;
+  letter-spacing: .15em;
+  text-transform: uppercase;
+  background: var(--em);
+  color: #000;
+  padding: .82rem 1.6rem;
+  border: 1px solid var(--em);
+  transition: all .2s;
+  text-decoration: none;
+  cursor: pointer !important;
+  font-weight: 600;
+}
+
+.waitlist-btn:hover {
+  background: #34d399;
+  border-color: #34d399;
+}
+
+.waitlist-btn:disabled {
+  opacity: .5;
+  cursor: not-allowed !important;
+}
+
+.waitlist-btn:focus-visible {
+  outline: 2px solid var(--em);
+  outline-offset: 2px;
 }
 
 /* Scroll hint */
@@ -1378,8 +1408,11 @@ nav {
 
 .cta-inner {
   border: 1px solid var(--border);
-  padding: 4rem;
-  max-width: 580px;
+  padding: 4rem 3rem;
+  max-width: 720px;
+  width: 100%;
+  margin: 0 auto;
+  text-align: center;
   position: relative;
   background: var(--surface);
 }
@@ -1483,7 +1516,7 @@ footer {
 .footer-brand p {
   font-size: .76rem;
   line-height: 1.8;
-  color: var(--muted);
+  color: var(--em);
   max-width: 200px;
 }
 
@@ -1518,25 +1551,18 @@ footer {
 
 .footer-copy {
   font-size: .68rem;
-  color: var(--dim);
-  letter-spacing: .12em;
-}
-
-.footer-socials {
-  display: flex;
-  gap: 1.5rem;
-}
-
-.footer-socials a {
-  font-size: .68rem;
-  color: var(--muted);
-  text-decoration: none;
-  letter-spacing: .1em;
-  transition: color .2s;
-}
-
-.footer-socials a:hover {
   color: var(--em);
+  letter-spacing: .12em;
+  opacity: .7;
+}
+
+.footer-tagline {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: .68rem;
+  color: var(--em);
+  letter-spacing: .15em;
+  text-transform: uppercase;
+  opacity: .6;
 }
 
 @media (max-width: 960px) {

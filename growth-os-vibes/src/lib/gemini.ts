@@ -8,5 +8,10 @@ if (!geminiApiKey) {
 
 export const genAI = new GoogleGenerativeAI(geminiApiKey || 'placeholder-key')
 
-// Use gemini-2.5-flash model
-export const model = genAI.getGenerativeModel({ model: 'gemini-2.5-flash' })
+// Use gemini-2.5-flash model with JSON output mode
+export const model = genAI.getGenerativeModel({
+  model: 'gemini-2.5-flash',
+  generationConfig: {
+    responseMimeType: 'application/json',
+  },
+})

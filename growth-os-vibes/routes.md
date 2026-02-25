@@ -6,7 +6,6 @@
 |---|---|
 | `/` | Landing page — hero, scroll panels, stats bar, how it works, pricing, waitlist CTA |
 | `/onboarding` | Onboarding wizard — goal setting, data source connection, resume upload, analysis trigger |
-| `/demo` | Demo mode — pre-populated gap analysis for first-time visitors |
 | `/results/view` | Results page — full gap analysis, domain scores, radar, 90-day plan, download |
 
 ## API Routes

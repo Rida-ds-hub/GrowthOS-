@@ -88,99 +88,67 @@ export async function POST(request: NextRequest) {
       )
     }
 
-    // Strip markdown code fences
+    // --- Robust JSON extraction ---
+    // Step 1: Strip markdown code fences
     let cleanedResponse = rawResponse
       .replace(/```json\n?/g, "")
       .replace(/```\n?/g, "")
       .trim()
 
-    cleanedResponse = cleanedResponse.trim()
-
-    // Remove control characters that break JSON (keep \n, \r, \t)
+    // Step 2: Remove control characters that break JSON (keep \n, \r, \t)
     cleanedResponse = cleanedResponse.replace(/[\x00-\x08\x0B\x0C\x0E-\x1F\x7F]/g, '')
 
-    // Fix common JSON issues from AI responses
-    for (let i = 0; i < 5; i++) {
-      cleanedResponse = cleanedResponse.replace(/,(\s*[}\]])/g, '$1')
-    }
-    
-    // Fix promotionNarrative if it's incorrectly nested inside plan
-    if (cleanedResponse.includes('"plan"') && cleanedResponse.includes('"promotionNarrative"')) {
-      const promoStart = cleanedResponse.indexOf('"promotionNarrative"')
-      if (promoStart !== -1) {
-        const valueStart = cleanedResponse.indexOf('"', promoStart + '"promotionNarrative"'.length) + 1
-        if (valueStart > 0) {
-          let valueEnd = valueStart
-          let escapeNext = false
-          for (let i = valueStart; i < cleanedResponse.length; i++) {
-            if (escapeNext) {
-              escapeNext = false
-              continue
-            }
-            if (cleanedResponse[i] === '\\') {
-              escapeNext = true
-              continue
-            }
-            if (cleanedResponse[i] === '"') {
-              valueEnd = i
-              break
-            }
-          }
-          
-          if (valueEnd > valueStart) {
-            const promotionValue = cleanedResponse.substring(valueStart, valueEnd)
-            const promoEnd = valueEnd + 1
-            const beforePromo = cleanedResponse.substring(0, promoStart)
-            const afterPromo = cleanedResponse.substring(promoEnd)
-            const cleanedBefore = beforePromo.replace(/,\s*$/, '')
-            cleanedResponse = cleanedBefore + afterPromo.replace(/^,?\s*/, '')
-            
-            const planStartIdx = cleanedResponse.indexOf('"plan"')
-            if (planStartIdx !== -1) {
-              let braceCount = 0
-              let inString = false
-              let escapeNext2 = false
-              let planEndIdx = -1
-              
-              const planOpenBrace = cleanedResponse.indexOf('{', planStartIdx)
-              if (planOpenBrace !== -1) {
-                for (let i = planOpenBrace; i < cleanedResponse.length; i++) {
-                  const char = cleanedResponse[i]
-                  if (escapeNext2) {
-                    escapeNext2 = false
-                    continue
-                  }
-                  if (char === '\\') {
-                    escapeNext2 = true
-                    continue
-                  }
-                  if (char === '"') {
-                    inString = !inString
-                    continue
-                  }
-                  if (!inString) {
-                    if (char === '{') braceCount++
-                    if (char === '}') {
-                      braceCount--
-                      if (braceCount === 0) {
-                        planEndIdx = i
-                        break
-                      }
-                    }
-                  }
-                }
-                
-                if (planEndIdx !== -1) {
-                  const beforePlan = cleanedResponse.substring(0, planEndIdx + 1)
-                  const afterPlan = cleanedResponse.substring(planEndIdx + 1).replace(/^,?\s*/, '')
-                  const escapedValue = promotionValue.replace(/\\/g, '\\\\').replace(/"/g, '\\"').replace(/\n/g, '\\n').replace(/\r/g, '\\r')
-                  cleanedResponse = beforePlan + ', "promotionNarrative": "' + escapedValue + '"' + (afterPlan.startsWith('}') ? '' : ',') + afterPlan
-                }
-              }
-            }
+    // Step 3: Extract only the top-level JSON object using brace-depth tracking
+    // This handles cases where Gemini appends commentary after the JSON
+    function extractJsonObject(str: string): string | null {
+      const start = str.indexOf('{')
+      if (start === -1) return null
+      
+      let depth = 0
+      let inString = false
+      let escaped = false
+      
+      for (let i = start; i < str.length; i++) {
+        const ch = str[i]
+        
+        if (escaped) {
+          escaped = false
+          continue
+        }
+        
+        if (ch === '\\' && inString) {
+          escaped = true
+          continue
+        }
+        
+        if (ch === '"') {
+          inString = !inString
+          continue
+        }
+        
+        if (inString) continue
+        
+        if (ch === '{') depth++
+        if (ch === '}') {
+          depth--
+          if (depth === 0) {
+            return str.substring(start, i + 1)
           }
         }
       }
+      
+      return null
+    }
+
+    const extractedJson = extractJsonObject(cleanedResponse)
+    if (extractedJson) {
+      cleanedResponse = extractedJson
+      console.log("API: Extracted JSON object, length:", cleanedResponse.length)
+    }
+
+    // Step 4: Fix trailing commas (common AI JSON issue)
+    for (let i = 0; i < 5; i++) {
+      cleanedResponse = cleanedResponse.replace(/,(\s*[}\]])/g, '$1')
     }
 
     let gapAnalysis: GapAnalysis
@@ -192,48 +160,34 @@ export async function POST(request: NextRequest) {
     } catch (parseError: any) {
       console.error("API: Failed to parse AI response:", parseError)
       console.error("API: Parse error at position:", parseError.message)
+      console.error("API: Cleaned response (first 500 chars):", cleanedResponse.slice(0, 500))
       console.error("API: Cleaned response (last 500 chars):", cleanedResponse.slice(-500))
       
+      // Retry: try to strip any remaining non-JSON and re-extract
       try {
-        const firstBrace = cleanedResponse.indexOf('{')
-        const lastBrace = cleanedResponse.lastIndexOf('}')
-        if (firstBrace !== -1 && lastBrace !== -1 && lastBrace > firstBrace) {
-          const jsonCandidate = cleanedResponse.substring(firstBrace, lastBrace + 1)
-          const fixedJson = jsonCandidate.replace(/,(\s*[}\]])/g, '$1')
-          gapAnalysis = JSON.parse(fixedJson)
-          console.log("API: Successfully parsed after aggressive cleanup")
-        } else {
-          throw new Error("Could not extract JSON structure")
+        // Remove any remaining control chars including \t and \r that might be in strings
+        let repairedJson = cleanedResponse
+          .replace(/\t/g, '    ')
+          .replace(/\r\n/g, '\\n')
+          .replace(/\r/g, '\\n')
+        
+        // Fix trailing commas again
+        for (let i = 0; i < 5; i++) {
+          repairedJson = repairedJson.replace(/,(\s*[}\]])/g, '$1')
         }
+        
+        gapAnalysis = JSON.parse(repairedJson)
+        console.log("API: Successfully parsed after repair pass")
       } catch (secondAttemptError) {
         console.error("API: Second parse attempt also failed:", secondAttemptError)
-        
-        try {
-          let ultraCleaned = cleanedResponse.replace(/[\x00-\x08\x0B\x0C\x0E-\x1F\x7F]/g, '')
-          
-          ultraCleaned = ultraCleaned
-            .replace(/,(\s*[}\]])/g, '$1')
-            .replace(/([{,]\s*)([a-zA-Z_][a-zA-Z0-9_]*)\s*:/g, '$1"$2":')
-            .replace(/:\s*([^",\[\]{}]+)\s*([,}\]])/g, (match, value, suffix) => {
-              if (!value.match(/^(true|false|null|\d+)$/)) {
-                return `: "${value.replace(/"/g, '\\"')}"${suffix}`
-              }
-              return match
-            })
-          
-          gapAnalysis = JSON.parse(ultraCleaned)
-          console.log("API: Successfully parsed after ultra-aggressive cleanup")
-        } catch (thirdAttemptError) {
-          console.error("API: Third parse attempt also failed:", thirdAttemptError)
-          return NextResponse.json(
-            { 
-              error: "Failed to parse analysis response. The AI may have returned malformed JSON. Please try again.",
-              details: parseError.message,
-              responseLength: cleanedResponse.length
-            },
-            { status: 500 }
-          )
-        }
+        return NextResponse.json(
+          { 
+            error: "Failed to parse analysis response. The AI may have returned malformed JSON. Please try again.",
+            details: parseError.message,
+            responseLength: cleanedResponse.length
+          },
+          { status: 500 }
+        )
       }
     }
 

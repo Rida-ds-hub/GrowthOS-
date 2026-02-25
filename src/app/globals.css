@@ -38,7 +38,7 @@ body {
 
 /* Restore pointer on all interactive elements for accessibility */
 a, button, input, textarea, select, [role="button"], label, summary,
-.bp, .bs, .plan-cta, .em-sub, .nav-links a, .footer-col a, .footer-socials a {
+.bp, .bs, .plan-cta, .em-sub, .nav-links a, .footer-col a {
   cursor: pointer !important;
 }
 
@@ -1516,7 +1516,7 @@ footer {
 .footer-brand p {
   font-size: .76rem;
   line-height: 1.8;
-  color: var(--muted);
+  color: var(--em);
   max-width: 200px;
 }
 
@@ -1551,25 +1551,18 @@ footer {
 
 .footer-copy {
   font-size: .68rem;
-  color: var(--dim);
-  letter-spacing: .12em;
-}
-
-.footer-socials {
-  display: flex;
-  gap: 1.5rem;
-}
-
-.footer-socials a {
-  font-size: .68rem;
-  color: var(--muted);
-  text-decoration: none;
-  letter-spacing: .1em;
-  transition: color .2s;
-}
-
-.footer-socials a:hover {
   color: var(--em);
+  letter-spacing: .12em;
+  opacity: .7;
+}
+
+.footer-tagline {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: .68rem;
+  color: var(--em);
+  letter-spacing: .15em;
+  text-transform: uppercase;
+  opacity: .6;
 }
 
 @media (max-width: 960px) {
@@ -1602,4 +1595,215 @@ footer {
   .sec {
     padding: 4rem 1.5rem;
   }
+  /* Loader responsive */
+  .al-grid { grid-template-columns: 1fr !important; }
+  .al-col:first-child, .al-col:last-child { display: none; }
+  .al-top { height: 40vh !important; }
+  .al-bottom { height: 60vh !important; }
 }
+
+/* ══════════════════════════════════════════════════════
+   ANALYSIS LOADER
+   ══════════════════════════════════════════════════════ */
+
+.al-root {
+  position: fixed; inset: 0; z-index: 50;
+  background: #0a0a0a;
+  font-family: 'JetBrains Mono', monospace;
+}
+
+/* ── Progress bar (top) ── */
+.al-progress-bar {
+  position: fixed; top: 0; left: 0; right: 0; height: 2px;
+  background: #0a0a0a; z-index: 100;
+}
+.al-progress-fill {
+  height: 100%; background: var(--em);
+  transition: width .9s cubic-bezier(.4,0,.2,1);
+  box-shadow: 0 0 12px rgba(16,185,129,.5);
+}
+
+/* ── Top zone: graph ── */
+.al-top {
+  position: fixed; top: 0; left: 0; right: 0;
+  height: 58vh; overflow: hidden;
+}
+.al-canvas {
+  position: absolute; inset: 0;
+  width: 100%; height: 100%;
+}
+.al-fade {
+  position: absolute; bottom: 0; left: 0; right: 0; height: 120px;
+  background: linear-gradient(to bottom, transparent, #0a0a0a);
+  pointer-events: none; z-index: 2;
+}
+
+/* ── Topbar ── */
+.al-topbar {
+  position: absolute; top: 0; left: 0; right: 0;
+  padding: 1.2rem 2rem;
+  display: flex; align-items: center; justify-content: space-between;
+  z-index: 10;
+}
+.al-tb-logo {
+  font-size: .85rem; font-weight: 700; color: #f0f0f0;
+  letter-spacing: -.01em;
+}
+.al-g { color: var(--em); }
+.al-tb-status {
+  display: flex; align-items: center; gap: .5rem;
+  font-size: .58rem; letter-spacing: .28em; text-transform: uppercase;
+  color: var(--em);
+}
+.al-pulse-dot {
+  width: 5px; height: 5px; border-radius: 50%; background: var(--em);
+  animation: al-pulse 1.4s ease-in-out infinite;
+}
+@keyframes al-pulse {
+  0%, 100% { opacity: 1; transform: scale(1); }
+  50% { opacity: .35; transform: scale(.7); }
+}
+.al-src-dots { display: flex; gap: 4px; align-items: center; }
+.al-src-dot {
+  width: 5px; height: 5px; border-radius: 50%; background: #1a1a1a;
+  transition: background .5s ease, box-shadow .5s;
+}
+.al-src-dot.on {
+  background: var(--em); box-shadow: 0 0 8px rgba(16,185,129,.5);
+}
+
+/* ── Bottom zone ── */
+.al-bottom {
+  position: fixed; bottom: 0; left: 0; right: 0;
+  height: 42vh;
+  border-top: 1px solid #141414;
+  background: rgba(10,10,10,.97);
+  display: flex; flex-direction: column;
+}
+.al-grid {
+  flex: 1; display: grid;
+  grid-template-columns: 260px 1fr 260px;
+  min-height: 0;
+}
+
+/* ── Columns ── */
+.al-col {
+  padding: 1.4rem 1.6rem;
+  display: flex; flex-direction: column;
+  border-right: 1px solid #111;
+  min-height: 0; overflow: hidden;
+}
+.al-col:last-child { border-right: none; }
+.al-col-label {
+  font-size: .52rem; letter-spacing: .35em; text-transform: uppercase;
+  color: #3f3f46; margin-bottom: .9rem; flex-shrink: 0;
+}
+
+/* ── Log ── */
+.al-log-entry {
+  display: flex; align-items: baseline; gap: .45rem;
+  font-size: .65rem; line-height: 2.1;
+  opacity: 0; transform: translateX(-6px);
+  transition: opacity .35s, transform .35s;
+}
+.al-log-entry.vis { opacity: 1; transform: translateX(0); }
+.al-log-dollar { color: #3f3f46; flex-shrink: 0; }
+.al-log-text { color: #52525b; flex: 1; }
+.al-log-text.active { color: #6ee7b7; }
+.al-log-check { color: var(--em); margin-left: auto; font-size: .6rem; }
+.al-log-blink {
+  color: var(--em); margin-left: auto; font-size: .6rem;
+  animation: al-blink .7s step-end infinite;
+}
+@keyframes al-blink { 50% { opacity: 0; } }
+
+/* ── Center column ── */
+.al-center-col {
+  position: relative; overflow: hidden;
+  align-items: center; justify-content: center;
+  text-align: center;
+}
+
+/* Chaos questions */
+.al-chaos {
+  position: absolute; inset: 0;
+  display: flex; flex-direction: column;
+  align-items: center; justify-content: center;
+  gap: .6rem; padding: 1rem 1.5rem;
+  transition: opacity .8s ease;
+}
+.al-chaos.hidden { opacity: 0; pointer-events: none; }
+.al-chaos-q {
+  font-size: .95rem; color: #52525b; font-style: italic; line-height: 1.7;
+  opacity: 0; transform: translateY(4px);
+  transition: opacity .6s, transform .6s, color .5s;
+}
+.al-chaos-q.vis { opacity: 1; transform: translateY(0); }
+.al-chaos-q.active { color: #71717a; }
+.al-chaos-q.answered { color: var(--em); font-style: normal; opacity: .6; }
+
+/* Signal layer */
+.al-signal {
+  position: absolute; inset: 0;
+  display: flex; flex-direction: column;
+  align-items: center; justify-content: center;
+  gap: .4rem;
+  opacity: 0; transition: opacity .8s ease;
+  pointer-events: none;
+}
+.al-signal.vis { opacity: 1; pointer-events: all; }
+.al-sig-stage {
+  font-size: .58rem; letter-spacing: .38em; text-transform: uppercase;
+  color: var(--em);
+  text-shadow: 0 0 20px rgba(16,185,129,.5);
+  transition: opacity .3s;
+}
+.al-sig-pct {
+  font-size: clamp(3.5rem, 7vw, 5.5rem); font-weight: 700; color: #f0f0f0;
+  letter-spacing: -.04em; line-height: 1;
+  text-shadow: 0 0 60px rgba(16,185,129,.08);
+}
+.al-sig-sub {
+  font-size: .72rem; color: #52525b; font-style: italic;
+  max-width: 240px; line-height: 1.5; text-align: center;
+  transition: opacity .5s;
+}
+
+/* ── Domain bars ── */
+.al-d-item { margin-bottom: .7rem; flex-shrink: 0; }
+.al-d-head {
+  display: flex; justify-content: space-between; align-items: baseline;
+  margin-bottom: .28rem;
+}
+.al-d-name {
+  font-size: .6rem; letter-spacing: .1em; text-transform: uppercase;
+  color: #52525b; transition: color .5s;
+}
+.al-d-name.active { color: #71717a; }
+.al-d-val {
+  font-size: .65rem; font-weight: 700; color: #3f3f46;
+  transition: color .4s;
+}
+.al-d-val.active { color: var(--em); }
+.al-d-track {
+  height: 3px; background: #1a1a1a; border-radius: 2px; overflow: hidden;
+}
+.al-d-fill {
+  height: 100%; background: var(--em); border-radius: 2px;
+  transition: width .12s linear;
+  box-shadow: 0 0 5px rgba(16,185,129,.3);
+}
+
+/* ── Footer stats ── */
+.al-footer {
+  height: 40px; border-top: 1px solid #111;
+  display: flex; align-items: center; justify-content: center;
+  gap: 3rem; flex-shrink: 0; padding: 0 2rem;
+}
+.al-stat { display: flex; align-items: center; gap: .6rem; }
+.al-stat-label {
+  font-size: .5rem; letter-spacing: .25em; text-transform: uppercase;
+  color: #3f3f46;
+}
+.al-stat-val { font-size: .65rem; color: #52525b; transition: color .4s; }
+.al-stat-val.lit { color: var(--em); }

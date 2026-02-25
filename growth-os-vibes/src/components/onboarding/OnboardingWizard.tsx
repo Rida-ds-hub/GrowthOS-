@@ -67,6 +67,7 @@ export function OnboardingWizard() {
     return {}
   })
   const [isAnalyzing, setIsAnalyzing] = useState(false)
+  const [analysisStage, setAnalysisStage] = useState("connect")
   const [analysisStatus, setAnalysisStatus] = useState("")
 
   // Save to localStorage whenever data changes
@@ -132,12 +133,13 @@ export function OnboardingWizard() {
 
   const runAnalysis = async (analysisData: OnboardingData) => {
     try {
+      setAnalysisStage("connect")
+
       // Fetch GitHub data if connected
       let githubData = ""
       if (analysisData.githubConnected) {
+        setAnalysisStage("github")
         try {
-          await new Promise((resolve) => setTimeout(resolve, 2000))
-          
           if (analysisData.githubUsername) {
             const githubResponse = await fetch("/api/github/public", {
               method: "POST",
@@ -154,19 +156,22 @@ export function OnboardingWizard() {
         }
       }
 
-      await new Promise((resolve) => setTimeout(resolve, 1800))
+      setAnalysisStage("resume")
+      await new Promise((resolve) => setTimeout(resolve, 1200))
 
       // Process LinkedIn data if manually provided
       let linkedinText = ""
       if (analysisData.linkedinManualData) {
+        setAnalysisStage("linkedin")
         setAnalysisStatus("Processing LinkedIn data...")
-        await new Promise((resolve) => setTimeout(resolve, 1000))
+        await new Promise((resolve) => setTimeout(resolve, 800))
         linkedinText = analysisData.linkedinManualData
       }
 
       // Fetch website content if URL provided
       let websiteText = ""
       if (analysisData.websiteUrl) {
+        setAnalysisStage("website")
         try {
           setAnalysisStatus("Scraping website content...")
           const websiteResponse = await fetch("/api/website/scrape", {
@@ -184,6 +189,8 @@ export function OnboardingWizard() {
           console.error("Failed to fetch website data:", err)
         }
       }
+
+      setAnalysisStage("ai")
 
       // Trigger gap analysis
       const analysisResponse = await fetch("/api/gap-analysis", {
@@ -227,6 +234,8 @@ export function OnboardingWizard() {
         throw new Error(errorMessage)
       }
 
+      setAnalysisStage("plan")
+
       const analysisResult = await analysisResponse.json()
       console.log("OnboardingWizard - Raw API response:", analysisResult)
       
@@ -245,8 +254,6 @@ export function OnboardingWizard() {
         localStorage.setItem(STORAGE_KEY, JSON.stringify(updatedData))
       }
 
-      await new Promise((resolve) => setTimeout(resolve, 1000))
-      
       // Store complete results data for the results page
       if (typeof window !== "undefined") {
         const resultsData = {
@@ -279,6 +286,10 @@ export function OnboardingWizard() {
         }
         sessionStorage.setItem("growthos_results_cache", JSON.stringify(cacheData))
       }
+
+      // Show 100% complete before navigating
+      setAnalysisStage("complete")
+      await new Promise((resolve) => setTimeout(resolve, 1500))
       
       setIsAnalyzing(false)
       setTimeout(() => {
@@ -291,14 +302,10 @@ export function OnboardingWizard() {
     }
   }
 
-  const handleAnalysisComplete = () => {
-    // Called after loader animation completes; actual API calls happen in runAnalysis
-  }
-
   if (isAnalyzing) {
     return (
       <AnalysisLoader
-        onComplete={handleAnalysisComplete}
+        stage={analysisStage}
         targetRole={data.targetRole}
       />
     )

@@ -803,7 +803,7 @@ export function LandingPage() {
             <div className="plan-price" style={{ fontSize: '1.6rem' }}>Custom</div>
             <div className="plan-desc">For engineering orgs that want structured progression at scale. Tailored onboarding, team dashboards, and dedicated support.</div>
             <div style={{ flex: 1 }} />
-            <a href="mailto:hello@growthos.dev" className="plan-cta outline">Let&apos;s Talk</a>
+            <a href="mailto:reach.rida.khan@gmail.com" className="plan-cta outline">Let&apos;s Talk</a>
           </div>
         </div>
       </div>
@@ -856,7 +856,7 @@ export function LandingPage() {
             <p>The structured progression engine for people who build things.</p>
           </div>
           <div className="footer-col"><h4>Product</h4><a href="#system">The System</a><a href="#how">How It Works</a><a href="#pricing">Pricing</a><a href="#access">Get Access</a></div>
-          <div className="footer-col"><h4>Company</h4><a href="#">About</a><a href="#">Blog</a><a href="#">Careers</a><a href="#">Contact</a></div>
+          <div className="footer-col"><h4>Company</h4><a href="#">About</a><a href="#">Blog</a><a href="#">Careers</a><a href="mailto:reach.rida.khan@gmail.com">Contact</a></div>
           <div className="footer-col"><h4>Legal</h4><a href="#">Privacy Policy</a><a href="#">Terms of Service</a><a href="#">Security</a></div>
         </div>
         <div className="footer-bottom">
@@ -865,7 +865,7 @@ export function LandingPage() {
             {new Date().getFullYear()}
             {" · all rights reserved"}
           </div>
-          <div className="footer-socials"><a href="#">Twitter</a><a href="#">GitHub</a><a href="#">LinkedIn</a></div>
+          <div className="footer-tagline">Built for builders.</div>
         </div>
       </footer>
 
