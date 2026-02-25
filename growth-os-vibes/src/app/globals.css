@@ -429,36 +429,6 @@ nav {
   border-color: var(--em-mid);
 }
 
-.waitlist-btn {
-  font-family: 'JetBrains Mono', monospace;
-  font-size: .72rem;
-  letter-spacing: .15em;
-  text-transform: uppercase;
-  background: var(--em);
-  color: #000;
-  padding: .82rem 1.6rem;
-  border: 1px solid var(--em);
-  transition: all .2s;
-  text-decoration: none;
-  cursor: pointer !important;
-  font-weight: 600;
-}
-
-.waitlist-btn:hover {
-  background: #34d399;
-  border-color: #34d399;
-}
-
-.waitlist-btn:disabled {
-  opacity: .5;
-  cursor: not-allowed !important;
-}
-
-.waitlist-btn:focus-visible {
-  outline: 2px solid var(--em);
-  outline-offset: 2px;
-}
-
 /* Scroll hint */
 .shint {
   position: absolute;
@@ -1408,11 +1378,8 @@ nav {
 
 .cta-inner {
   border: 1px solid var(--border);
-  padding: 4rem 3rem;
-  max-width: 720px;
-  width: 100%;
-  margin: 0 auto;
-  text-align: center;
+  padding: 4rem;
+  max-width: 580px;
   position: relative;
   background: var(--surface);
 }

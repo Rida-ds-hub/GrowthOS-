@@ -153,7 +153,6 @@ export function LandingPage() {
               >
                 Run My Analysis
               </Link>
-              <a href="#access" className="waitlist-btn">Join Waitlist</a>
             </div>
           </div>
 
@@ -808,15 +807,15 @@ export function LandingPage() {
         </div>
       </div>
 
-      <div className="sec" id="access" style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+      <div className="sec" id="access">
         <div className="sec-tag">Get Started</div>
         <div className="cta-inner">
           <h2>See your gaps.<br /><span className="g">Close them.</span></h2>
           <p>One analysis. Five domains. A plan built from your actual work. Free — no sign-up, no card, no catch.</p>
-          <div className="brow" style={{ marginTop: '1.8rem', justifyContent: 'center' }}>
+          <div className="brow" style={{ marginTop: '1.8rem' }}>
             <a href="/onboarding" className="bp" onClick={handleStartJourney}>Run My Analysis</a>
           </div>
-          <div style={{ marginTop: '2.4rem', maxWidth: '460px', width: '100%', margin: '2.4rem auto 0' }}>
+          <div style={{ marginTop: '2.4rem', maxWidth: '420px', width: '100%' }}>
             <p style={{ fontSize: '.78rem', color: 'var(--muted)', marginBottom: '.6rem' }}>
               {"// Or join the waitlist for the Operator plan"}
             </p>
@@ -835,7 +834,7 @@ export function LandingPage() {
                   className="em-in"
                   style={{ flex: 1 }}
                 />
-                <button type="submit" className="waitlist-btn" disabled={waitlistStatus === "loading"}>
+                <button type="submit" className="bs" disabled={waitlistStatus === "loading"}>
                   {waitlistStatus === "loading" ? "..." : "Join Waitlist"}
                 </button>
               </form>
