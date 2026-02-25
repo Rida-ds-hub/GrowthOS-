@@ -758,6 +758,9 @@ export function LandingPage() {
         <div className="sec-tag">Pricing</div>
         <h2 className="sec-h">Start free.<br /><span className="g">No card required.</span></h2>
         <p className="sec-p">Run a full gap analysis today at zero cost. Upgrade when the daily engine launches.</p>
+        <p className="sec-p" style={{ marginTop: '0.5rem', fontSize: '0.9rem', opacity: 0.9 }}>
+          We&apos;re in beta — full gap analysis is free so you can try it. Paid plans later will include saved history, weekly refreshes, and team reports.
+        </p>
         <div className="pricing-grid">
           <div className="plan">
             <span className="plan-badge">

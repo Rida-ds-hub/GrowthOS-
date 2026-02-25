@@ -1,6 +1,10 @@
 import { NextRequest, NextResponse } from "next/server"
 import pdf from "pdf-parse"
 
+export const runtime = "nodejs"
+
+const MAX_PDF_SIZE_BYTES = 5 * 1024 * 1024 // 5 MB
+
 export async function POST(request: NextRequest) {
   try {
     const formData = await request.formData()
@@ -12,6 +16,13 @@ export async function POST(request: NextRequest) {
 
     if (file.type !== "application/pdf") {
       return NextResponse.json({ error: "File must be a PDF" }, { status: 400 })
+    }
+
+    if (file.size > MAX_PDF_SIZE_BYTES) {
+      return NextResponse.json(
+        { error: "PDF must be under 5 MB. Please upload a smaller file." },
+        { status: 400 }
+      )
     }
 
     const arrayBuffer = await file.arrayBuffer()

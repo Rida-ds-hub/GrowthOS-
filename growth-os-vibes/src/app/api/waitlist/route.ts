@@ -1,26 +1,20 @@
 import { NextRequest, NextResponse } from "next/server"
 import { supabase } from "@/lib/supabase"
+import { waitlistBodySchema, validationErrorResponse } from "@/lib/api-schemas"
 
 export async function POST(request: NextRequest) {
   try {
-    const body = await request.json()
-    const { email } = body
-
-    if (!email || typeof email !== "string") {
-      return NextResponse.json(
-        { error: "Email is required" },
-        { status: 400 }
-      )
+    let body: unknown
+    try {
+      body = await request.json()
+    } catch {
+      return validationErrorResponse("Invalid JSON body")
     }
-
-    // Basic email validation
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
-    if (!emailRegex.test(email)) {
-      return NextResponse.json(
-        { error: "Invalid email format" },
-        { status: 400 }
-      )
+    const parsed = waitlistBodySchema.safeParse(body)
+    if (!parsed.success) {
+      return validationErrorResponse(parsed.error.errors[0]?.message ?? "Invalid request body", parsed.error)
     }
+    const { email } = parsed.data
 
     if (!supabase) {
       // If Supabase isn't configured, still return success
@@ -29,7 +23,6 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ success: true })
     }
 
-    // Insert email into waitlist table (upsert to avoid duplicates)
     const { error } = await supabase
       .from("waitlist")
       .upsert(

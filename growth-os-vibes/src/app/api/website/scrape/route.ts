@@ -1,34 +1,21 @@
 import { NextRequest, NextResponse } from "next/server"
+import { websiteScrapeBodySchema, validationErrorResponse } from "@/lib/api-schemas"
+
+export const runtime = "nodejs"
 
 export async function POST(request: NextRequest) {
   try {
-    const { url } = await request.json()
-
-    if (!url || typeof url !== "string") {
-      return NextResponse.json(
-        { error: "URL is required" },
-        { status: 400 }
-      )
-    }
-
-    // Validate URL format
-    let validUrl: URL
+    let body: unknown
     try {
-      validUrl = new URL(url)
-      if (!["http:", "https:"].includes(validUrl.protocol)) {
-        return NextResponse.json(
-          { error: "URL must use http or https protocol" },
-          { status: 400 }
-        )
-      }
+      body = await request.json()
     } catch {
-      return NextResponse.json(
-        { error: "Invalid URL format" },
-        { status: 400 }
-      )
+      return validationErrorResponse("Invalid JSON body")
     }
-
-    // Fetch the website content
+    const parsed = websiteScrapeBodySchema.safeParse(body)
+    if (!parsed.success) {
+      return validationErrorResponse(parsed.error.errors[0]?.message ?? "Invalid request body", parsed.error)
+    }
+    const { url } = parsed.data
     try {
       const response = await fetch(url, {
         headers: {

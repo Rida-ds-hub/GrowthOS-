@@ -2,6 +2,9 @@ import { NextRequest, NextResponse } from "next/server"
 import { model } from "@/lib/gemini"
 import { buildGapAnalysisPrompt } from "@/lib/prompts"
 import { GapAnalysis } from "@/lib/types"
+import { gapAnalysisBodySchema, validationErrorResponse } from "@/lib/api-schemas"
+
+export const runtime = "nodejs"
 
 export async function POST(request: NextRequest) {
   try {
@@ -17,33 +20,34 @@ export async function POST(request: NextRequest) {
       )
     }
 
-    const body = await request.json()
+    let body: unknown
+    try {
+      body = await request.json()
+    } catch {
+      return validationErrorResponse("Invalid JSON body")
+    }
+    const parsed = gapAnalysisBodySchema.safeParse(body)
+    if (!parsed.success) {
+      return validationErrorResponse("Invalid request body", parsed.error)
+    }
     const {
-      currentRole,
-      targetRole,
+      currentRole: cappedCurrentRole,
+      targetRole: cappedTargetRole,
       yearsExperience,
       timeline,
       progressionIntent,
-      githubData,
-      resumeText,
-      linkedinText,
-      websiteText,
-    } = body
-
-    // Apply input caps as per spec
-    const cappedCurrentRole = (currentRole || "").slice(0, 100)
-    const cappedTargetRole = (targetRole || "").slice(0, 100)
-    const cappedResumeText = (resumeText || "").slice(0, 8000)
-    const cappedLinkedinText = (linkedinText || "").slice(0, 8000)
-    const cappedGithubData = (githubData || "").slice(0, 4000)
-    const cappedWebsiteText = (websiteText || "").slice(0, 4000)
+      githubData: cappedGithubData,
+      resumeText: cappedResumeText,
+      linkedinText: cappedLinkedinText,
+      websiteText: cappedWebsiteText,
+    } = parsed.data
 
     const prompt = buildGapAnalysisPrompt({
       currentRole: cappedCurrentRole,
       targetRole: cappedTargetRole,
-      yearsExperience: yearsExperience || 0,
-      timeline: timeline || "",
-      progressionIntent: progressionIntent || "same_company",
+      yearsExperience,
+      timeline,
+      progressionIntent,
       githubData: cappedGithubData,
       resumeText: cappedResumeText,
       linkedinText: cappedLinkedinText,
@@ -53,15 +57,21 @@ export async function POST(request: NextRequest) {
     console.log("API: Calling Gemini API...")
     console.log("API: Prompt length:", prompt.length)
     
+    const requiredDomains = [
+      "System Design Maturity",
+      "Execution Scope",
+      "Communication & Visibility",
+      "Technical Depth",
+      "Leadership & Influence",
+    ] as const
+
     let result
     try {
       result = await model.generateContent(prompt)
       console.log("API: Gemini API call successful")
     } catch (geminiError: any) {
-      console.error("API: Gemini API error:", geminiError)
-      console.error("API: Gemini error message:", geminiError?.message)
-      
-      if (geminiError?.message?.includes("API_KEY_INVALID") || geminiError?.status === 401) {
+      const isAuthError = geminiError?.message?.includes("API_KEY_INVALID") || geminiError?.status === 401
+      if (isAuthError) {
         return NextResponse.json(
           { 
             error: "Invalid Gemini API Key. Please check your GEMINI_API_KEY in .env.local and ensure it's valid. Get your key from https://aistudio.google.com/app/apikey" 
@@ -69,11 +79,18 @@ export async function POST(request: NextRequest) {
           { status: 500 }
         )
       }
-      
-      return NextResponse.json(
-        { error: `Gemini API error: ${geminiError?.message || "Unknown error"}` },
-        { status: 500 }
-      )
+      // Optional retry once on transient/network errors (non-4xx)
+      console.warn("API: First Gemini call failed, retrying once...", geminiError?.message)
+      try {
+        result = await model.generateContent(prompt)
+        console.log("API: Gemini API retry successful")
+      } catch (retryError: any) {
+        console.error("API: Gemini API retry also failed:", retryError)
+        return NextResponse.json(
+          { error: `Gemini API error: ${retryError?.message || "Unknown error"}` },
+          { status: 500 }
+        )
+      }
     }
 
     const rawResponse = result.response.text() || "{}"
@@ -191,17 +208,9 @@ export async function POST(request: NextRequest) {
       }
     }
 
-    // Validate all 5 domainScores keys exist
-    const requiredDomains = [
-      "System Design Maturity",
-      "Execution Scope",
-      "Communication & Visibility",
-      "Technical Depth",
-      "Leadership & Influence",
-    ]
-
+    // Validate all 5 domainScores keys exist and apply safe defaults for response shape
     const hasAllDomains = requiredDomains.every(
-      (domain) => domain in gapAnalysis.domainScores
+      (domain) => domain in (gapAnalysis.domainScores || {})
     )
 
     if (!hasAllDomains) {
@@ -211,8 +220,51 @@ export async function POST(request: NextRequest) {
       )
     }
 
+    // Minimal post-LLM validation: ensure required fields exist with safe defaults
+    const normalized: GapAnalysis = {
+      summary: typeof gapAnalysis.summary === "string" ? gapAnalysis.summary : "Analysis complete.",
+      readinessScore: typeof gapAnalysis.readinessScore === "number" && gapAnalysis.readinessScore >= 0 && gapAnalysis.readinessScore <= 100
+        ? gapAnalysis.readinessScore
+        : 0,
+      domainScores: gapAnalysis.domainScores as GapAnalysis["domainScores"],
+      domainBreakdowns: gapAnalysis.domainBreakdowns,
+      gaps: Array.isArray(gapAnalysis.gaps) ? gapAnalysis.gaps : [],
+      plan: gapAnalysis.plan && typeof gapAnalysis.plan === "object"
+        ? {
+            phase1: {
+              label: gapAnalysis.plan.phase1?.label ?? "Phase 1",
+              theme: gapAnalysis.plan.phase1?.theme ?? "",
+              actions: Array.isArray(gapAnalysis.plan.phase1?.actions) ? gapAnalysis.plan.phase1.actions : [],
+              specificTasks: gapAnalysis.plan.phase1?.specificTasks,
+              deliverables: gapAnalysis.plan.phase1?.deliverables,
+            },
+            phase2: {
+              label: gapAnalysis.plan.phase2?.label ?? "Phase 2",
+              theme: gapAnalysis.plan.phase2?.theme ?? "",
+              actions: Array.isArray(gapAnalysis.plan.phase2?.actions) ? gapAnalysis.plan.phase2.actions : [],
+              specificTasks: gapAnalysis.plan.phase2?.specificTasks,
+              deliverables: gapAnalysis.plan.phase2?.deliverables,
+            },
+            phase3: {
+              label: gapAnalysis.plan.phase3?.label ?? "Phase 3",
+              theme: gapAnalysis.plan.phase3?.theme ?? "",
+              actions: Array.isArray(gapAnalysis.plan.phase3?.actions) ? gapAnalysis.plan.phase3.actions : [],
+              specificTasks: gapAnalysis.plan.phase3?.specificTasks,
+              deliverables: gapAnalysis.plan.phase3?.deliverables,
+            },
+          }
+        : {
+            phase1: { label: "Phase 1", theme: "", actions: [] },
+            phase2: { label: "Phase 2", theme: "", actions: [] },
+            phase3: { label: "Phase 3", theme: "", actions: [] },
+          },
+      upskillingProjects: gapAnalysis.upskillingProjects,
+      postingStrategy: gapAnalysis.postingStrategy,
+      promotionNarrative: typeof gapAnalysis.promotionNarrative === "string" ? gapAnalysis.promotionNarrative : "",
+    }
+
     console.log("API: Returning gapAnalysis response")
-    return NextResponse.json({ gapAnalysis })
+    return NextResponse.json({ gapAnalysis: normalized })
   } catch (error) {
     console.error("API: Error in gap analysis:", error)
     if (error instanceof Error) {

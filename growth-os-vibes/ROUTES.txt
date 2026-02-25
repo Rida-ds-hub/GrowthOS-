@@ -1,0 +1,17 @@
+# Growth OS — Routes Index (path → method → purpose)
+# Single artifact for submission deliverables.
+
+# Pages
+/                     GET   Landing page (hero, pricing, waitlist CTA)
+/onboarding           GET   Onboarding wizard (goal, data sources, analysis trigger)
+/results/view         GET   Results page (gap analysis, radar, 90-day plan, download)
+
+# API
+POST /api/gap-analysis      Gemini-based gap analysis JSON (5 domains, scores, plan, narrative)
+POST /api/github/public     Public GitHub profile + repos by username (no OAuth)
+POST /api/parse-resume      PDF resume → text (max 5 MB, 8000 chars)
+POST /api/website/scrape    Scrape URL → text (10s timeout, 4000 chars)
+POST /api/waitlist          Collect waitlist email (Supabase upsert)
+
+# Env: GEMINI_API_KEY (required for analysis), NEXT_PUBLIC_SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY (optional).
+# See routes.md for full route map; schema.sql for Supabase table.

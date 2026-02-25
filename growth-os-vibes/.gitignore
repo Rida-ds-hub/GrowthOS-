@@ -1,0 +1,32 @@
+# dependencies
+node_modules/
+
+# build output
+.next/
+out/
+build/
+
+# env (keep .env.example; ignore actual secrets)
+.env*.local
+.env.local
+
+# OS / editor
+.DS_Store
+Thumbs.db
+*.swp
+*.swo
+
+# debug logs
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# typescript (auto-generated)
+*.tsbuildinfo
+next-env.d.ts
+
+# vercel
+.vercel
+
+# archives (never commit zips)
+*.zip
