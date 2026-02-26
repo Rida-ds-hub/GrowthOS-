@@ -7,6 +7,7 @@ import { Label } from "@/components/ui/label"
 import { Card, CardContent } from "@/components/ui/card"
 import { Github, ExternalLink, FileText } from "lucide-react"
 import { Textarea } from "@/components/ui/textarea"
+import { normalizeWebsiteUrl } from "@/lib/url-utils"
 
 interface StepConnectProps {
   onContinue: (data: {
@@ -44,10 +45,11 @@ export function StepConnect({ onContinue }: StepConnectProps) {
   }, [])
 
   const handleContinue = () => {
+    const rawWebsite = websiteUrl.trim()
     const continueData = {
       githubConnected: !!githubUsername.trim(),
       linkedinConnected: !!linkedinManualData.trim(),
-      websiteUrl: websiteUrl.trim() || undefined,
+      websiteUrl: rawWebsite ? normalizeWebsiteUrl(rawWebsite) : undefined,
       githubUsername: githubUsername.trim() || undefined,
       linkedinManualData: linkedinManualData.trim() || undefined,
     }
@@ -149,8 +151,8 @@ export function StepConnect({ onContinue }: StepConnectProps) {
             <div className="flex gap-2">
               <Input
                 id="websiteUrl"
-                type="url"
-                placeholder="https://yourwebsite.com"
+                type="text"
+                placeholder="yourwebsite.com or https://..."
                 value={websiteUrl}
                 onChange={(e) => setWebsiteUrl(e.target.value)}
                 className="bg-zinc-950 border-zinc-700 focus:border-emerald-500"
@@ -159,7 +161,7 @@ export function StepConnect({ onContinue }: StepConnectProps) {
                 <Button
                   type="button"
                   variant="outline"
-                  onClick={() => window.open(websiteUrl, "_blank")}
+                  onClick={() => window.open(normalizeWebsiteUrl(websiteUrl.trim()), "_blank")}
                   className="flex-shrink-0"
                 >
                   <ExternalLink className="w-4 h-4" />

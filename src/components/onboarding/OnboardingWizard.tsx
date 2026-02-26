@@ -7,6 +7,7 @@ import { StepGoal } from "./StepGoal"
 import { StepConnect } from "./StepConnect"
 import { StepResume } from "./StepResume"
 import { AnalysisLoader } from "./AnalysisLoader"
+import { normalizeWebsiteUrl } from "@/lib/url-utils"
 
 interface OnboardingData {
   currentRole?: string
@@ -174,10 +175,11 @@ export function OnboardingWizard() {
         setAnalysisStage("website")
         try {
           setAnalysisStatus("Scraping website content...")
+          const urlToScrape = normalizeWebsiteUrl(analysisData.websiteUrl.trim())
           const websiteResponse = await fetch("/api/website/scrape", {
             method: "POST",
             headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ url: analysisData.websiteUrl }),
+            body: JSON.stringify({ url: urlToScrape }),
           })
           if (websiteResponse.ok) {
             const websiteResult = await websiteResponse.json()
