@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server"
 import { z, type ZodError } from "zod"
+import { normalizeWebsiteUrl, isPrivateOrInternalHost } from "@/lib/url-utils"
 
 // --- Schemas ---
 
@@ -21,15 +22,33 @@ export const gapAnalysisBodySchema = z.object({
 export const websiteScrapeBodySchema = z.object({
   url: z
     .string()
-    .url("Invalid URL format")
-    .refine((url) => {
-      try {
-        const u = new URL(url)
-        return u.protocol === "http:" || u.protocol === "https:"
-      } catch {
-        return false
+    .trim()
+    .max(2048, "URL is too long")
+    .refine(
+      (url) => {
+        if (!url) return false
+        const normalized = normalizeWebsiteUrl(url)
+        try {
+          const u = new URL(normalized)
+          if (u.protocol !== "http:" && u.protocol !== "https:") return false
+          const host = u.hostname.toLowerCase()
+          if (
+            ["javascript", "data", "vbscript", "file", "localhost", ""].includes(
+              host
+            )
+          )
+            return false
+          if (isPrivateOrInternalHost(u.hostname)) return false
+          return true
+        } catch {
+          return false
+        }
+      },
+      {
+        message:
+          "URL not allowed (invalid format or disallowed host, e.g. private/internal)",
       }
-    }, "URL must use http or https protocol"),
+    ),
 })
 
 export const githubPublicBodySchema = z.object({

@@ -7,7 +7,7 @@ import { Label } from "@/components/ui/label"
 import { Card, CardContent } from "@/components/ui/card"
 import { Github, ExternalLink, FileText } from "lucide-react"
 import { Textarea } from "@/components/ui/textarea"
-import { normalizeWebsiteUrl } from "@/lib/url-utils"
+import { normalizeWebsiteUrl, isSafeWebsiteUrl } from "@/lib/url-utils"
 
 interface StepConnectProps {
   onContinue: (data: {
@@ -161,13 +161,19 @@ export function StepConnect({ onContinue }: StepConnectProps) {
                 <Button
                   type="button"
                   variant="outline"
-                  onClick={() => window.open(normalizeWebsiteUrl(websiteUrl.trim()), "_blank")}
+                  onClick={() => {
+                    const normalized = normalizeWebsiteUrl(websiteUrl.trim())
+                    if (isSafeWebsiteUrl(websiteUrl)) window.open(normalized, "_blank")
+                  }}
                   className="flex-shrink-0"
                 >
                   <ExternalLink className="w-4 h-4" />
                 </Button>
               )}
             </div>
+            <p className="text-sm text-zinc-400">
+              No personal site? You can use your newsletter (e.g. Substack or Medium) URL instead.
+            </p>
           </div>
         </div>
 

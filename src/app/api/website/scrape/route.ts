@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server"
 import { XMLParser } from "fast-xml-parser"
 import * as cheerio from "cheerio"
 import { websiteScrapeBodySchema, validationErrorResponse } from "@/lib/api-schemas"
+import { normalizeWebsiteUrl } from "@/lib/url-utils"
 
 export const runtime = "nodejs"
 
@@ -257,12 +258,13 @@ export async function POST(request: NextRequest) {
       return validationErrorResponse(parsed.error.errors[0]?.message ?? "Invalid request body", parsed.error)
     }
     const { url } = parsed.data
+    const urlToFetch = normalizeWebsiteUrl(url.trim())
     try {
-      const response = await fetch(url, getFetchOptions())
+      const response = await fetch(urlToFetch, getFetchOptions())
 
       if (!response.ok) {
         // Medium (and some others) block page fetch with 403; try profile feed when applicable
-        const mediumFeedUrl = getMediumFeedUrl(url)
+        const mediumFeedUrl = getMediumFeedUrl(urlToFetch)
         if (mediumFeedUrl && (response.status === 403 || response.status === 401)) {
           try {
             const feedResponse = await fetch(mediumFeedUrl, getFetchOptions())
@@ -272,7 +274,7 @@ export async function POST(request: NextRequest) {
               if (dataFromFeed.length >= MIN_RSS_TEXT_TO_USE) {
                 return NextResponse.json({
                   data: dataFromFeed,
-                  url: url,
+                  url: urlToFetch,
                 })
               }
             }
@@ -283,7 +285,7 @@ export async function POST(request: NextRequest) {
         return NextResponse.json(
           {
             data: "",
-            url,
+            url: urlToFetch,
             error: `Failed to fetch website: ${response.status} ${response.statusText}`,
             ...(mediumFeedUrl ? { hint: "We tried the feed for this site; it may be temporarily unavailable." } : {}),
           },
@@ -295,9 +297,9 @@ export async function POST(request: NextRequest) {
 
       // Try RSS/Atom feed first (from page link or Substack convention)
       const feedUrl =
-        getFeedUrlFromHtml(html, url) ??
-        getSubstackFeedUrl(url) ??
-        getSubstackFeedUrlFromProfileUrl(url)
+        getFeedUrlFromHtml(html, urlToFetch) ??
+        getSubstackFeedUrl(urlToFetch) ??
+        getSubstackFeedUrlFromProfileUrl(urlToFetch)
       let dataFromFeed = ""
 
       if (feedUrl) {
@@ -319,7 +321,7 @@ export async function POST(request: NextRequest) {
 
       return NextResponse.json({
         data: combinedText || "No extractable text content found",
-        url: url,
+        url: urlToFetch,
       })
     } catch (fetchError: unknown) {
       const err = fetchError as { name?: string; message?: string }
