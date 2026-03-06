@@ -64,3 +64,24 @@ export const MAX_TREE_FILES = 10_000;
 
 /** Max file size (bytes) to fetch content for dependency analysis. */
 export const MAX_FILE_SIZE_FOR_CONTENT = 500 * 1024;
+
+/** Max file size (bytes) to fetch for documentation (README / Markdown) files. */
+export const MAX_DOC_FILE_SIZE = 500 * 1024;
+
+/** Max number of documentation files (Markdown) to fetch per repo. */
+export const MAX_DOC_FILES = 50;
+
+/** Max file size (bytes) to fetch for .ipynb notebooks. Higher than code files to support large notebooks. */
+const DEFAULT_MAX_NOTEBOOK_MB = 30;
+const MIN_NOTEBOOK_MB = 1;
+const MAX_NOTEBOOK_MB = 100;
+
+function parseNotebookMb(): number {
+  const raw = process.env.GITHUBURL_MAX_NOTEBOOK_MB;
+  if (raw == null || raw === "") return DEFAULT_MAX_NOTEBOOK_MB;
+  const n = parseInt(raw, 10);
+  if (isNaN(n)) return DEFAULT_MAX_NOTEBOOK_MB;
+  return Math.max(MIN_NOTEBOOK_MB, Math.min(MAX_NOTEBOOK_MB, n));
+}
+
+export const MAX_NOTEBOOK_FILE_SIZE = parseNotebookMb() * 1024 * 1024;
